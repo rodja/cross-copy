@@ -1,14 +1,18 @@
+// cross-copy.com server implemented in node.js 
+//
+// usage:
+//    GET /<your secret code>      wait's for data on the given phrase
+//    PUT /<your secret code>      sends data in body to all waiting clients
+
 var port = 8124;
 var host = "127.0.0.1";
-
-var url = require('url');
 
 var getters = {};
 
 var http = require('http');
 http.createServer(function (req, res) {
 
-  var secret = url.parse(req.url).pathname.substring(1);
+  var secret = require('url').parse(req.url).pathname.substring(1);
 
   if (req.method === 'GET') {
     
