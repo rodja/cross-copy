@@ -32,17 +32,54 @@ function trackEvent(category, action){
 
             <script type="text/javascript">
 
+
 var server = "http://localhost:8124";
 
-function listen(){
-  $.get(server + '/secret', function(response) {
-    $('#incomming').append($('<li>' + response + '</li>'));
+var request;
+
+function listen(secret){
+  if (request != undefined)
+    request.abort();
+
+  if (secret.length == 0)
+    return;
+  
+  request = $.get(server + '/' + secret, function(response) {
+    setTimeout('listen()', 0);
+    $('#received').append($('<li>' + response + '</li>'));
   });
 }
 
 $(document).ready(function() {
 
-  listen();
+  $('#secret').keyup(function (e){
+    listen($(this).val());
+  });
+
+  $('#data').keyup(function (e){
+  
+    if (e.which != 13)
+      return;
+
+    if (secret.length == 0)
+      return;    
+
+    console.log("what: " + $(this).val());
+    $.ajax({
+	      url: server + '/' + $('#secret').val(),
+	      type: 'PUT',
+        crossDomain: false,
+	      data: "hallo",
+        dataType: "text",
+        success: function(response){
+          console.log(response);
+	      },
+	      error: function(xhr, status){
+		      console.log(status);
+	      }
+	 });
+
+  });
   
 });
 
@@ -51,9 +88,15 @@ $(document).ready(function() {
 </head>
 
 <body>
-  <h1>cross copy</h1>
+  <div id="wrapper">
+    <h1>cross copy</h1>
 
-  <ul id="incomming"></ul>
+    <input name="secret" id="secret" type="text" size="30" placeholder="choose common secret">
+
+    <input name="data" id="data" type="text" size="30" placeholder="your data">
+    
+    <ul id="received"></ul>
+  </div>
 </body>
 </html>
 
