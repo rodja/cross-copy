@@ -3,7 +3,7 @@ var host = "127.0.0.1";
 
 var url = require('url');
 
-var cache = {};
+var getters = {};
 
 var http = require('http');
 http.createServer(function (req, res) {
@@ -11,19 +11,27 @@ http.createServer(function (req, res) {
   var secret = url.parse(req.url).pathname.substring(1);
 
   if (req.method === 'GET') {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(secret + '\n');
-  } else if (req.method === 'PUT') {
-      if (cache[secret] != undefined){
-        res.writeHead(403, {'Content-Type': 'text/plain'});
-        res.end('ALREADY IN USE\n');
+    
+    if (getters[secret] === undefined) getters[secret] = [];
+    getters[secret].push(res);
+ 
+ } else if (req.method === 'PUT') {
+
+      if (getters[secret] == undefined){
+        res.writeHead(404, {'Content-Type': 'text/plain'});
+        res.end('0\n');
+        return;
       }
 
-      req.on('data', function (chunk) {
-        cache[secret] = chunk;
-         
+      req.on('data', function(chunk) {
+        getters[secret].forEach(function(getter){
+          getter.writeHead(200, {'Content-Type': 'text/plain'});
+          getter.end(chunk + '\n');
+        });
+        
         res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('ACCEPTED\n');
+        res.end(getters[secret].length + '\n');
+        getters[secret] = undefined;
      });
   }
 
