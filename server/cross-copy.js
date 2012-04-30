@@ -8,6 +8,7 @@ var port = 8124;
 var host = "127.0.0.1";
 
 var getters = {};
+var header = {'Content-Type': 'text/plain', 'Access-Control-Allow-Origin' : '*'}
 
 var http = require('http');
 http.createServer(function (req, res) {
@@ -22,18 +23,18 @@ http.createServer(function (req, res) {
  } else if (req.method === 'PUT') {
 
       if (getters[secret] == undefined){
-        res.writeHead(404, {'Content-Type': 'text/plain'});
+        res.writeHead(404, header);
         res.end('0\n');
         return;
       }
 
       req.on('data', function(chunk) {
         getters[secret].forEach(function(getter){
-          getter.writeHead(200, {'Content-Type': 'text/plain'});
+          getter.writeHead(200, header);
           getter.end(chunk + '\n');
         });
         
-        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.writeHead(200, header);
         res.end(getters[secret].length + '\n');
         getters[secret] = undefined;
      });
