@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SERVER=localhost
+
+if [ $# == 1 ]; then
+  curl $SERVER/$1
+elif [ $# == 2 ]; then
+  curl -X PUT -d "$2" $SERVER/$1
+else
+  echo "wrong number of arguments. usage:"
+  echo "   $ cross-copy my-secred-code              # to receive data"
+  echo "   $ cross-copy my-secred-code 'some data'  # to send data"
+fi
