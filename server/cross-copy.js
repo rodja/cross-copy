@@ -11,33 +11,21 @@ var getters = {};
 var header = {'Content-Type': 'text/plain'}
 
 var http = require('http');
+var fs = require('fs');
+var path = require('path');
 http.createServer(function (req, res) {
 
-  var secret = require('url').parse(req.url).pathname.substring(1);
+  var pathname = require('url').parse(req.url).pathname;
+  var secret = pathname.substring(5);
 
   console.log(req.method + " " + secret);
 
-  if (req.method === 'GET') {
+  if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
-    if (secret === ""){
-      fs.readFile('../web-client/index.html', function(error, content) {
-        if (error) {
-            console.log(error);
-            res.writeHead(500);
-            res.end();
-        }
-        else {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(content, 'utf-8');
-        }
-      });
-      return;
-    }
-
     if (getters[secret] === undefined) getters[secret] = [];
     getters[secret].push(res);
  
-  } else if (req.method === 'PUT' || req.method === 'OPTIONS' ) {
+  } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
 
       if (getters[secret] == undefined){
         res.writeHead(404, header);
@@ -58,22 +46,13 @@ http.createServer(function (req, res) {
      });
   }
 
+  if (pathname.indexOf('/api') == 0) return;
 
-}).listen(port, host);
+  var filePath = '.' + req.url;
+  if (filePath == './')
+    filePath = './index.html';
+  filePath = '../web-client/' + filePath;    
 
-console.log('cross-copy is running at http://' + host + ':' + port + '/');
-
-
-var fs = require('fs');
-var path = require('path');
- 
-http.createServer(function (request, response) {
- 
-    var filePath = '.' + request.url;
-    if (filePath == './')
-        filePath = './index.html';
-    filePath = '../web-client/' + filePath;    
-  
     var extname = path.extname(filePath);
     var contentType = 'text/html';
     switch (extname) {
@@ -90,22 +69,23 @@ http.createServer(function (request, response) {
         if (exists) {
             fs.readFile(filePath, function(error, content) {
                 if (error) {
-                    response.writeHead(500);
-                    response.end();
+                    res.writeHead(500);
+                    res.end();
                 }
                 else {
-                    response.writeHead(200, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
+                    res.writeHead(200, { 'Content-Type': contentType });
+                    res.end(content, 'utf-8');
                 }
             });
         }
         else {
-            response.writeHead(404);
-            response.end();
+            res.writeHead(404);
+            res.end();
         }
     });
-     
-}).listen(++port);
 
-console.log('web-client is running at http://' + host + ':' + port + '/');
+
+}).listen(port, host);
+
+console.log('cross-copy is running at http://' + host + ':' + port + '/');
 

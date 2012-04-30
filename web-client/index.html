@@ -33,7 +33,7 @@ function trackEvent(category, action){
             <script type="text/javascript">
 
 
-var server = "http://localhost:8124";
+var server = "http://localhost:8124/api";
 
 var request;
 
@@ -68,8 +68,9 @@ $(document).ready(function() {
     $.ajax({
 	      url: server + '/' + $('#secret').val(),
 	      type: 'PUT',
+        processData: false,
         crossDomain: false,
-	      data: "hallo",
+	      data: $('#data').val(),
         dataType: "text",
         success: function(response){
           console.log(response);
