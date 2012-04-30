@@ -1,4 +1,4 @@
-// cross-copy.com server implemented in node.js 
+// cross-copy.net server implemented in node.js 
 //
 // usage:
 //    GET /<your secret code>      wait's for data on the given phrase
