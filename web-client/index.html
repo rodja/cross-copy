@@ -37,23 +37,25 @@ var server = "http://localhost:8124/api";
 
 var request;
 
-function listen(secret){
+function listen(){
+  var secret = $('#secret').val();  
+
   if (request != undefined)
     request.abort();
 
-  if (secret.length == 0)
+  if (secret === undefined || secret.length == 0)
     return;
   
   request = $.get(server + '/' + secret, function(response) {
-    setTimeout('listen()', 0);
-    $('#received').append($('<li>' + response + '</li>'));
+    $('#received').prepend($('<li>' + response + '</li>'));
+    setTimeout('listen()', 10);
   });
 }
 
 $(document).ready(function() {
 
   $('#secret').keyup(function (e){
-    listen($(this).val());
+    listen();
   });
 
   $('#data').keyup(function (e){
@@ -79,7 +81,7 @@ $(document).ready(function() {
 		      console.log(status);
 	      },
 	      complete: function(xhr, status){
-		      listen($('#secret').val());
+		      listen();
 	      }
 	 });
 
