@@ -47,7 +47,7 @@ function listen(){
   request = $.ajax({
       url: server + '/' + secret,
       success: function(response){
-        $('#received').prepend($('<li>' + response + '</li>')).hide().fadeIn();
+      $('#received').fadeOut(300, function(){$(this).text(response).fadeIn(300)});
 	      setTimeout("listen()", 50);
       },
       error: function(xhr, status){
