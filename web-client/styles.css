@@ -38,7 +38,7 @@ input {
 
 input:focus{
   outline: none;
-border-bottom: 2px dashed #aaa;  
+  border-bottom: 2px dashed #aaa;  
 }
 
 .num{
@@ -49,6 +49,10 @@ border-bottom: 2px dashed #aaa;
   font-size:2em;
   float:left;
   height:1em;
+}
+
+ul{
+  margin-top:0.5em;
 }
 
 li {

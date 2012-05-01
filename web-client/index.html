@@ -36,7 +36,7 @@ var server = "http://localhost:8124/api";
 var request;
 
 function listen(){
-  var secret = $('#secret').val();  
+  var secret = encodeURI($('#secret').val());
 
   if (request != undefined)
     request.abort();
@@ -44,9 +44,19 @@ function listen(){
   if (secret === undefined || secret.length == 0)
     return;
   
-  request = $.get(server + '/' + secret, function(response) {
-    $('#received').prepend($('<li>' + response + '</li>'));
-    setTimeout('listen()', 10);
+  request = $.ajax({
+      url: server + '/' + secret,
+      success: function(response){
+        $('#received').prepend($('<li>' + response + '</li>')).hide().fadeIn();
+	      setTimeout("listen()", 50);
+      },
+      error: function(xhr, status){
+	      if (status != "abort"){
+          setTimeout("listen()", 50);
+        }
+	    },
+      complete: function(xhr, status){
+      }
   });
 }
 
@@ -75,15 +85,15 @@ $(document).ready(function() {
 	      data: $('#data').val(),
         dataType: "text",
         success: function(response){
-          console.log(response);
-	      },
+                  
+        },
 	      error: function(xhr, status){
-		      console.log(status);
+
 	      },
 	      complete: function(xhr, status){
 		      listen();
 	      }
-	 });
+	  });
 
   });
   
