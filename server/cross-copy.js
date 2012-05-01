@@ -53,7 +53,7 @@ server = http.createServer(function (req, res) {
   var filePath = '.' + req.url;
   if (filePath == './')
     filePath = './index.html';
-  filePath = '../web-client/' + filePath;    
+  filePath = 'web-client/' + filePath;    
 
     var extname = path.extname(filePath);
     var contentType = 'text/html';
