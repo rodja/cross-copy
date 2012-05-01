@@ -13,17 +13,16 @@ var header = {'Content-Type': 'text/plain'}
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
-http.createServer(function (req, res) {
+server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
 
-  console.log(req.method + " " + secret);
-
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
     if (getters[secret] === undefined) getters[secret] = [];
-    getters[secret].push(res);
+    req.socket.secret = secret;
+    getters[secret].push(res);    
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
 
@@ -34,14 +33,16 @@ http.createServer(function (req, res) {
       }
 
       req.on('data', function(chunk) {
-      console.log("chunk is: " + chunk);
+        var livingGetters = 0;
         getters[secret].forEach(function(getter){
+          if (getter.socket.remoteAddress != undefined)
+            livingGetters++;
           getter.writeHead(200, header);
           getter.end(chunk + '\n');
         });
         
         res.writeHead(200, header);
-        res.end(getters[secret].length + '\n');
+        res.end(livingGetters + '\n');
         getters[secret] = undefined;
      });
   }
