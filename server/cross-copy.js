@@ -4,8 +4,7 @@
 //    GET /api/<your secret code>      wait's for data on the given phrase
 //    PUT /api/<your secret code>      sends data in body to all waiting clients
 
-var port = 8124;
-var host = "127.0.0.1";
+var port = 8080;
 
 var getters = {};
 var header = {'Content-Type': 'text/plain'}
@@ -91,7 +90,6 @@ server = http.createServer(function (req, res) {
     });
 
 
-}).listen(port, host);
+}).listen(port);
 
-console.log('cross-copy is running at http://' + host + ':' + port + '/');
-
+console.log('cross-copy is running at http://loclahost:' + port + '/');
