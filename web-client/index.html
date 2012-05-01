@@ -44,10 +44,13 @@ function listen(){
   if (secret === undefined || secret.length == 0)
     return;
   
+  if (request != undefined)
+      request.abort();
+    
   request = $.ajax({
       url: server + '/' + secret,
       success: function(response){
-      $('#received').fadeOut(300, function(){$(this).text(response).fadeIn(300)});
+      $('#received').fadeOut(100, function(){$(this).text(response).fadeIn(300)});
 	      setTimeout("listen()", 50);
       },
       error: function(xhr, status){
@@ -77,6 +80,7 @@ $(document).ready(function() {
 
     if (request != undefined)
       request.abort();
+
     $.ajax({
 	      url: server + '/' + $('#secret').val(),
 	      type: 'PUT',
@@ -85,7 +89,7 @@ $(document).ready(function() {
 	      data: $('#data').val(),
         dataType: "text",
         success: function(response){
-                  
+          $('#received').fadeOut(100, function(){$(this).text($('#data').val()).fadeIn(300)});
         },
 	      error: function(xhr, status){
 
