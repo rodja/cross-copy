@@ -59,6 +59,9 @@ server = http.createServer(function (req, res) {
     var extname = path.extname(filePath);
     var contentType = 'text/html';
     switch (extname) {
+        case '.png':
+            contentType = 'image/png';
+            break;
         case '.js':
             contentType = 'text/javascript';
             break;

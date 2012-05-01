@@ -1,49 +1,36 @@
+html {
+	background: url(noise.png);
+}
+
 html, body {
 	margin: 0;
-	font-size: 100%;
+	font-size: 120%;
 	padding: 0;
-	background: #fff;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	background-color: white;
 }
 
-.project{
-  color:white;
-  float:left;
-  margin:1em;
-  padding:0.2em;
-  width:380px;
-  height:200px;
-  background:#eee;
-  overflow:auto;
+#wrapper{
+  width:400px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
-.project .name {
-  font-size:200%;
+h1{
+  text-align:center;
+}
+
+h2{
+  margin-top:1.5em;
+  margin-bottom:0px;
+  font-weight:normal;
+  font-size:1em;
+  color: #555;
+}
+
+input {
+  font-size: 1em;
   border: none;
+  border-bottom: 1px dashed #555;
+  width:100%;
   background:none;
-  width:85%;
-  height: 1.2em;
-  padding: 0.2em;
-}
-
-.action{
-  padding-bottom: 10px;
-  border:none;
-  height:1em;
-  background:none;
-  color:black;
-  width:97%;
-  text-align:left;
-  overflow:hidden;
-}
-
-.new {
-  color:black;
-  width:97%;
-  border:none;
-}
-
-.button{
-  padding:0.3em;
 }
