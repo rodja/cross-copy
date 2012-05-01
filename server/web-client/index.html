@@ -43,6 +43,8 @@ function listen(){
 
   if (secret === undefined || secret.length == 0)
     return;
+
+  $('#step-2 h2').css({color: ''}); 
   
   if (request != undefined)
       request.abort();
@@ -75,8 +77,11 @@ $(document).ready(function() {
       return;
 
     var secret = $('#secret').val();  
-    if (secret.length == 0)
-      return;    
+    if (secret.length == 0){
+      $('#step-2 h2').css({color: '#f00'});
+      $('#received').fadeOut();   
+      return;
+    }
 
     if (request != undefined)
       request.abort();
@@ -89,7 +94,14 @@ $(document).ready(function() {
 	      data: $('#data').val(),
         dataType: "text",
         success: function(response){
-          $('#received').fadeOut(100, function(){$(this).text($('#data').val()).fadeIn(300)});
+          if (response == 0){
+            $('#step-1 h2').css({color: '#f00'});
+            $('#received').fadeOut();   
+          }
+          else {
+            $('#step-1 h2').css({color: ''});       
+            $('#received').fadeOut(100, function(){$(this).text($('#data').val()).fadeIn(300)});
+          }
         },
 	      error: function(xhr, status){
 
@@ -111,12 +123,12 @@ $(document).ready(function() {
   <div id="wrapper">
     <h1>cross copy</h1>
 
-    <div class="step">
+    <div id="step-1" class="step">
       <h2><span class="num">1</span> open this page on different devices</h2>
     </div>
 
-    <div class="step">
-      <h2><span class="num">2</span> choose common secret</h2>
+    <div id="step-2" class="step">
+      <h2><span class="num">2</span> choose a common secret</h2>
       <input name="secret" id="secret" type="text" size="30" placeholder="">
     </div>
 
