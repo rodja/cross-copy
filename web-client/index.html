@@ -61,10 +61,12 @@ $(document).ready(function() {
     if (e.which != 13)
       return;
 
+    var secret = $('#secret').val();  
     if (secret.length == 0)
       return;    
 
-    request.abort();
+    if (request != undefined)
+      request.abort();
     $.ajax({
 	      url: server + '/' + $('#secret').val(),
 	      type: 'PUT',

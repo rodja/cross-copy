@@ -50,3 +50,8 @@ border-bottom: 2px dashed #aaa;
   float:left;
   height:1em;
 }
+
+li {
+  list-style-type:none;
+  margin-bottom:0.5em;  
+}
