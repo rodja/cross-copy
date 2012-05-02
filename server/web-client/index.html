@@ -58,10 +58,10 @@ var history;
 var secret;
 var request;
 
-function listen(){
+function listen(force){
 if (request != undefined)
 console.log(request.statusText);
-  if (request != undefined && request.statusText != 'abort' && secret === encodeURI($('#secret').val())) 
+  if (request != undefined && !force && secret === encodeURI($('#secret').val())) 
     return;
 
   secret = encodeURI($('#secret').val());
@@ -76,14 +76,15 @@ console.log(request.statusText);
   if (oldPastes == null)
     oldPastes = [];
 
-  $('#received').fadeOut(function(){
-    $(this).empty();
-    $.each(oldPastes, function(i,e){ 
-       var $li = $('<li>' + e +'</li>\n');
-       $('#received').append($li);
+  if (!force)
+    $('#received').fadeOut(function(){
+      $(this).empty();
+      $.each(oldPastes, function(i,e){ 
+         var $li = $('<li>' + e +'</li>\n');
+         $('#received').append($li);
+      });
+      $('#received').fadeIn();
     });
-    $('#received').fadeIn();
-  });
 
   $('#step-2 h2').css({color: ''}); 
   
@@ -145,6 +146,7 @@ $(document).ready(function() {
 
     if (secret.length == 0){
       $('#step-2 h2').css({color: '#f00'});
+      $('#step-1 h2').css({color: ''});
       return;
     }
 
@@ -178,7 +180,7 @@ $(document).ready(function() {
 	      },
 	      complete: function(xhr, status){
           console.log('completed');		      
-          listen();
+          listen(true);
 	      }
 	  });
 
