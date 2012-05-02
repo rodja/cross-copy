@@ -6,11 +6,11 @@ html, body {
 	margin: 0;
 	font-size: 120%;
 	padding: 0;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family: 'Varela', sans-serif;
 }
 
 #wrapper{
-  width:400px;
+  width:20em;
   margin-left:auto;
   margin-right:auto;
 }
@@ -35,6 +35,7 @@ input {
   width:90%;
   background:none;
   -webkit-appearance: none;
+  font-family: 'Varela', sans-serif;
 }
 
 input:focus{
