@@ -76,7 +76,7 @@ function listen(){
       success: function(response){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-    $('#received').fadeOut(100, function(){$(this).text(response).fadeIn(300)});
+        paste(response);
 	      setTimeout("listen()", 50);
       },
       error: function(xhr, status){
@@ -90,7 +90,20 @@ function listen(){
   });
 }
 
+function paste(data){
+
+  $('#received').prepend($('<li>' + data +'</li>\n'));
+
+//          localStorage.setItem('projects', JSON.stringify(projects, null, 2));
+}
+
 $(document).ready(function() {
+
+  var secrets = JSON.parse(localStorage.getItem('secrets'));
+  if (secrets != null && secrets.length > 0){
+    $('#secret').val(secrets[0]); 
+  }
+  
 
   $('#secret').keyup(function (e){
     listen();
@@ -130,6 +143,7 @@ $(document).ready(function() {
             trackEvent('succsess', 'GET');
             $('#step-1 h2').css({color: ''});       
             $('#received').fadeOut(100, function(){$(this).text($('#data').val()).fadeIn(300)});
+            localStorage.setItem('secrets', JSON.stringify([secret], null, 2));
           }
         },
 	      error: function(xhr, status){
