@@ -34,6 +34,7 @@ input {
   border-bottom: 1px dashed #888;
   width:90%;
   background:none;
+  -webkit-appearance: none;
 }
 
 input:focus{
