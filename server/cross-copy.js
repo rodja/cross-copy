@@ -37,7 +37,7 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  console.log(req.method + ' ' + pathname);
+  //console.log(req.method + ' ' + pathname);
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     

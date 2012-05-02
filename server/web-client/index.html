@@ -54,17 +54,36 @@ function trackEvent(category, action){
 
 
 var server = "/api";
-
+var history;
+var secret;
 var request;
 
 function listen(){
-  var secret = encodeURI($('#secret').val());
+if (request != undefined)
+console.log(request.statusText);
+  if (request != undefined && request.statusText != 'abort' && secret === encodeURI($('#secret').val())) 
+    return;
+
+  secret = encodeURI($('#secret').val());
 
   if (request != undefined)
     request.abort();
 
   if (secret === undefined || secret.length == 0)
     return;
+
+  var oldPastes = history[secret];
+  if (oldPastes == null)
+    oldPastes = [];
+
+  $('#received').fadeOut(function(){
+    $(this).empty();
+    $.each(oldPastes, function(i,e){ 
+       var $li = $('<li>' + e +'</li>\n');
+       $('#received').append($li);
+    });
+    $('#received').fadeIn();
+  });
 
   $('#step-2 h2').css({color: ''}); 
   
@@ -77,31 +96,41 @@ function listen(){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
         paste(response);
-	      setTimeout("listen()", 50);
       },
       error: function(xhr, status){
         trackEvent('error', 'GET');
+	    },
+      complete: function(xhr, status){
 	      if (status != "abort"){
           setTimeout("listen()", 50);
         }
-	    },
-      complete: function(xhr, status){
       }
   });
 }
 
 function paste(data){
 
-  $('#received').prepend($('<li>' + data +'</li>\n'));
+  var $li = $('<li>' + data +'</li>\n');
+  $('#received').prepend($li);
+  $li.hide().slideDown();
 
-//          localStorage.setItem('projects', JSON.stringify(projects, null, 2));
+  var pastes = [];
+  $("ul li").each(function() { pastes.push($(this).text()) });
+  history[secret] = pastes;
+  localStorage.setItem('history', JSON.stringify(history, null, 2));
 }
 
 $(document).ready(function() {
 
+  $('#secret').focus();
+
+  history = JSON.parse(localStorage.getItem('history'));
+  if (history == null) history = {};
+
   var secrets = JSON.parse(localStorage.getItem('secrets'));
   if (secrets != null && secrets.length > 0){
     $('#secret').val(secrets[0]); 
+    listen();
   }
   
 
@@ -114,10 +143,8 @@ $(document).ready(function() {
     if (e.which != 13)
       return;
 
-    var secret = $('#secret').val();  
     if (secret.length == 0){
       $('#step-2 h2').css({color: '#f00'});
-      $('#received').fadeOut();   
       return;
     }
 
@@ -127,7 +154,7 @@ $(document).ready(function() {
     trackEvent('data', 'submitted');
 
     $.ajax({
-	      url: server + '/' + $('#secret').val(),
+	      url: server + '/' + secret,
 	      type: 'PUT',
         processData: false,
         crossDomain: false,
@@ -136,21 +163,22 @@ $(document).ready(function() {
         success: function(response){
           if (response == 0){
             $('#step-1 h2').css({color: '#f00'});
-            $('#received').fadeOut();
             trackEvent('error', 'lonley PUT');
           }
           else {
             trackEvent('succsess', 'GET');
             $('#step-1 h2').css({color: ''});       
-            $('#received').fadeOut(100, function(){$(this).text($('#data').val()).fadeIn(300)});
+            paste($('#data').val());
             localStorage.setItem('secrets', JSON.stringify([secret], null, 2));
           }
         },
 	      error: function(xhr, status){
+          $('#step-1 h2').css({color: '#f00'});
           trackEvent('error', 'PUT');
 	      },
 	      complete: function(xhr, status){
-		      listen();
+          console.log('completed');		      
+          listen();
 	      }
 	  });
 
