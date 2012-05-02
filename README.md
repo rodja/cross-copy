@@ -4,6 +4,11 @@ The web app http://cross-copy.net attacs the problem when you need to copy and p
 
 ## Use Cases
 
+ * sharing a link in the office (alternatives: Skype, spelling, Post-It)
+ * getting a phone number from laptop to mobile (alternatives: type in, repeat search on mobile, send mail to yourself)
+ * get some text from desktop to laptop (alternatives: Dropbox, Evernote, etc.)
+ * ...
+
 ## License
 
 Copyright (c) Rodja Trappe
