@@ -43,6 +43,10 @@ server = http.createServer(function (req, res) {
     
     if (getters[secret] === undefined) getters[secret] = [];
     req.socket.secret = secret;
+    req.connection.on('close',function(){  
+       console.log("closed " + pathname);  
+       res.hasBeenAborted = true;
+    });
     getters[secret].push(res);    
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
@@ -56,7 +60,7 @@ server = http.createServer(function (req, res) {
       req.on('data', function(chunk) {
         var livingGetters = 0;
         getters[secret].forEach(function(getter){
-          if (getter.socket.remoteAddress != undefined)
+          if (!getter.hasBeenAborted)
             livingGetters++;
           getter.writeHead(200, header);
           getter.end(chunk + '\n');
