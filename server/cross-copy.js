@@ -42,8 +42,8 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  console.log(req.method + ' ' + secret);
-  console.log(util.inspect(filecache));
+  //console.log(req.method + ' ' + secret);
+  //console.log(util.inspect(filecache));
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
@@ -53,17 +53,24 @@ server = http.createServer(function (req, res) {
        res.hasBeenAborted = true;
     });
 
-    if (filecache[secret] != undefined){
-      var data = filecache[secret].data;
-      fs.readFile(data.path, function(error, content) {
-        if (error) {
-          res.writeHead(500);
-          res.end();
-        } else {
-          res.writeHead(200, { 'Content-Type': data.type });
-          res.end(content, 'binary');
-        }
-      });
+    // if asking for a file
+    if (secret.indexOf('/') != -1){
+      if (filecache[secret] != undefined){
+        var data = filecache[secret].data;
+        fs.readFile(data.path, function(error, content) {
+          if (error) {
+            res.writeHead(500);
+            res.end();
+          } else {
+            res.writeHead(200, { 'Content-Type': data.type });
+            res.end(content, 'binary');
+          }
+        });
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
+
       return;
     }
 
@@ -97,9 +104,14 @@ server = http.createServer(function (req, res) {
 
       var form = new formidable.IncomingForm();
         form.parse(req, function(err, fields, files) {
-          res.writeHead(200, {'content-type': 'text/plain'});
-          filecache[secret] = files;
+          if (err) res.writeHead(500);
+          else res.writeHead(200, {'content-type': 'text/plain'});
           res.end();
+          filecache[secret] = files;
+
+          setTimeout(function(){ 
+            fs.unlink(files.data.path);
+          }, 10 * 1000);
         });
   }
 
