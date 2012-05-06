@@ -27,26 +27,46 @@
 var port = 8080;
 
 var getters = {};
+var filecache = {};
+
 var header = {'Content-Type': 'text/plain'}
 
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var formidable = require('formidable');
+var util = require('util');
+
 server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  //console.log(req.method + ' ' + pathname);
+  console.log(req.method + ' ' + secret);
+  console.log(util.inspect(filecache));
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
     if (getters[secret] === undefined) getters[secret] = [];
     req.socket.secret = secret;
     req.connection.on('close',function(){  
-       console.log("closed " + pathname);  
        res.hasBeenAborted = true;
     });
+
+    if (filecache[secret] != undefined){
+      var data = filecache[secret].data;
+      fs.readFile(data.path, function(error, content) {
+        if (error) {
+          res.writeHead(500);
+          res.end();
+        } else {
+          res.writeHead(200, { 'Content-Type': data.type });
+          res.end(content, 'binary');
+        }
+      });
+      return;
+    }
+
     getters[secret].push(res);    
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
@@ -62,14 +82,25 @@ server = http.createServer(function (req, res) {
         getters[secret].forEach(function(getter){
           if (!getter.hasBeenAborted)
             livingGetters++;
-          getter.writeHead(200, header);
-          getter.end(chunk + '\n');
+          else {
+            getter.writeHead(200, header);
+            getter.end(chunk);
+          }
         });
         
         res.writeHead(200, header);
         res.end(livingGetters + '\n');
         getters[secret] = undefined;
      });
+
+    } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
+
+      var form = new formidable.IncomingForm();
+        form.parse(req, function(err, fields, files) {
+          res.writeHead(200, {'content-type': 'text/plain'});
+          filecache[secret] = files;
+          res.end();
+        });
   }
 
   if (pathname.indexOf('/api') == 0) return;
