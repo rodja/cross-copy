@@ -90,11 +90,8 @@ if (request != undefined)
   $('#step-2 h2').css({color: ''}); 
   
   
-  if (request != undefined){
+  if (request != undefined)
     request.abort();
-    while(request.statusText != "abort")
-      console.log("status: " + request.statusText);
-}
 
   request = $.ajax({
       url: server + '/' + secret,
@@ -128,8 +125,7 @@ function paste(data){
 
 $(document).ready(function() {
 
-  $('#secret').focus();
-
+ 
   history = JSON.parse(localStorage.getItem('history'));
   if (history == null) history = {};
 
@@ -138,15 +134,17 @@ $(document).ready(function() {
     $('#secret').val(secrets[0]); 
     listen();
   }
-  
+ 
+  $('#secret').focus();
+  $('#secret').select();
+ 
 
   $('#secret').keyup(function (e){
     listen();
   });
 
   $('#data').keyup(function (e){
-    console.log('keyup');  
-
+    
     if (e.which != 13)
       return;
 
@@ -185,7 +183,6 @@ $(document).ready(function() {
           trackEvent('error', 'PUT');
 	      },
 	      complete: function(xhr, status){
-          console.log('completed');		      
           listen(true);
 	      }
 	  });
@@ -193,6 +190,12 @@ $(document).ready(function() {
   });
   
 });
+
+function showWhy(){
+  $('#explenation a').fadeOut(200, function(){
+    $('#why').slideDown(500);
+  });
+}
 
 </script>
 
@@ -205,23 +208,41 @@ $(document).ready(function() {
   <div id="wrapper">
     <h1>cross copy</h1>
 
-    <div id="step-1" class="step">
-      <h2><span class="num">1</span> open this page on different devices</h2>
-    </div>
+    <div id="content">
+      <div id="explenation">      
+        <p>
+          ... can transfer text between devices<br/>
+                <a href="javascript:void(0)" onclick="showWhy();">see why another tool?</a>
+        </p>
+          <div id="why" style="display:none;">
+            <strong>Why another tool?</strong><br/><br/>
 
-    <div id="step-2" class="step">
-      <h2><span class="num">2</span> enter the same secret</h2>
-      <input name="secret" id="secret" type="text" size="30" placeholder="">
-    </div>
+            No need to login.</br>          
+            No need to install an application.</br>
+            No need to explain much.<br/> <br/>
+            Just agree on a code word!
+          </div>
+        </p>
+      </div>
 
-    <div class="step">
-      <h2><span class="num">3</span> enter text and press return</h2>
-    <input name="data" id="data" type="text" size="30" placeholder="">
-    </div>
+      <div id="step-1" class="step">
+        <h2><span class="num">1</span> open this page on different devices</h2>
+      </div>
 
-    <div class="step">
-      <h2><span class="num">4</span> see cross copied text</h2>
-      <ul id="received"></ul>
+      <div id="step-2" class="step">
+        <h2><span class="num">2</span> enter the same secret</h2>
+        <input name="secret" id="secret" type="text" size="30" placeholder="">
+      </div>
+
+      <div class="step">
+        <h2><span class="num">3</span> enter text and press return</h2>
+      <input name="data" id="data" type="text" size="30" placeholder="">
+      </div>
+
+      <div class="step">
+        <h2><span class="num">4</span> see cross copied text</h2>
+        <ul id="received"></ul>
+      </div>
     </div>
   </div>
 </body>
