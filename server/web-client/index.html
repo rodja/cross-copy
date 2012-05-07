@@ -50,7 +50,9 @@ function trackEvent(category, action){
    <title>cross copy</title>
    
             <link rel='stylesheet' href='styles.css' type='text/css' />
+            <link rel='stylesheet' href='fileuploader/styles.css' type='text/css' />
             <script src='jquery-1.7.1.min.js' type='text/javascript'></script>
+            <script src='fileuploader/fileuploader.js' type='text/javascript'></script>
             
             <script type="text/javascript">
 
@@ -199,6 +201,20 @@ function showWhy(){
 
 </script>
 
+<script>        
+        function createUploader(){            
+            var uploader = new qq.FileUploader({
+                element: document.getElementById('upload'),
+                action: secret + '/',
+                debug: true
+            });           
+        }
+        
+        // in your app create uploader as soon as the DOM is ready
+        // don't wait for the window to load  
+        window.onload = createUploader;     
+    </script>    
+
 </head>
 
 <body>
@@ -236,7 +252,8 @@ function showWhy(){
 
       <div class="step">
         <h2><span class="num">3</span> enter text and press return</h2>
-      <input name="data" id="data" type="text" size="30" placeholder="">
+        <input name="data" id="data" type="text" size="30" placeholder="">
+        <div id="upload">upload</div>      
       </div>
 
       <div class="step">

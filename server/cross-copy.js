@@ -2,8 +2,13 @@
 // cross-copy.net server implemented in node.js 
 //
 // usage:
-//    GET /api/<your secret code>      wait's for data on the given phrase
-//    PUT /api/<your secret code>      sends data in body to all waiting clients
+
+//  wait's for data on the given phrase
+//    GET   /api/<secret code>
+//  sends data in body to all waiting clients    
+//    PUT   /api/<secret code>
+//  store a file temporary on the server at the given uri
+//    POST  /api/<secret code>/<filename.extension>
 
 /*  
     Copyright 2012 Rodja Trappe
