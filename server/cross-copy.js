@@ -47,8 +47,8 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  console.log(req.method + ' ' + secret);
-  console.log(util.inspect(filecache));
+  //console.log(req.method + ' ' + secret);
+  //console.log(util.inspect(filecache));
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
@@ -67,7 +67,7 @@ server = http.createServer(function (req, res) {
             res.writeHead(500);
             res.end();
           } else {
-            res.writeHead(200, { 'Content-Type': file.type });
+            res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
             res.end(content, 'binary');
           }
         });
@@ -116,12 +116,13 @@ server = http.createServer(function (req, res) {
         form.parse(req, function(err, fields, files) {
           if (err) res.writeHead(500);
           else res.writeHead(200, {'content-type': 'text/plain'});
-          res.end();
-          console.log(util.inspect(files));
-          filecache[secret] = files.file;
+          res.end("OK");
+          var file = files.file;
+          if (file === undefined) file = files.data;
+          filecache[secret] = file;
 
           setTimeout(function(){ 
-            fs.unlink(files.file.path);
+            fs.unlink(file.path);
           }, 10 * 60 * 1000);
         });
   }
