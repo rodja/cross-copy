@@ -50,7 +50,7 @@ function trackEvent(category, action){
    <title>cross copy</title>
    
             <link rel='stylesheet' href='styles.css' type='text/css' />
-            <link rel='stylesheet' href='fileuploader/styles.css' type='text/css' />
+            <link rel='stylesheet' href='fileuploader/fileuploader.css' type='text/css' />
             <script src='jquery-1.7.1.min.js' type='text/javascript'></script>
             <script src='fileuploader/fileuploader.js' type='text/javascript'></script>
             
@@ -205,7 +205,7 @@ function showWhy(){
         function createUploader(){            
             var uploader = new qq.FileUploader({
                 element: document.getElementById('upload'),
-                action: secret + '/',
+                action: 'api/' + secret + '/',
                 debug: true
             });           
         }

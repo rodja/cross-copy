@@ -39,7 +39,7 @@ var header = {'Content-Type': 'text/plain'}
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
-var formidable = require('formidable');
+var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
 server = http.createServer(function (req, res) {
@@ -47,8 +47,8 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  //console.log(req.method + ' ' + secret);
-  //console.log(util.inspect(filecache));
+  console.log(req.method + ' ' + secret);
+  console.log(util.inspect(filecache));
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
@@ -61,13 +61,13 @@ server = http.createServer(function (req, res) {
     // if asking for a file
     if (secret.indexOf('/') != -1){
       if (filecache[secret] != undefined){
-        var data = filecache[secret].data;
-        fs.readFile(data.path, function(error, content) {
+        var file = filecache[secret];
+        fs.readFile(file.path, function(error, content) {
           if (error) {
             res.writeHead(500);
             res.end();
           } else {
-            res.writeHead(200, { 'Content-Type': data.type });
+            res.writeHead(200, { 'Content-Type': file.type });
             res.end(content, 'binary');
           }
         });
@@ -117,10 +117,11 @@ server = http.createServer(function (req, res) {
           if (err) res.writeHead(500);
           else res.writeHead(200, {'content-type': 'text/plain'});
           res.end();
-          filecache[secret] = files;
+          console.log(util.inspect(files));
+          filecache[secret] = files.file;
 
           setTimeout(function(){ 
-            fs.unlink(files.data.path);
+            fs.unlink(files.file.path);
           }, 10 * 60 * 1000);
         });
   }
