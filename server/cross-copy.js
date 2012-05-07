@@ -102,6 +102,11 @@ server = http.createServer(function (req, res) {
 
     } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
 
+      if (secret.indexOf('/') == -1) {
+        res.writeHead(403);
+        res.end();
+      }
+
       var form = new formidable.IncomingForm();
         form.parse(req, function(err, fields, files) {
           if (err) res.writeHead(500);
@@ -111,7 +116,7 @@ server = http.createServer(function (req, res) {
 
           setTimeout(function(){ 
             fs.unlink(files.data.path);
-          }, 10 * 1000);
+          }, 10 * 60 * 1000);
         });
   }
 
