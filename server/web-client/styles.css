@@ -55,6 +55,15 @@ input {
   font-family: 'Varela', sans-serif;
 }
 
+#step-3 input {
+  width:80%;
+}
+
+#upload{
+  float:right;
+  margin-top:10px;
+}
+
 input:focus{
   outline: none;
   border-bottom: 2px dashed #aaa;  

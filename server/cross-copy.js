@@ -114,12 +114,16 @@ server = http.createServer(function (req, res) {
 
       var form = new formidable.IncomingForm();
         form.parse(req, function(err, fields, files) {
-          if (err) res.writeHead(500);
-          else res.writeHead(200, {'content-type': 'text/plain'});
-          res.end("OK");
+          if (err) {
+            res.writeHead(500); res.end();
+            return;
+          }
           var file = files.file;
           if (file === undefined) file = files.data;
           filecache[secret] = file;
+
+          res.writeHead(200, {'content-type': 'text/plain'});
+          res.end('/api/'+ secret);
 
           setTimeout(function(){ 
             fs.unlink(file.path);

@@ -206,7 +206,20 @@ function showWhy(){
             var uploader = new qq.FileUploader({
                 element: document.getElementById('upload'),
                 action: 'api/' + secret + '/',
-                debug: true
+                debug: false,
+                onSubmit: function(id, fileName){},
+                onProgress: function(id, filename, loaded, total){
+                  console.log(loaded + "/" + total);
+                },
+                onComplete: function(id, filename, response){
+                  console.log("completed");                
+                },
+                template: '<div class="qq-uploader">' + 
+                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+                  '<div class="qq-upload-button"><img src="fileuploader/upload.png"</img></div>' +
+                  '<div class="qq-upload-progress"></div>' + 
+                '</div>',
+                listElement: " "
             });           
         }
         
@@ -250,13 +263,13 @@ function showWhy(){
         <input name="secret" id="secret" type="text" size="30" placeholder="">
       </div>
 
-      <div class="step">
+      <div  id="step-3" class="step">
         <h2><span class="num">3</span> enter text and press return</h2>
         <input name="data" id="data" type="text" size="30" placeholder="">
-        <div id="upload">upload</div>      
+        <div id="upload"></div>      
       </div>
 
-      <div class="step">
+      <div id="step-4" class="step">
         <h2><span class="num">4</span> see cross copied text</h2>
         <ul id="received"></ul>
       </div>
