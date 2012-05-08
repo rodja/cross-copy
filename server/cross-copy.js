@@ -47,7 +47,7 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  //console.log(req.method + ' ' + secret);
+  console.log(req.method + ' ' + secret);
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
 

@@ -41,9 +41,21 @@ h2{
 #explenation a{
   margin-left: 15px;
   font-size:80%;
-  color:#ccc;
+  color:#bbb;
 }
 
+a {
+  color:black;
+  text-decoration:underline;
+}
+
+a :visited {
+  color:#black;
+}
+
+a:hover {
+ color: #555;
+}
 
 input {
   font-size: 1em;

@@ -79,9 +79,6 @@ function listen(){
     uploader._handler._options.action = uploader._options.action;
   }
 
-  if (request != undefined)
-    request.abort();
-
   request = $.ajax({
       url: server + '/' + secret,
       success: function(response){
@@ -152,7 +149,7 @@ function share(text){
         trackEvent('error', 'PUT');
       },
       complete: function(xhr, status){
-        listen();
+        setTimeout("listen()", 50);
       }
   });
 }

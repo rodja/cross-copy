@@ -32,6 +32,6 @@ opacity:0.8;
 
 .qq-upload-progress{
   clear:both;
-  border-top:3px solid black;
+  border-top:3px solid #666;
   width:0%;
 }
