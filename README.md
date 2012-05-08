@@ -1,12 +1,12 @@
 # cross copy
 
-The web app http://cross-copy.net attacs the problem when you need to copy and paste between different devices. The backend is written in node.js. There is also a commandline tool for sending and receiving texts when working on a server.
+The web app http://www.cross-copy.net attacs the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The backend is written in node.js. There is also a commandline tool for sending and receiving stuff when working on a server.
 
 ## Use Cases
 
  * sharing a link in the office (alternatives: Skype, spelling, Post-It)
  * getting a phone number from laptop to mobile (alternatives: type in, repeat search on mobile, send mail to yourself)
- * get some text from desktop to laptop (alternatives: Dropbox, Evernote, send email)
+ * get a file from desktop to laptop or mobile (alternatives: Dropbox, Evernote, send email)
  * send address to someone who is asking for it on the phone (alternatives: send email, spell it) 
  * ...
 
