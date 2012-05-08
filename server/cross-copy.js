@@ -48,7 +48,9 @@ server = http.createServer(function (req, res) {
   var secret = pathname.substring(5);
   
   console.log(req.method + ' ' + secret);
-  
+    //console.log(util.inspect(filecache));
+  console.log(util.inspect(getters));
+
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
     if (getters[secret] === undefined) getters[secret] = [];
@@ -90,9 +92,8 @@ server = http.createServer(function (req, res) {
     req.on('data', function(chunk) {
       var livingGetters = 0;
       getters[secret].forEach(function(getter){
-        if (!getter.hasBeenAborted)
+        if (!getter.hasBeenAborted){
           livingGetters++;
-        else {
           getter.writeHead(200, header);
           getter.end(chunk);
         }
@@ -128,10 +129,6 @@ server = http.createServer(function (req, res) {
         }, 10 * 60 * 1000);
       });
   }
-
-  //console.log(util.inspect(filecache));
-  console.log(util.inspect(getters));
-
 
   if (pathname.indexOf('/api') == 0) return;
 
