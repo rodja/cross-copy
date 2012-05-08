@@ -47,9 +47,9 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  console.log(req.method + ' ' + secret);
-    //console.log(util.inspect(filecache));
-  console.log(util.inspect(getters));
+  //console.log(req.method + ' ' + secret);
+  //console.log(util.inspect(filecache));
+  //console.log(util.inspect(getters));
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
@@ -122,7 +122,7 @@ server = http.createServer(function (req, res) {
         filecache[secret] = file;
 
         res.writeHead(200, {'content-type': 'text/plain'});
-        res.end('/api/'+ secret);
+        res.end('{"url": "/api/'+ secret + '"}');
 
         setTimeout(function(){ 
           fs.unlink(file.path);

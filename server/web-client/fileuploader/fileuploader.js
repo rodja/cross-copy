@@ -1219,7 +1219,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             this.log("responseText = " + xhr.responseText);
                         
             var response;
-                    
+                  
             try {
                 response = eval("(" + xhr.responseText + ")");
             } catch(err){

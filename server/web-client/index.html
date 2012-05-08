@@ -210,13 +210,14 @@ function showWhy(){
             var uploader = new qq.FileUploader({
                 element: document.getElementById('upload'),
                 action: 'api/' + secret + '/',
-                debug: false,
+                debug: true,
                 onSubmit: function(id, fileName){},
                 onProgress: function(id, filename, loaded, total){
                   console.log(loaded + "/" + total);
                 },
                 onComplete: function(id, filename, response){
-                  share(response);
+                  console.log(response);
+                  share(response.url);
                 },
                 template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
