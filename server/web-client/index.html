@@ -218,6 +218,7 @@ function showWhy(){
                   $('.qq-upload-progress').width((loaded/total * 100).toString() +"%");
                 },
                 onComplete: function(id, filename, response){
+                  trackEvent('succsess', 'POST');
                   share(response.url);
                 },
                 template: '<div class="qq-uploader">' + 
@@ -246,7 +247,7 @@ function showWhy(){
     <div id="content">
       <div id="explenation">      
         <p>
-          ... can transfer text between devices<br/>
+          ... can transfer stuff between devices<br/>
                 <a href="javascript:void(0)" onclick="showWhy();">see why another tool?</a>
         </p>
           <div id="why" style="display:none;">
@@ -254,7 +255,7 @@ function showWhy(){
 
             No need to login.</br>          
             No need to install an application.</br>
-            No need to explain much.<br/> <br/>
+            No need to explain much.<br/>
             Just agree on a code word!
           </div>
         </p>
