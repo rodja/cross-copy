@@ -47,9 +47,8 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  //console.log(req.method + ' ' + secret);
-  //console.log(util.inspect(filecache));
-
+  console.log(req.method + ' ' + secret);
+  
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     
     if (getters[secret] === undefined) getters[secret] = [];
@@ -58,78 +57,81 @@ server = http.createServer(function (req, res) {
        res.hasBeenAborted = true;
     });
 
-    // if asking for a file
-    if (secret.indexOf('/') != -1){
-      if (filecache[secret] != undefined){
-        var file = filecache[secret];
-        fs.readFile(file.path, function(error, content) {
-          if (error) {
-            res.writeHead(500);
-            res.end();
-          } else {
-            res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
-            res.end(content, 'binary');
-          }
-        });
-      } else {
-        res.writeHead(404);
-        res.end();
-      }
-
+    // if not asking for a file we will wait for the shared data
+    if (secret.indexOf('/') == -1){
+      getters[secret].push(res);    
       return;
     }
 
-    getters[secret].push(res);    
+    if (filecache[secret] != undefined){
+      var file = filecache[secret];
+      fs.readFile(file.path, function(error, content) {
+        if (error) {
+          res.writeHead(500);
+          res.end();
+        } else {
+          res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+          res.end(content, 'binary');
+        }
+      });
+    } else {
+      res.writeHead(404);
+      res.end();
+    }
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
 
-      if (getters[secret] == undefined){
-        res.writeHead(404, header);
-        res.end('0\n');
-        return;
-      }
+    if (getters[secret] == undefined){
+      res.writeHead(404, header);
+      res.end('0\n');
+      return;
+    }
 
-      req.on('data', function(chunk) {
-        var livingGetters = 0;
-        getters[secret].forEach(function(getter){
-          if (!getter.hasBeenAborted)
-            livingGetters++;
-          else {
-            getter.writeHead(200, header);
-            getter.end(chunk);
-          }
-        });
-        
-        res.writeHead(200, header);
-        res.end(livingGetters + '\n');
-        getters[secret] = undefined;
-     });
+    req.on('data', function(chunk) {
+      var livingGetters = 0;
+      getters[secret].forEach(function(getter){
+        if (!getter.hasBeenAborted)
+          livingGetters++;
+        else {
+          getter.writeHead(200, header);
+          getter.end(chunk);
+        }
+      });
+      
+      res.writeHead(200, header);
+      res.end(livingGetters + '\n');
+      getters[secret] = undefined;
+   });
 
-    } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
+  } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
 
-      if (secret.indexOf('/') == -1) {
-        res.writeHead(403);
-        res.end();
-      }
+    if (secret.indexOf('/') == -1) {
+      res.writeHead(403);
+      res.end();
+    }
 
-      var form = new formidable.IncomingForm();
-        form.parse(req, function(err, fields, files) {
-          if (err) {
-            res.writeHead(500); res.end();
-            return;
-          }
-          var file = files.file;
-          if (file === undefined) file = files.data;
-          filecache[secret] = file;
+    var form = new formidable.IncomingForm();
+      form.parse(req, function(err, fields, files) {
+        if (err) {
+          res.writeHead(500); res.end();
+          return;
+        }
+        var file = files.file;
+        if (file === undefined) file = files.data;
+        filecache[secret] = file;
 
-          res.writeHead(200, {'content-type': 'text/plain'});
-          res.end('/api/'+ secret);
+        res.writeHead(200, {'content-type': 'text/plain'});
+        res.end('/api/'+ secret);
 
-          setTimeout(function(){ 
-            fs.unlink(file.path);
-          }, 10 * 60 * 1000);
-        });
+        setTimeout(function(){ 
+          fs.unlink(file.path);
+        }, 10 * 60 * 1000);
+      });
   }
+
+  //console.log(util.inspect(filecache));
+  console.log(util.inspect(getters));
+
 
   if (pathname.indexOf('/api') == 0) return;
 

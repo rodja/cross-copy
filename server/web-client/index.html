@@ -125,6 +125,48 @@ function paste(data){
   localStorage.setItem('history', JSON.stringify(history, null, 2));
 }
 
+function share(text){
+
+  if (secret.length == 0){
+    $('#step-2 h2').css({color: '#f00'});
+    $('#step-1 h2').css({color: ''});
+    return;
+  }
+
+  if (request != undefined)
+    request.abort();
+
+  trackEvent('data', 'submitted');
+
+  $.ajax({
+      url: server + '/' + secret,
+      type: 'PUT',
+      processData: false,
+      crossDomain: false,
+      data: text,
+      dataType: "text",
+      success: function(response){
+        if (response == 0){
+          $('#step-1 h2').css({color: '#f00'});
+          trackEvent('error', 'lonley PUT');
+        }
+        else {
+          trackEvent('succsess', 'GET');
+          $('#step-1 h2').css({color: ''});       
+          paste($('#data').val());
+          localStorage.setItem('secrets', JSON.stringify([secret], null, 2));
+        }
+      },
+      error: function(xhr, status){
+        $('#step-1 h2').css({color: '#f00'});
+        trackEvent('error', 'PUT');
+      },
+      complete: function(xhr, status){
+        listen(true);
+      }
+  });
+}
+
 $(document).ready(function() {
 
  
@@ -149,46 +191,8 @@ $(document).ready(function() {
     
     if (e.which != 13)
       return;
-
-    if (secret.length == 0){
-      $('#step-2 h2').css({color: '#f00'});
-      $('#step-1 h2').css({color: ''});
-      return;
-    }
-
-    if (request != undefined)
-      request.abort();
-
-    trackEvent('data', 'submitted');
-
-    $.ajax({
-	      url: server + '/' + secret,
-	      type: 'PUT',
-        processData: false,
-        crossDomain: false,
-	      data: $('#data').val(),
-        dataType: "text",
-        success: function(response){
-          if (response == 0){
-            $('#step-1 h2').css({color: '#f00'});
-            trackEvent('error', 'lonley PUT');
-          }
-          else {
-            trackEvent('succsess', 'GET');
-            $('#step-1 h2').css({color: ''});       
-            paste($('#data').val());
-            localStorage.setItem('secrets', JSON.stringify([secret], null, 2));
-          }
-        },
-	      error: function(xhr, status){
-          $('#step-1 h2').css({color: '#f00'});
-          trackEvent('error', 'PUT');
-	      },
-	      complete: function(xhr, status){
-          listen(true);
-	      }
-	  });
-
+  
+    share($('#data').val());    
   });
   
 });
@@ -212,7 +216,7 @@ function showWhy(){
                   console.log(loaded + "/" + total);
                 },
                 onComplete: function(id, filename, response){
-                  console.log("completed");                
+                  share(response);
                 },
                 template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
