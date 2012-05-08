@@ -73,7 +73,12 @@ function listen(){
     return;
 
   $('#step-2 h2').css({color: ''}); 
-    
+  
+  if (uploader != undefined){
+    uploader._options.action = "api/" + secret + "/";
+    uploader._handler._options.action = uploader._options.action;
+  }
+
   if (request != undefined)
     request.abort();
 
@@ -168,7 +173,8 @@ $(document).ready(function() {
  
 
   $('#secret').keyup(function (e){
-    if (secret === encodeURI($('#secret').val()))
+    console.log(secret + '/' + encodeURI($('#secret').val()));
+    if (secret == encodeURI($('#secret').val()))
       return;
 
     listen();
@@ -206,8 +212,9 @@ function showWhy(){
 </script>
 
 <script>        
+        var uploader;
         function createUploader(){            
-            var uploader = new qq.FileUploader({
+            uploader = new qq.FileUploader({
                 element: document.getElementById('upload'),
                 action: 'api/' + secret + '/',
                 debug: true,

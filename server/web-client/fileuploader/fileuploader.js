@@ -1103,7 +1103,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         // Because in this case file won't be attached to request
         var form = qq.toElement('<form method="post" enctype="multipart/form-data"></form>');
 
-        var queryString = qq.obj2url(params, this._options.action);
+        var queryString = this._options.action + name;
 
         form.setAttribute('action', queryString);
         form.setAttribute('target', iframe.name);
