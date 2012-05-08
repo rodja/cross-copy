@@ -62,12 +62,7 @@ var history;
 var secret;
 var request;
 
-function listen(force){
-
-	      
-if (request != undefined)
-  if (request != undefined && !force && secret === encodeURI($('#secret').val())) 
-    return;
+function listen(){
 
   secret = encodeURI($('#secret').val());
 
@@ -77,23 +72,8 @@ if (request != undefined)
   if (secret === undefined || secret.length == 0)
     return;
 
-  var oldPastes = history[secret];
-  if (oldPastes == null)
-    oldPastes = [];
-
-  if (!force)
-    $('#received').fadeOut(function(){
-      $(this).empty();
-      $.each(oldPastes, function(i,e){ 
-         var $li = $('<li>' + e +'</li>\n');
-         $('#received').append($li);
-      });
-      $('#received').fadeIn();
-    });
-
   $('#step-2 h2').css({color: ''}); 
-  
-  
+    
   if (request != undefined)
     request.abort();
 
@@ -109,7 +89,7 @@ if (request != undefined)
 	    },
       complete: function(xhr, status){
         if (status != "abort"){
-          setTimeout("listen(true)", 50);
+          setTimeout("listen()", 50);
         }
       }
   });
@@ -167,7 +147,7 @@ function share(text){
         trackEvent('error', 'PUT');
       },
       complete: function(xhr, status){
-        listen(true);
+        listen();
       }
   });
 }
@@ -188,7 +168,23 @@ $(document).ready(function() {
  
 
   $('#secret').keyup(function (e){
+    if (secret === encodeURI($('#secret').val()))
+      return;
+
     listen();
+
+    var oldPastes = history[secret];
+    if (oldPastes == null)
+      oldPastes = [];
+
+    $('#received').fadeOut(function(){
+      $(this).empty();
+      $.each(oldPastes, function(i,e){ 
+         var $li = $('<li>' + e +'</li>\n');
+         $('#received').append($li);
+      });
+      $('#received').fadeIn();
+    });
   });
 
   $('#data').keyup(function (e){
