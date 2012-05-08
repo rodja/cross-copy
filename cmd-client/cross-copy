@@ -1,11 +1,13 @@
 #!/bin/bash
 
-SERVER=http://localhost:8080/api
+SERVER=http://localhost:8080
 
 if [ $# == 1 ]; then
-  curl $SERVER/$1
+  PASTE=`curl -s $SERVER/api/$1`
+  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE
+  echo $PASTE
 elif [ $# == 2 ]; then
-  curl -X PUT -d "$2" $SERVER/$1
+  curl -X PUT -s -d "$2" $SERVER/api/$1
 else
   echo "wrong number of arguments. usage:"
   echo "   $ cross-copy my-secred-code              # to receive data"

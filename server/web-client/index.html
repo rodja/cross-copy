@@ -63,6 +63,8 @@ var secret;
 var request;
 
 function listen(force){
+
+	      
 if (request != undefined)
   if (request != undefined && !force && secret === encodeURI($('#secret').val())) 
     return;
@@ -106,8 +108,8 @@ if (request != undefined)
         trackEvent('error', 'GET');
 	    },
       complete: function(xhr, status){
-	      if (status != "abort"){
-          setTimeout("listen()", 50);
+        if (status != "abort"){
+          setTimeout("listen(true)", 50);
         }
       }
   });
@@ -115,6 +117,9 @@ if (request != undefined)
 
 function paste(data){
 
+  if (data.indexOf('/api/' + secret) != -1)
+    data = '<a href="' + data + '">' + data.substring(('/api/' + secret).length + 1) + '</a>';
+  
   var $li = $('<li>' + data +'</li>\n');
   $('#received').prepend($li);
   $li.hide().slideDown();
@@ -169,7 +174,6 @@ function share(text){
 
 $(document).ready(function() {
 
- 
   history = JSON.parse(localStorage.getItem('history'));
   if (history == null) history = {};
 
