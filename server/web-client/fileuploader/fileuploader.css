@@ -29,3 +29,9 @@ opacity:0.8;
 
 .qq-upload-failed-text {display:none;}
 .qq-upload-fail .qq-upload-failed-text {display:inline;}
+
+.qq-upload-progress{
+  clear:both;
+  border-top:3px solid black;
+  width:0%;
+}

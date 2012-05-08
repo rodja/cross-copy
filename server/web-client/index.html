@@ -215,20 +215,19 @@ function showWhy(){
             uploader = new qq.FileUploader({
                 element: document.getElementById('upload'),
                 action: 'api/' + secret + '/',
-                debug: true,
+                debug: false,
                 onSubmit: function(id, fileName){},
                 onProgress: function(id, filename, loaded, total){
-                  console.log(loaded + "/" + total);
+                  $('.qq-upload-progress').width((loaded/total * 100).toString() +"%");
                 },
                 onComplete: function(id, filename, response){
-                  console.log(response);
                   share(response.url);
                 },
                 template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
                   '<div class="qq-upload-button"><img src="fileuploader/upload.png"</img></div>' +
-                  '<div class="qq-upload-progress"></div>' + 
-                '</div>',
+                  '' + 
+                '</div><div class="qq-upload-progress"></div>',
                 listElement: " "
             });           
         }
