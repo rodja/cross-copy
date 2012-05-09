@@ -110,7 +110,6 @@ function paste(data, direction){
   var pastes = [];
   $("ul li").each(function() { 
     var direction = $(this).attr('class');    
-    console.log("dir " + direction);
     pastes.push( {'direction': direction, 'msg' : $(this).text() });
   });
   history[secret] = pastes;
@@ -204,7 +203,6 @@ function showHistory(){
     $.each(oldPastes, function(i,e){
        var d = e.direction ? e.direction : 'in';
        var $li = $('<li class="' + d + '">' + (e.msg != undefined ? e.msg : e) +'</li>\n');
-      console.log($li);       
       $('#received').append($li);
     });
     $('#received').fadeIn();
@@ -290,7 +288,7 @@ function showWhy(){
       </div>
 
       <div id="step-4" class="step">
-        <h2><span class="num">4</span> see cross copied text</h2>
+        <h2><span class="num">4</span> your history of cross copies</h2>
         <ul id="received"></ul>
       </div>
     </div>
