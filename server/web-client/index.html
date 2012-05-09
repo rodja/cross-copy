@@ -163,6 +163,7 @@ $(document).ready(function() {
   if (secrets != null && secrets.length > 0){
     $('#secret').val(secrets[0]); 
     listen();
+    showHistory();
   }
  
   $('#secret').focus();
@@ -174,18 +175,7 @@ $(document).ready(function() {
 
     listen();
 
-    var oldPastes = history[secret];
-    if (oldPastes == null)
-      oldPastes = [];
-
-    $('#received').fadeOut(function(){
-      $(this).empty();
-      $.each(oldPastes, function(i,e){ 
-         var $li = $('<li>' + e +'</li>\n');
-         $('#received').append($li);
-      });
-      $('#received').fadeIn();
-    });
+    showHistory();
   });
 
   $('#data').keyup(function (e){
@@ -197,6 +187,24 @@ $(document).ready(function() {
   });
   
 });
+
+function showHistory(){
+
+  var oldPastes = history[secret];
+  if (oldPastes == null)
+    oldPastes = [];
+
+  $('#received').fadeOut(function(){
+    $(this).empty();
+    $.each(oldPastes, function(i,e){
+       var d = e.direction != undefined ? e.direction : 'in';
+       console.log(d);
+       var $li = $('<li class="' + d + '">' + e +'</li>\n');
+       $('#received').append($li);
+    });
+    $('#received').fadeIn();
+  });
+}
 
 function showWhy(){
   $('#explenation a').fadeOut(200, function(){
