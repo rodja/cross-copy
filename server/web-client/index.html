@@ -84,7 +84,7 @@ function listen(){
       success: function(response){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-        paste(response);
+        paste(response, "in");
       },
       error: function(xhr, status){
         trackEvent('error', 'GET');
@@ -97,17 +97,22 @@ function listen(){
   });
 }
 
-function paste(data){
+function paste(data, direction){
 
   if (data.indexOf('/api/' + secret) != -1)
     data = '<a href="' + data + '">' + data.substring(('/api/' + secret).length + 1) + '</a>';
   
   var $li = $('<li>' + data +'</li>\n');
+  $li.addClass(direction);
   $('#received').prepend($li);
   $li.hide().slideDown();
 
   var pastes = [];
-  $("ul li").each(function() { pastes.push($(this).text()) });
+  $("ul li").each(function() { 
+    var direction = $(this).attr('class');    
+    console.log("dir " + direction);
+    pastes.push( {'direction': direction, 'msg' : $(this).text() });
+  });
   history[secret] = pastes;
   localStorage.setItem('history', JSON.stringify(history, null, 2));
 }
@@ -140,7 +145,7 @@ function share(text){
         else {
           trackEvent('succsess', 'GET');
           $('#step-1 h2').css({color: ''});       
-          paste(text);
+          paste(text, "out");
           localStorage.setItem('secrets', JSON.stringify([secret], null, 2));
         }
       },
@@ -197,10 +202,10 @@ function showHistory(){
   $('#received').fadeOut(function(){
     $(this).empty();
     $.each(oldPastes, function(i,e){
-       var d = e.direction != undefined ? e.direction : 'in';
-       console.log(d);
-       var $li = $('<li class="' + d + '">' + e +'</li>\n');
-       $('#received').append($li);
+       var d = e.direction ? e.direction : 'in';
+       var $li = $('<li class="' + d + '">' + (e.msg != undefined ? e.msg : e) +'</li>\n');
+      console.log($li);       
+      $('#received').append($li);
     });
     $('#received').fadeIn();
   });
