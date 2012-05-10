@@ -111,7 +111,8 @@ function paste(data, direction){
   var pastes = [];
   $("ul li").each(function() { 
     var direction = $(this).attr('class');    
-    pastes.push( {'direction': direction, 'msg' : $(this).text() });
+    if (direction === 'in' || direction === 'out')   
+      pastes.push( {'direction': direction, 'msg' : $(this).text() });
   });
   history[secret] = pastes;
   localStorage.setItem('history', JSON.stringify(history, null, 2));
@@ -211,7 +212,7 @@ function showHistory(){
       $('#received').append($li);
     });
     if (oldPastes.length > 0)
-      $('#received').prepend($('<li class="new-session">'+ (new Date()).toLocaleDateString() + " --- " + (new Date()).toLocaleTimeString() +'</li>'));
+      $('#received').prepend($('<li class="new-session">locally stored history for this secret</li>'));
     $('#received').fadeIn();
   });
 }
@@ -295,7 +296,7 @@ function showWhy(){
       </div>
 
       <div id="step-4" class="step">
-        <h2><span class="num">4</span> your recorded cross copies</h2>
+        <h2><span class="num">4</span> wait for appearing cross copies</h2>
         <ul id="received"></ul>
       </div>
     </div>
