@@ -52,6 +52,7 @@ function trackEvent(category, action){
             <link rel='stylesheet' href='styles.css' type='text/css' />
             <link rel='stylesheet' href='fileuploader/fileuploader.css' type='text/css' />
             <script src='jquery-1.7.1.min.js' type='text/javascript'></script>
+            <script src='jquery.autosize-min.js' type='text/javascript'></script>
             <script src='fileuploader/fileuploader.js' type='text/javascript'></script>
             
             <script type="text/javascript">
@@ -186,9 +187,13 @@ $(document).ready(function() {
     
     if (e.which != 13)
       return;
-  
     share($('#data').val());    
   });
+  $('#data').keypress(function(e){
+    if (e.which == 13)
+      e.preventDefault();
+  });
+  $('#data').autosize();
   
 });
 
@@ -283,7 +288,7 @@ function showWhy(){
 
       <div  id="step-3" class="step">
         <h2><span class="num">3</span> enter text and press return</h2>
-        <input name="data" id="data" type="text" size="30" placeholder="">
+        <textarea name="data" id="data" rows=1 type="text" size="30" placeholder="or pick a file"></textarea>
         <div id="upload"></div>      
       </div>
 
