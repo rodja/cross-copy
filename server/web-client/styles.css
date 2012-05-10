@@ -120,3 +120,10 @@ li {
 .in {
   text-align:right;
 }
+
+.new-session{
+  border-top:1px solid #ddd;
+  color:gray;
+  font-size:50%;
+  margin-bottom:0.5em;
+}

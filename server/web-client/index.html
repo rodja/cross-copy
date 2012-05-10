@@ -210,6 +210,8 @@ function showHistory(){
        var $li = $('<li class="' + d + '">' + (e.msg != undefined ? e.msg : e) +'</li>\n');
       $('#received').append($li);
     });
+    if (oldPastes.length > 0)
+      $('#received').prepend($('<li class="new-session">'+ (new Date()).toLocaleDateString() + " --- " + (new Date()).toLocaleTimeString() +'</li>'));
     $('#received').fadeIn();
   });
 }
@@ -293,7 +295,7 @@ function showWhy(){
       </div>
 
       <div id="step-4" class="step">
-        <h2><span class="num">4</span> your history of cross copies</h2>
+        <h2><span class="num">4</span> your recorded cross copies</h2>
         <ul id="received"></ul>
       </div>
     </div>
