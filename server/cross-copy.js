@@ -9,6 +9,8 @@
 //    PUT   /api/<secret code>
 //  store a file temporary on the server at the given uri
 //    POST  /api/<secret code>/<filename.extension>
+//  see who is listening on the given phrase
+//    GET   /api/<secret code>?count=listeners
 
 /*  
     Copyright 2012 Rodja Trappe
@@ -39,6 +41,8 @@ var header = {'Content-Type': 'text/plain'}
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+
+// using a fork of formidable be make octstream parsing possible
 var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
@@ -47,11 +51,23 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  //console.log(req.method + ' ' + secret);
+  console.log(req.method + ' ' + pathname);
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
 
+
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
+    console.log(util.inspect(require('url').parse(req.url, true).query));
+    if (require('url').parse(req.url, true).query.count == 'listeners') {
+      var livingGetters = 0;
+      getters[secret].forEach(function(getter){
+        if (!getter.hasBeenAborted) livingGetters++;
+      });
+      res.writeHead(200, header);
+      res.end(livingGetters + '\n');
+      console.log(livingGetters);
+      return;
+    }
     
     if (getters[secret] === undefined) getters[secret] = [];
     req.socket.secret = secret;

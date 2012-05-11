@@ -3,6 +3,7 @@
 SERVER=http://localhost:8080
 
 if [ $# == 1 ]; then
+  echo "waiting for pastes on secret '$1'"
   PASTE=`curl -s $SERVER/api/$1`
   [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE
   echo $PASTE
@@ -10,6 +11,6 @@ elif [ $# == 2 ]; then
   curl -X PUT -s -d "$2" $SERVER/api/$1
 else
   echo "wrong number of arguments. usage:"
-  echo "   $ cross-copy my-secred-code              # to receive data"
-  echo "   $ cross-copy my-secred-code 'some data'  # to send data"
+  echo "   $ cross-copy secred-code              # to receive data"
+  echo "   $ cross-copy secred-code 'some data'  # to send data"
 fi
