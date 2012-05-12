@@ -57,15 +57,20 @@ server = http.createServer(function (req, res) {
 
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
-    console.log(util.inspect(require('url').parse(req.url, true).query));
-    if (require('url').parse(req.url, true).query.count == 'listeners') {
-      var livingGetters = 0;
+    var query = require('url').parse(req.url, true).query;    
+    if (query.watch == 'listeners' && getters[secret] != undefined) {
+      var listeners = 0;
       getters[secret].forEach(function(getter){
-        if (!getter.hasBeenAborted) livingGetters++;
+        if (!getter.hasBeenAborted) listeners++;
       });
-      res.writeHead(200, header);
-      res.end(livingGetters + '\n');
-      console.log(livingGetters);
+
+      if (listeners != query.count){
+        res.writeHead(200, header);
+        res.end(listeners + '\n');
+      } else{
+        res.writeHead(200, header);
+        res.end('longpoll!!!\n');
+      }
       return;
     }
     
