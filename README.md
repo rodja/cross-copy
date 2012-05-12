@@ -1,6 +1,6 @@
 # cross copy
 
-The web app http://www.cross-copy.net attacs the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The backend is written in node.js. There is also a commandline tool for sending and receiving stuff when working on a server.
+The Web App http://www.cross-copy.net attacs the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The only thing which needs to be done on all participating devices is to agree on a secret phrase and connect to a RESTful Web Service (written in node.js). There is also a commandline tool for sending and receiving stuff when working on a remote computer via ssh or similar.
 
 ## Use Cases
 
