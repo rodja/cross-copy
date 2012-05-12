@@ -10,6 +10,23 @@ The web app http://www.cross-copy.net attacs the problem when you  spontaneously
  * send address to someone who is asking for it on the phone (alternatives: send email, spell it) 
  * ...
 
+## Service API
+
+The web-client uses the hostname http://www.cross-copy.net
+
+waiting for data to appear "on the given phrase" (long polling)
+    GET   /api/<secret code>
+
+send data in body to all waiting clients    
+    PUT   /api/<secret code>
+
+store a file temporary on the server at the given uri
+    POST  /api/<secret code>/<filename.extension>
+
+watch number of listeners for changes (long polling)
+    GET   /api/<secret code>?watch=listeners&count=<known num of listeners>
+
+
 ## License
 
 Copyright (c) Rodja Trappe
