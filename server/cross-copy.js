@@ -3,14 +3,14 @@
 //
 // usage:
 
-//  wait's for data on the given phrase
+//  wait's for data on the given phrase (long polling)
 //    GET   /api/<secret code>
 //  sends data in body to all waiting clients    
 //    PUT   /api/<secret code>
 //  store a file temporary on the server at the given uri
 //    POST  /api/<secret code>/<filename.extension>
-//  see who is listening on the given phrase
-//    GET   /api/<secret code>?count=listeners
+//  watch number of listeners for changes (long polling)
+//    GET   /api/<secret code>?watch=listeners&count=<known num of listeners>
 
 /*  
     Copyright 2012 Rodja Trappe
@@ -34,6 +34,7 @@
 var port = 8080;
 
 var getters = {};
+var watchers = {};
 var filecache = {};
 
 var header = {'Content-Type': 'text/plain'}
@@ -46,6 +47,20 @@ var path = require('path');
 var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
+function updateWatchers(secret){
+  var untouched = [];     
+  console.log("getters  " + getters[secret].length);
+  console.log("watchers a " + watchers[secret].length);
+  watchers[secret].forEach(function(watcher){
+    if (watcher.knownNumberOfListeners != getters[secret].length){
+      watcher.writeHead(200, header);
+      watcher.end(getters[secret].length + '\n');
+    } else untouched.push(watcher);
+  });
+  watchers[secret] = untouched;
+  console.log("watchers b " + watchers[secret].length);
+}
+
 server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
@@ -54,35 +69,37 @@ server = http.createServer(function (req, res) {
   console.log(req.method + ' ' + pathname);
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
-
+  if (watchers[secret] == undefined) watchers[secret] = [];
+  if (getters[secret] === undefined) getters[secret] = [];
+     
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     var query = require('url').parse(req.url, true).query;    
-    if (query.watch == 'listeners' && getters[secret] != undefined) {
-      var listeners = 0;
-      getters[secret].forEach(function(getter){
-        if (!getter.hasBeenAborted) listeners++;
-      });
+    if (query.watch == 'listeners') {
 
-      if (listeners != query.count){
+      if (getters[secret].length != query.count){
         res.writeHead(200, header);
-        res.end(listeners + '\n');
+        res.end(getters[secret].length + '\n');
       } else{
-        res.writeHead(200, header);
-        res.end('longpoll!!!\n');
+        res.knownNumberOfListeners = query.count;
+        watchers[secret].push(res);
       }
       return;
     }
     
-    if (getters[secret] === undefined) getters[secret] = [];
     req.socket.secret = secret;
     req.connection.on('close',function(){  
-       res.hasBeenAborted = true;
+       // remove this getter from list
+       if (res === undefined) return;
+       getters[secret].splice(getters[secret].indexOf(res), 1);
+       updateWatchers(secret);
     });
 
-    // if not asking for a file we will wait for the shared data
     if (secret.indexOf('/') == -1){
-      getters[secret].push(res);    
+      // if not asking for a file we will wait for the shared data
+      getters[secret].push(res); 
+      
+      updateWatchers(secret);
       return;
     }
 
@@ -104,25 +121,22 @@ server = http.createServer(function (req, res) {
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
 
-    if (getters[secret] == undefined){
+    if (getters[secret] == undefined || getters[secret].length == 0){
       res.writeHead(404, header);
       res.end('0\n');
       return;
     }
 
     req.on('data', function(chunk) {
-      var livingGetters = 0;
       getters[secret].forEach(function(getter){
-        if (!getter.hasBeenAborted){
-          livingGetters++;
-          getter.writeHead(200, header);
-          getter.end(chunk);
-        }
+        getter.writeHead(200, header);
+        getter.end(chunk);
       });
       
       res.writeHead(200, header);
-      res.end(livingGetters + '\n');
-      getters[secret] = undefined;
+      res.end(getters[secret].length + '\n');
+      getters[secret] = [];
+      updateWatchers(secret);
    });
 
   } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
