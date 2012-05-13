@@ -1,6 +1,6 @@
-# cross copy
+# About
 
-The Web App http://www.cross-copy.net attacs the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The only thing which needs to be done on all participating devices is to agree on a secret phrase and connect to a RESTful Web Service (written in node.js). There is also a commandline tool for sending and receiving stuff when working on a remote computer via ssh or similar.
+*cross copy* (http://www.cross-copy.net) attacs the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The only thing which needs to be done on all participating devices is to agree on a secret phrase and connect to a RESTful Web Service (written in node.js). The hosted [Web App](http://www.cross-copy.net) provides a neat interface for doing so in any modern Browser (not IE). There is also a commandline tool for sending and receiving stuff when working on a remote system via ssh or similar (of course you can also use curl directly).
 
 ## Use Cases
 
