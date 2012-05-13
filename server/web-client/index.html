@@ -61,7 +61,7 @@ function trackEvent(category, action){
 var server = "/api";
 var history;
 var secret;
-var request;
+var receiverRequest;
 var watchRequest;
 var listenerCount = 0;
 
@@ -69,8 +69,8 @@ function listen(){
 
   secret = encodeURI($('#secret').val());
 
-  if (request != undefined)
-    request.abort();
+  if (receiverRequest != undefined)
+    receiverRequest.abort();
 
   if (secret === undefined || secret.length == 0)
     return;
@@ -82,7 +82,7 @@ function listen(){
     uploader._handler._options.action = uploader._options.action;
   }
 
-  request = $.ajax({
+  receiverRequest = $.ajax({
       url: server + '/' + secret,
       success: function(response){
         trackEvent('succsess', 'GET');
@@ -111,6 +111,12 @@ function watch(){
       success: function(response){
         trackEvent('watch_listeners', 'changed');
         listenerCount = response - 1;
+
+        // wait for reconnecting myself
+        if (listenerCount == -1){
+          return;
+        }
+
         var msg = "(" + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s use" : " uses") + " this secret)";
         if ($('#step-2 p').is(":visible"))
           $('#step-2 p').text(msg);
@@ -157,8 +163,8 @@ function share(text){
     return;
   }
 
-  if (request != undefined)
-    request.abort();
+  if (receiverRequest != undefined)
+    receiverRequest.abort();
 
   trackEvent('data', 'submitted');
 
@@ -186,6 +192,7 @@ function share(text){
         trackEvent('error', 'PUT');
       },
       complete: function(xhr, status){
+receiverRequest = undefined;
         setTimeout("listen()", 50);
       }
   });

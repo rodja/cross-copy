@@ -49,8 +49,6 @@ var util = require('util');
 
 function updateWatchers(secret){
   var untouched = [];     
-  console.log("getters  " + getters[secret].length);
-  console.log("watchers a " + watchers[secret].length);
   watchers[secret].forEach(function(watcher){
     if (watcher.knownNumberOfListeners != getters[secret].length){
       watcher.writeHead(200, header);
@@ -58,7 +56,6 @@ function updateWatchers(secret){
     } else untouched.push(watcher);
   });
   watchers[secret] = untouched;
-  console.log("watchers b " + watchers[secret].length);
 }
 
 server = http.createServer(function (req, res) {
@@ -66,15 +63,17 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);
   
-  console.log(req.method + ' ' + pathname);
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
-  if (watchers[secret] == undefined) watchers[secret] = [];
+  if (watchers[secret] === undefined) watchers[secret] = [];
   if (getters[secret] === undefined) getters[secret] = [];
-     
+   
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
     var query = require('url').parse(req.url, true).query;    
+
+    //console.log(req.method + ' ' + pathname + " " + require('url').parse(req.url).query );
+    
     if (query.watch == 'listeners') {
 
       if (getters[secret].length != query.count){
@@ -88,10 +87,14 @@ server = http.createServer(function (req, res) {
     }
     
     req.socket.secret = secret;
-    req.connection.on('close',function(){  
-       // remove this getter from list
-       if (res === undefined) return;
-       getters[secret].splice(getters[secret].indexOf(res), 1);
+    req.connection.on('close',function(){
+       res.aborted = true;
+       var livingGetters = [];
+       getters[secret].forEach(function(getter){
+           if (!getter.aborted) livingGetters.push(getter);
+       });
+
+       getters[secret] = livingGetters;        
        updateWatchers(secret);
     });
 
@@ -120,8 +123,9 @@ server = http.createServer(function (req, res) {
     }
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
+    //console.log("PUT getters  " + getters[secret].length);
 
-    if (getters[secret] == undefined || getters[secret].length == 0){
+    if (getters[secret] == [] || getters[secret].length == 0){
       res.writeHead(404, header);
       res.end('0\n');
       return;
