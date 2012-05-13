@@ -62,6 +62,8 @@ var server = "/api";
 var history;
 var secret;
 var request;
+var watchRequest;
+var numberOfListeners = 1;
 
 function listen(){
 
@@ -97,6 +99,30 @@ function listen(){
       }
   });
 }
+
+function watch(){
+  if (watchRequest != undefined)
+    watchRequest.abort();
+
+  watchRequest = $.ajax({
+      url: server + '/' + secret + '?watch=listeners&count=' + numberOfListeners,
+      success: function(response){
+  console.log(response);
+        trackEvent('watch_listeners', 'changed');
+        numberOfListeners = response;
+        $('#step-1 p').text(response).hide().slideDown(1000);
+      },
+      error: function(xhr, status){
+        trackEvent('error', 'GET listeners count');
+	    },
+      complete: function(xhr, status){
+        if (status != "abort"){
+          setTimeout("watch()", 50);
+        }
+      }
+  });
+}
+
 
 function paste(data, direction){
 
@@ -169,6 +195,7 @@ $(document).ready(function() {
   if (secrets != null && secrets.length > 0){
     $('#secret').val(secrets[0]); 
     listen();
+    watch();
     showHistory();
   }
  
@@ -180,6 +207,8 @@ $(document).ready(function() {
       return;
 
     listen();
+
+    watch();
 
     showHistory();
   });
@@ -282,7 +311,8 @@ function showWhy(){
 
       <div id="step-1" class="step">
         <h2><span class="num">1</span> open this page on different devices</h2>
-      </div>
+        <p style="display:hidden"></p>     
+     </div>
 
       <div id="step-2" class="step">
         <h2><span class="num">2</span> enter the same secret</h2>

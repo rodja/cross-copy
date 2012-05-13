@@ -105,6 +105,7 @@ textarea:focus{
   top:-0.3em;
   font-size:2em;
   float:left;
+  padding-bottom:1em;
   height:1em;
 }
 
