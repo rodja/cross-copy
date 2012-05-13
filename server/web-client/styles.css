@@ -107,6 +107,12 @@ textarea:focus{
   float:left;
   padding-bottom:1em;
   height:1em;
+  clear:both;
+}
+
+#step-1 p {
+  margin-top:0.5em;
+  color:#666;
 }
 
 ul{
