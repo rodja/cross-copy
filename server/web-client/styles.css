@@ -110,9 +110,11 @@ textarea:focus{
   clear:both;
 }
 
-#step-1 p {
-  margin-top:0.5em;
-  color:#666;
+#step-2 p {
+  margin-top:0.2em;
+  color:#999;
+  font-size:70%;
+  text-align: right;
 }
 
 ul{
@@ -122,6 +124,7 @@ ul{
 li {
   list-style-type:none;
   margin-bottom:0.5em;  
+  margin-bottom:0.8em;  
 }
 
 .in {

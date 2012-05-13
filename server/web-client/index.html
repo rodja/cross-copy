@@ -63,7 +63,7 @@ var history;
 var secret;
 var request;
 var watchRequest;
-var numberOfListeners = 1;
+var listenerCount = 0;
 
 function listen(){
 
@@ -100,19 +100,22 @@ function listen(){
   });
 }
 
+var numbersAsWords = ['no','one','two','three','four', 'five','six','seven','eight','nine', 'ten','eleven','twelve'];
+
 function watch(){
   if (watchRequest != undefined)
     watchRequest.abort();
 
   watchRequest = $.ajax({
-      url: server + '/' + secret + '?watch=listeners&count=' + numberOfListeners,
+      url: server + '/' + secret + '?watch=listeners&count=' + (listenerCount + 1),
       success: function(response){
         trackEvent('watch_listeners', 'changed');
-        numberOfListeners = response;
-        if ($('#step-1 p').is(":visible"))
-          $('#step-1 p').text(response);
+        listenerCount = response - 1;
+        var msg = "(" + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s use" : " uses") + " this secret)";
+        if ($('#step-2 p').is(":visible"))
+          $('#step-2 p').text(msg);
         else
-          $('#step-1 p').text(response).hide().slideDown(1000);    
+          $('#step-2 p').text(msg).hide().slideDown(400);    
       },
       error: function(xhr, status){
         trackEvent('error', 'GET listeners count');
@@ -204,7 +207,7 @@ $(document).ready(function() {
   $('#secret').focus();
   $('#secret').select();
 
-  $('#step-1 p').hide();
+  $('#step-2 p').hide();
 
   $('#secret').keyup(function (e){
     if (secret == encodeURI($('#secret').val()))
@@ -315,12 +318,12 @@ function showWhy(){
 
       <div id="step-1" class="step">
         <h2><span class="num">1</span> open this page on different devices</h2>
-        <p style="display:hidden"></p>     
      </div>
 
       <div id="step-2" class="step">
         <h2><span class="num">2</span> enter the same secret</h2>
         <input name="secret" id="secret" type="text" size="30" placeholder="">
+        <p style="display:hidden"></p>     
       </div>
 
       <div  id="step-3" class="step">
