@@ -65,6 +65,19 @@ var receiverRequest;
 var watchRequest;
 var listenerCount = 0;
 
+// Feature detect + local reference (from http://mathiasbynens.be/notes/localstorage-pattern)
+var storage = (function() {
+  var uid = new Date,
+      storage,
+      result;
+  try {
+    (storage = window.localStorage).setItem(uid, uid);
+    result = storage.getItem(uid) == uid;
+    storage.removeItem(uid);
+    return result && storage;
+  } catch(e) {}
+}());
+
 function listen(){
 
   secret = encodeURI($('#secret').val());
@@ -152,7 +165,7 @@ function paste(data, direction){
       pastes.push( {'direction': direction, 'msg' : $(this).text() });
   });
   history[secret] = pastes;
-  localStorage.setItem('history', JSON.stringify(history, null, 2));
+  storage && storage.setItem('history', JSON.stringify(history, null, 2));
 }
 
 function share(text){
@@ -184,7 +197,7 @@ function share(text){
           trackEvent('succsess', 'GET');
           $('#step-1 h2').css({color: ''});       
           paste(text, "out");
-          localStorage.setItem('secrets', JSON.stringify([secret], null, 2));
+          storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
         }
       },
       error: function(xhr, status){
@@ -200,16 +213,21 @@ receiverRequest = undefined;
 
 $(document).ready(function() {
 
-  history = JSON.parse(localStorage.getItem('history'));
-  if (history == null) history = {};
+  try{
+    if (storage)
+      history = JSON.parse(storage.getItem('history'));
+    if (history == null) history = {};
 
-  var secrets = JSON.parse(localStorage.getItem('secrets'));
-  if (secrets != null && secrets.length > 0){
-    $('#secret').val(secrets[0]); 
-    listen();
-    watch();
-    showHistory();
-  }
+    if (storage){
+      var secrets = JSON.parse(storage.getItem('secrets'));
+      if (secrets != null && secrets.length > 0){
+        $('#secret').val(secrets[0]); 
+        listen();
+        watch();
+        showHistory();
+      }
+    }
+  } catch (e){ history = {}; }
  
   $('#secret').focus();
   $('#secret').select();
