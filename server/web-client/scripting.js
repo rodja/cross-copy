@@ -1,4 +1,24 @@
-/*jslint devel: true, browser: true, sloppy: true, eqeq: true, white: true, maxerr: 50, indent: 2 */
+/*
+  Copyright 2012 Rodja Trappe
+
+  This file is part of cross copy.
+
+  cross copy is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  cross copy is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with cross copy.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+/* jslint devel: true, browser: true, sloppy: true, eqeq: true, white: true, maxerr: 50, indent: 2 */
 
 var internetExplorerSucks = 30;
 var server = "/api";
@@ -7,8 +27,6 @@ var secret;
 var receiverRequest;
 var watchRequest;
 var listenerCount = 0;
-
-
 
 
 // Feature detect + local reference (from http://mathiasbynens.be/notes/localstorage-pattern)
@@ -44,6 +62,7 @@ function listen () {
 
   receiverRequest = $.ajax({
       url: server + '/' + secret,
+      cache: false,
       success: function(response){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
@@ -68,6 +87,7 @@ function watch(){
 
   watchRequest = $.ajax({
       url: server + '/' + secret + '?watch=listeners&count=' + (listenerCount + 1),
+      cache: false,
       success: function(response){
         trackEvent('watch_listeners', 'changed');
         listenerCount = response - 1;
@@ -130,6 +150,7 @@ function share(text){
 
   $.ajax({
       url: server + '/' + secret,
+      cache: false,
       type: 'PUT',
       processData: false,
       crossDomain: false,

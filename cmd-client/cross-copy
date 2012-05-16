@@ -1,6 +1,8 @@
 #!/bin/bash
 
 SERVER=http://localhost:8080
+#SERVER=http://www.cross-copy.net
+
 
 if [ $# == 1 ]; then
   echo "waiting for pastes on secret '$1'"
