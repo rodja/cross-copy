@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="crosscopy-ios-client/RootViewController.cs">
+    <Files>
+      <File FileName="crosscopy-ios-client/AppDelegate.cs" Line="9" Column="30" />
+      <File FileName="crosscopy-ios-client/Helpers.cs" Line="5" Column="11" />
+      <File FileName="crosscopy-ios-client/RootViewController.cs" Line="325" Column="7" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
