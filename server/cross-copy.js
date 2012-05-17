@@ -47,6 +47,21 @@ var path = require('path');
 var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
+function track(){
+  var options = {
+    host: 'www.google-analytics.com',
+    path: '/__utm.gif?utmwv=1&utmac=UA-31324545-2&utmp=/track&utmdt=Trackz'
+  };
+
+  http.get(options, function(res) {
+    console.log("Got response: " + res.statusCode);
+  }).on('error', function(e) {
+    console.log("Got error: " + e.message);
+  });
+}
+
+track();
+
 function updateWatchers(secret){
   var untouched = [];     
   watchers[secret].forEach(function(watcher){
@@ -140,6 +155,9 @@ server = http.createServer(function (req, res) {
       res.writeHead(200, header);
       res.end(getters[secret].length + '\n');
       getters[secret] = [];
+
+      track();
+
       updateWatchers(secret);
    });
 
