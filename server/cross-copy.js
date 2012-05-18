@@ -98,12 +98,15 @@ server = http.createServer(function (req, res) {
         res.knownNumberOfListeners = query.count;
         watchers[secret].push(res);
       }
+      track("watch-listeners");
       return;
     }
     
     req.socket.secret = secret;
     req.connection.on('close',function(){
        res.aborted = true;
+       track("get-aborted");
+      
        var livingGetters = [];
        getters[secret].forEach(function(getter){
            if (!getter.aborted) livingGetters.push(getter);
@@ -116,6 +119,7 @@ server = http.createServer(function (req, res) {
     if (secret.indexOf('/') == -1){
       // if not asking for a file we will wait for the shared data
       getters[secret].push(res); 
+      track("get-waiting");
       
       updateWatchers(secret);
       return;
@@ -126,14 +130,17 @@ server = http.createServer(function (req, res) {
       fs.readFile(file.path, function(error, content) {
         if (error) {
           res.writeHead(500);
+          track("get-file-500");
           res.end();
         } else {
           res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
           res.end(content, 'binary');
+          track("get-file-200");
         }
       });
     } else {
       res.writeHead(404);
+      track("get-file-404");
       res.end();
     }
  
@@ -143,20 +150,23 @@ server = http.createServer(function (req, res) {
     if (getters[secret] == [] || getters[secret].length == 0){
       res.writeHead(404, header);
       res.end('0\n');
+      track("put-404");
       return;
     }
 
     req.on('data', function(chunk) {
       getters[secret].forEach(function(getter){
         getter.writeHead(200, header);
+        track("get-200");
         getter.end(chunk);
       });
       
+      track("put-" + getters[secret].length);
+
       res.writeHead(200, header);
       res.end(getters[secret].length + '\n');
       getters[secret] = [];
 
-      track();
 
       updateWatchers(secret);
    });
@@ -164,6 +174,7 @@ server = http.createServer(function (req, res) {
   } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
 
     if (secret.indexOf('/') == -1) {
+      track("post-403");
       res.writeHead(403);
       res.end();
     }
@@ -172,6 +183,7 @@ server = http.createServer(function (req, res) {
       form.parse(req, function(err, fields, files) {
         if (err) {
           res.writeHead(500); res.end();
+          track("post-500");
           return;
         }
         var file = files.file;
@@ -180,7 +192,8 @@ server = http.createServer(function (req, res) {
 
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "/api/'+ secret + '"}');
-
+        track("post-200");
+        
         setTimeout(function(){ 
           fs.unlink(file.path);
         }, 10 * 60 * 1000);
