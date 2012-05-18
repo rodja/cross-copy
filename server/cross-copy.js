@@ -47,20 +47,20 @@ var path = require('path');
 var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
-function track(){
+function track(pageName){
   var options = {
     host: 'www.google-analytics.com',
-    path: '/__utm.gif?utmwv=1&utmac=UA-31324545-2&utmp=/track&utmdt=Trackz'
+    path: '/__utm.gif?mn=1766671084&utmhn=api.cross-copy.net&utmr=-&utmp=' + pageName + '&utmac=UA-31324545-2&utmcc=__utma%3D103436114.1871841882.1336279481.1337056578.1337314345.13%3B%2B__utmz%3D103436114.1336279481.1.1.utmcsr%3D(direct)%7Cutmccn%3D(direct)%7Cutmcmd%3D(none)%3B'
   };
 
   http.get(options, function(res) {
-    console.log("Got response: " + res.statusCode);
+    //console.log("Got response: " + res.statusCode);
   }).on('error', function(e) {
-    console.log("Got error: " + e.message);
+    //console.log("Got error: " + e.message);
   });
 }
 
-track();
+track("server-started");
 
 function updateWatchers(secret){
   var untouched = [];     
