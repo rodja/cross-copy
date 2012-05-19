@@ -81,10 +81,9 @@ server = http.createServer(function (req, res) {
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id;  
   
-  if (device)
-  console.log(req.method + ": " + device);
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
+
   if (watchers[secret] === undefined) watchers[secret] = [];
   if (getters[secret] === undefined) getters[secret] = [];
    
@@ -152,7 +151,8 @@ server = http.createServer(function (req, res) {
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
     //console.log("PUT getters  " + getters[secret].length);
 
-    if (getters[secret] == [] || getters[secret].length == 0){
+    if (getters[secret] == [] || getters[secret].length == 0 || 
+       ( getters[secret].length == 1 && getters[secret][0].device === device )){
       res.writeHead(404, header);
       res.end('0\n');
       track("put-404");
