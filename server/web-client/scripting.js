@@ -151,13 +151,10 @@ function share(text){
     return;
   }
 
-  if (receiverRequest != undefined)
-    receiverRequest.abort();
-
   trackEvent('data', 'submitted');
 
   $.ajax({
-      url: server + '/' + secret + "&device_id=" + deviceId,
+      url: server + '/' + secret + "?device_id=" + deviceId,
       cache: false,
       type: 'PUT',
       processData: false,
@@ -181,8 +178,6 @@ function share(text){
         trackEvent('error', 'PUT');
       },
       complete: function(xhr, status){
-receiverRequest = undefined;
-        setTimeout(listen, 50);
       }
   });
 }

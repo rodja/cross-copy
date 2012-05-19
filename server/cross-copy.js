@@ -48,6 +48,7 @@ var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
 function track(pageName){
+  return; // no tracking while developing on master branch
   var options = {
     host: 'www.google-analytics.com',
     path: '/__utm.gif?mn=1766671084&utmhn=api.cross-copy.net&utmr=-&utmp=' + pageName + '&utmac=UA-31324545-2&utmcc=__utma%3D103436114.1871841882.1336279481.1337056578.1337314345.13%3B%2B__utmz%3D103436114.1336279481.1.1.utmcsr%3D(direct)%7Cutmccn%3D(direct)%7Cutmcmd%3D(none)%3B'
@@ -78,8 +79,10 @@ server = http.createServer(function (req, res) {
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.substring(5);   
   var query = require('url').parse(req.url, true).query;    
+  var device = query.device_id;  
   
-  console.log(req.url + ": " + util.inspect(query));
+  if (device)
+  console.log(req.method + ": " + device);
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
   if (watchers[secret] === undefined) watchers[secret] = [];
@@ -88,8 +91,6 @@ server = http.createServer(function (req, res) {
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
 
-    //console.log(req.method + ' ' + pathname + " " + require('url').parse(req.url).query );
-    
     if (query.watch == 'listeners') {
 
       if (getters[secret].length != query.count){
@@ -110,7 +111,7 @@ server = http.createServer(function (req, res) {
       
        var livingGetters = [];
        getters[secret].forEach(function(getter){
-           if (!getter.aborted) livingGetters.push(getter);
+         if (!getter.aborted) livingGetters.push(getter);
        });
 
        getters[secret] = livingGetters;        
@@ -118,6 +119,9 @@ server = http.createServer(function (req, res) {
     });
 
     if (secret.indexOf('/') == -1){
+      
+      if (device) res.device = device;
+      
       // if not asking for a file we will wait for the shared data
       getters[secret].push(res); 
       track("get-waiting");
@@ -156,18 +160,25 @@ server = http.createServer(function (req, res) {
     }
 
     req.on('data', function(chunk) {
+      var getterWhoSendsTheData;
       getters[secret].forEach(function(getter){
-        getter.writeHead(200, header);
-        track("get-200");
-        getter.end(chunk);
+        if (getter.device !== device || !device){
+          getter.writeHead(200, header);
+          track("get-200");
+          getter.end(chunk);
+        } else
+          getterWhoSendsTheData = getter;
       });
       
       track("put-" + getters[secret].length);
 
       res.writeHead(200, header);
-      res.end(getters[secret].length + '\n');
-      getters[secret] = [];
-
+      res.end( getters[secret].length + '\n');
+  
+      if (getterWhoSendsTheData)
+        getters[secret] = [getterWhoSendsTheData];
+      else
+        getters[secret] = [];
 
       updateWatchers(secret);
    });
