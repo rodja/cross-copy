@@ -22,12 +22,12 @@
 
 var internetExplorerSucks = 30;
 var server = "/api";
-var localHistory = undefined;
+var localHistory;
 var secret;
 var receiverRequest;
 var watchRequest;
 var listenerCount = 0;
-
+var deviceId;
 
 // Feature detect + local reference (from http://mathiasbynens.be/notes/localstorage-pattern)
 var storage = (function () {
@@ -42,6 +42,14 @@ var storage = (function () {
     return result && storage;
   } catch (e) {}
 }() );
+
+// guid generator from http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+function guid() {
+    var S4 = function() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
 
 function listen () {
 
@@ -61,7 +69,7 @@ function listen () {
   }
 
   receiverRequest = $.ajax({
-      url: server + '/' + secret,
+      url: server + '/' + secret + "?device_id=" + deviceId,
       cache: false,
       success: function(response){
         trackEvent('succsess', 'GET');
@@ -149,7 +157,7 @@ function share(text){
   trackEvent('data', 'submitted');
 
   $.ajax({
-      url: server + '/' + secret,
+      url: server + '/' + secret + "&device_id=" + deviceId,
       cache: false,
       type: 'PUT',
       processData: false,
@@ -181,7 +189,12 @@ receiverRequest = undefined;
 
 $(document).ready(function() {
 
+  if (storage) deviceId = storage.getItem('device_id');
+  if (deviceId == null) deviceId = guid();
+  if (storage) storage.setItem('device_id', deviceId);
+
   try{
+
     if (storage)
       localHistory = JSON.parse(storage.getItem('localHistory'));
     if (localHistory == null) localHistory = {};
@@ -197,6 +210,8 @@ $(document).ready(function() {
     }
   } catch (e){ localHistory = {}; }
  
+  
+
   $('#secret').focus();
   $('#secret').select();
 

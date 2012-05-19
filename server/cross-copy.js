@@ -76,8 +76,10 @@ function updateWatchers(secret){
 server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
-  var secret = pathname.substring(5);
+  var secret = pathname.substring(5);   
+  var query = require('url').parse(req.url, true).query;    
   
+  console.log(req.url + ": " + util.inspect(query));
   //console.log(util.inspect(filecache));
   //console.log(util.inspect(getters));
   if (watchers[secret] === undefined) watchers[secret] = [];
@@ -85,7 +87,6 @@ server = http.createServer(function (req, res) {
    
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
-    var query = require('url').parse(req.url, true).query;    
 
     //console.log(req.method + ' ' + pathname + " " + require('url').parse(req.url).query );
     
