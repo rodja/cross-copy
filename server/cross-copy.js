@@ -173,7 +173,7 @@ server = http.createServer(function (req, res) {
       track("put-" + getters[secret].length);
 
       res.writeHead(200, header);
-      res.end( getters[secret].length + '\n');
+      res.end( (getters[secret].length - (getterWhoSendsTheData ? 1 : 0)) + '\n');
   
       if (getterWhoSendsTheData)
         getters[secret] = [getterWhoSendsTheData];
