@@ -1,16 +1,8 @@
 //
 // cross-copy.net server implemented in node.js 
 //
-// usage:
-
-//  wait's for data on the given phrase (long polling)
-//    GET   /api/<secret code>
-//  sends data in body to all waiting clients    
-//    PUT   /api/<secret code>
-//  store a file temporary on the server at the given uri
-//    POST  /api/<secret code>/<filename.extension>
-//  watch number of listeners for changes (long polling)
-//    GET   /api/<secret code>?watch=listeners&count=<known num of listeners>
+// see https://github.com/rodja/cross-copy/blob/master/README.md#service-api
+// for usage and documentation
 
 /*  
     Copyright 2012 Rodja Trappe

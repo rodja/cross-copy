@@ -30,6 +30,9 @@ The web-client uses the hostname http://www.cross-copy.net
 
     GET   /api/<secret code>?watch=listeners&count=<known num of listeners>
 
+### parameters
+
+If the parameter device_id=<uuid> is added to the above urls for GET & PUT,  you wont receive the data you send out with the same uuid. 
 
 ## License
 
