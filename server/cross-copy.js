@@ -28,6 +28,7 @@ var port = 8080;
 var waitingReceivers = {};
 var watchers = {};
 var filecache = {};
+var messagecache = {};
 
 var header = {'Content-Type': 'text/plain'}
 
@@ -47,7 +48,7 @@ function track(pageName){
   };
 
   http.get(options, function(res) {
-    //console.log("Got response: " + res.statusCode);
+    //console.log("Got receiverWhoSendsTheData: " + res.statusCode);
   }).on('error', function(e) {
     //console.log("Got error: " + e.message);
   });
@@ -73,7 +74,7 @@ server = http.createServer(function (req, res) {
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id;  
   
-  //console.log(util.inspect(filecache));
+  console.log(util.inspect(messagecache));
   //console.log(util.inspect(waitingReceivers));
 
   if (watchers[secret] === undefined) watchers[secret] = [];
@@ -101,8 +102,8 @@ server = http.createServer(function (req, res) {
        track("get-aborted");
       
        var livingwaitingReceivers = [];
-       waitingReceivers[secret].forEach(function(getter){
-         if (!getter.aborted) livingwaitingReceivers.push(getter);
+       waitingReceivers[secret].forEach(function(response){
+         if (!response.aborted) livingwaitingReceivers.push(response);
        });
 
        waitingReceivers[secret] = livingwaitingReceivers;        
@@ -152,23 +153,23 @@ server = http.createServer(function (req, res) {
     }
 
     req.on('data', function(chunk) {
-      var getterWhoSendsTheData;
-      waitingReceivers[secret].forEach(function(getter){
-        if (getter.device !== device || !device){
-          getter.writeHead(200, header);
+      var receiverWhoSendsTheData;
+      waitingReceivers[secret].forEach(function(response){
+        if (response.device !== device || !device){
+          response.writeHead(200, header);
           track("get-200");
-          getter.end(chunk);
+          response.end(chunk);
         } else
-          getterWhoSendsTheData = getter;
+          receiverWhoSendsTheData = response;
       });
       
       track("put-" + waitingReceivers[secret].length);
 
       res.writeHead(200, header);
-      res.end( (waitingReceivers[secret].length - (getterWhoSendsTheData ? 1 : 0)) + '\n');
+      res.end( (waitingReceivers[secret].length - (receiverWhoSendsTheData ? 1 : 0)) + '\n');
   
-      if (getterWhoSendsTheData)
-        waitingReceivers[secret] = [getterWhoSendsTheData];
+      if (receiverWhoSendsTheData)
+        waitingReceivers[secret] = [receiverWhoSendsTheData];
       else
         waitingReceivers[secret] = [];
 
