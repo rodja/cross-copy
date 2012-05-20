@@ -25,7 +25,7 @@
 
 var port = 8080;
 
-var getters = {};
+var waitingReceivers = {};
 var watchers = {};
 var filecache = {};
 
@@ -58,9 +58,9 @@ track("server-started");
 function updateWatchers(secret){
   var untouched = [];     
   watchers[secret].forEach(function(watcher){
-    if (watcher.knownNumberOfListeners != getters[secret].length){
+    if (watcher.knownNumberOfListeners != waitingReceivers[secret].length){
       watcher.writeHead(200, header);
-      watcher.end(getters[secret].length + '\n');
+      watcher.end(waitingReceivers[secret].length + '\n');
     } else untouched.push(watcher);
   });
   watchers[secret] = untouched;
@@ -74,19 +74,19 @@ server = http.createServer(function (req, res) {
   var device = query.device_id;  
   
   //console.log(util.inspect(filecache));
-  //console.log(util.inspect(getters));
+  //console.log(util.inspect(waitingReceivers));
 
   if (watchers[secret] === undefined) watchers[secret] = [];
-  if (getters[secret] === undefined) getters[secret] = [];
+  if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];
    
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
 
     if (query.watch == 'listeners') {
 
-      if (getters[secret].length != query.count){
+      if (waitingReceivers[secret].length != query.count){
         res.writeHead(200, header);
-        res.end(getters[secret].length + '\n');
+        res.end(waitingReceivers[secret].length + '\n');
       } else{
         res.knownNumberOfListeners = query.count;
         watchers[secret].push(res);
@@ -100,12 +100,12 @@ server = http.createServer(function (req, res) {
        res.aborted = true;
        track("get-aborted");
       
-       var livingGetters = [];
-       getters[secret].forEach(function(getter){
-         if (!getter.aborted) livingGetters.push(getter);
+       var livingwaitingReceivers = [];
+       waitingReceivers[secret].forEach(function(getter){
+         if (!getter.aborted) livingwaitingReceivers.push(getter);
        });
 
-       getters[secret] = livingGetters;        
+       waitingReceivers[secret] = livingwaitingReceivers;        
        updateWatchers(secret);
     });
 
@@ -114,7 +114,7 @@ server = http.createServer(function (req, res) {
       if (device) res.device = device;
       
       // if not asking for a file we will wait for the shared data
-      getters[secret].push(res); 
+      waitingReceivers[secret].push(res); 
       track("get-waiting");
       
       updateWatchers(secret);
@@ -141,10 +141,10 @@ server = http.createServer(function (req, res) {
     }
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
-    //console.log("PUT getters  " + getters[secret].length);
+    //console.log("PUT waitingReceivers  " + waitingReceivers[secret].length);
 
-    if (getters[secret] == [] || getters[secret].length == 0 || 
-       ( getters[secret].length == 1 && getters[secret][0].device === device )){
+    if (waitingReceivers[secret] == [] || waitingReceivers[secret].length == 0 || 
+       ( waitingReceivers[secret].length == 1 && waitingReceivers[secret][0].device === device )){
       res.writeHead(404, header);
       res.end('0\n');
       track("put-404");
@@ -153,7 +153,7 @@ server = http.createServer(function (req, res) {
 
     req.on('data', function(chunk) {
       var getterWhoSendsTheData;
-      getters[secret].forEach(function(getter){
+      waitingReceivers[secret].forEach(function(getter){
         if (getter.device !== device || !device){
           getter.writeHead(200, header);
           track("get-200");
@@ -162,15 +162,15 @@ server = http.createServer(function (req, res) {
           getterWhoSendsTheData = getter;
       });
       
-      track("put-" + getters[secret].length);
+      track("put-" + waitingReceivers[secret].length);
 
       res.writeHead(200, header);
-      res.end( (getters[secret].length - (getterWhoSendsTheData ? 1 : 0)) + '\n');
+      res.end( (waitingReceivers[secret].length - (getterWhoSendsTheData ? 1 : 0)) + '\n');
   
       if (getterWhoSendsTheData)
-        getters[secret] = [getterWhoSendsTheData];
+        waitingReceivers[secret] = [getterWhoSendsTheData];
       else
-        getters[secret] = [];
+        waitingReceivers[secret] = [];
 
       updateWatchers(secret);
    });
