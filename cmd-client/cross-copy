@@ -1,23 +1,26 @@
 #!/bin/bash
 
 SERVER=http://www.cross-copy.net
+QUIET=false 
 
-while getopts ":l" opt; do
+while getopts ":lq" opt; do
   case $opt in
+    q)
+      QUIET=true
+      ;;
     l)
       SERVER=http://localhost:8080
-      echo "using localhost instead of cross-copy.net"
-      shift $((OPTIND-1)); OPTIND=1
+      $QUIET || echo "using localhost instead of cross-copy.net"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
-      shift $((OPTIND-1)); OPTIND=1
       ;;
   esac
+  shift $((OPTIND-1)); OPTIND=1
 done
 
 if [ $# == 1 ]; then
-  echo "waiting for pastes on secret '$1' on $SERVER"
+  $QUIET || echo "waiting for pastes on secret '$1' on $SERVER"
   PASTE=`curl -s $SERVER/api/$1`
   [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE
   echo $PASTE

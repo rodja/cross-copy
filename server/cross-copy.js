@@ -74,7 +74,7 @@ server = http.createServer(function (req, res) {
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id;  
   
-  console.log(util.inspect(messagecache));
+  console.log("msgs " + util.inspect(messagecache));
   //console.log(util.inspect(waitingReceivers));
 
   if (watchers[secret] === undefined) watchers[secret] = [];
@@ -145,14 +145,17 @@ server = http.createServer(function (req, res) {
     //console.log("PUT waitingReceivers  " + waitingReceivers[secret].length);
 
     if (waitingReceivers[secret] == [] || waitingReceivers[secret].length == 0 || 
-       ( waitingReceivers[secret].length == 1 && waitingReceivers[secret][0].device === device )){
-      res.writeHead(404, header);
+       ( waitingReceivers[secret].length == 1 && waitingReceivers[secret][0].device === device && device !== undefined )){
+      res.writeHead(202, header);
       res.end('0\n');
-      track("put-404");
-      return;
+      track("put-202");
     }
 
     req.on('data', function(chunk) {
+
+     if (messagecache[secret] === undefined) messagecache[secret] = [];
+     messagecache[secret].push({data: chunk, delivered:[device]});
+
       var receiverWhoSendsTheData;
       waitingReceivers[secret].forEach(function(response){
         if (response.device !== device || !device){
