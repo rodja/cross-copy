@@ -13,14 +13,18 @@ assertEqual(){
 
 ##### FUNCTION TESTS
 
-R=`$TEST some-secret "$DATA"`
-assertEqual 0 $R "shoud have no direct deliverys"
-
 DATA="the message"
-( M=`$TEST some-secret`; assertEqual "$DATA" "$M" "should receive correct message" ) &
+SECRET=1
+
+R=`$TEST $SECRET "$DATA"`
+assertEqual 0 $R "shoud have no direct deliverys"
+SECRET=$(($SECRET+1))
+
+( M=`$TEST $SECRET`; assertEqual "$DATA" "$M" "should receive correct message" ) &
 sleep 1
-R=`$TEST some-secret "$DATA"`
+R=`$TEST $SECRET "$DATA"`
 assertEqual 1 $R "shoud have one direct delivery"
+SECRET=$(($SECRET+1))
 
 
 
