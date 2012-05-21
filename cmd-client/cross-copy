@@ -2,11 +2,15 @@
 
 SERVER=http://www.cross-copy.net
 QUIET=false 
+FETCH_RECENT_DATA=false
 
-while getopts ":lq" opt; do
+while getopts ":lqr" opt; do
   case $opt in
     q)
       QUIET=true
+      ;;
+    r)
+      FETCH_RECENT_DATA=true
       ;;
     l)
       SERVER=http://localhost:8080
@@ -14,16 +18,24 @@ while getopts ":lq" opt; do
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
+      exit 1
       ;;
   esac
   shift $((OPTIND-1)); OPTIND=1
 done
 
 if [ $# == 1 ]; then
+  if [ $FETCH_RECENT_DATA == true ]; then
+    RECENT=`curl -s $SERVER/api/$1/recent-data.json`
+    echo $RECENT
+    exit 0
+  fi
+
   $QUIET || echo "waiting for pastes on secret '$1' on $SERVER"
   PASTE=`curl -s $SERVER/api/$1`
-  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE
+  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE  # complete internal urls
   echo $PASTE
+
 elif [ $# == 2 ]; then
   curl -X PUT -s -d "$2" $SERVER/api/$1
 else

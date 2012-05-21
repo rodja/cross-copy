@@ -40,6 +40,18 @@ var path = require('path');
 var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
+// guid generator from http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+function guid() {
+    var S4 = function() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 function track(pageName){
   return; // no tracking while developing on master branch
   var options = {
@@ -74,7 +86,6 @@ server = http.createServer(function (req, res) {
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id;  
   
-  console.log("msgs " + util.inspect(messagecache));
   //console.log(util.inspect(waitingReceivers));
 
   if (watchers[secret] === undefined) watchers[secret] = [];
@@ -96,22 +107,21 @@ server = http.createServer(function (req, res) {
       return;
     }
     
-    req.socket.secret = secret;
-    req.connection.on('close',function(){
-       res.aborted = true;
-       track("get-aborted");
-      
-       var livingwaitingReceivers = [];
-       waitingReceivers[secret].forEach(function(response){
-         if (!response.aborted) livingwaitingReceivers.push(response);
-       });
-
-       waitingReceivers[secret] = livingwaitingReceivers;        
-       updateWatchers(secret);
-    });
-
     if (secret.indexOf('/') == -1){
-      
+    
+      req.connection.on('close',function(){
+         res.aborted = true;
+         track("get-aborted");
+        
+         var livingwaitingReceivers = [];
+         waitingReceivers[secret].forEach(function(response){
+           if (!response.aborted) livingwaitingReceivers.push(response);
+         });
+
+         waitingReceivers[secret] = livingwaitingReceivers;        
+         updateWatchers(secret);
+      });
+  
       if (device) res.device = device;
       
       // if not asking for a file we will wait for the shared data
@@ -122,7 +132,15 @@ server = http.createServer(function (req, res) {
       return;
     }
 
-    if (filecache[secret] != undefined){
+    if (secret.endsWith("/recent-data.json")){
+
+      secret = secret.substr(0, secret.length - 17);
+      console.log(secret + " msgs " + util.inspect(messagecache));
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(messagecache[secret]));
+
+    } else if (filecache[secret] != undefined){
       var file = filecache[secret];
       fs.readFile(file.path, function(error, content) {
         if (error) {
@@ -154,7 +172,7 @@ server = http.createServer(function (req, res) {
     req.on('data', function(chunk) {
 
      if (messagecache[secret] === undefined) messagecache[secret] = [];
-     messagecache[secret].push({data: chunk, delivered:[device]});
+     messagecache[secret].push({data: chunk.toString(), id: guid()});
 
       var receiverWhoSendsTheData;
       waitingReceivers[secret].forEach(function(response){
