@@ -3,11 +3,15 @@
 SERVER=http://www.cross-copy.net
 QUIET=false 
 FETCH_RECENT_DATA=false
+PARAMETERS="?"
 
-while getopts ":lqr" opt; do
+while getopts ":lqrk:" opt; do
   case $opt in
     q)
       QUIET=true
+      ;;
+    k)
+      PARAMETERS="${PARAMETERS}keep_for=${OPTARG}&"
       ;;
     r)
       FETCH_RECENT_DATA=true
@@ -32,12 +36,12 @@ if [ $# == 1 ]; then
   fi
 
   $QUIET || echo "waiting for pastes on secret '$1' on $SERVER"
-  PASTE=`curl -s $SERVER/api/$1`
+  PASTE=`curl -s $SERVER/api/$1$PARAMETERS`
   [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE  # complete internal urls
   echo $PASTE
 
 elif [ $# == 2 ]; then
-  curl -X PUT -s -d "$2" $SERVER/api/$1
+  curl -X PUT -s -d "$2" $SERVER/api/$1$PARAMETERS
 else
   echo "wrong number of arguments. usage:"
   echo "   $ cross-copy secred-code              # to receive data"

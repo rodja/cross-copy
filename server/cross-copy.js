@@ -172,7 +172,11 @@ server = http.createServer(function (req, res) {
     req.on('data', function(chunk) {
 
      if (messagecache[secret] === undefined) messagecache[secret] = [];
-     messagecache[secret].push({data: chunk.toString(), id: guid()});
+     var msg = {data: chunk.toString(), id: guid()};
+     messagecache[secret].push(msg);
+     setTimeout(function(){
+       messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
+     }, 1000 * (query.keep_for || 10) );
 
       var receiverWhoSendsTheData;
       waitingReceivers[secret].forEach(function(response){
