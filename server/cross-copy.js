@@ -86,7 +86,7 @@ server = http.createServer(function (req, res) {
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id;  
   
-  //console.log(util.inspect(waitingReceivers));
+  console.log(req.method + ": " + pathname);
 
   if (watchers[secret] === undefined) watchers[secret] = [];
   if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];

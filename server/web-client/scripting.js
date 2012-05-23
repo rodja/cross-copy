@@ -130,7 +130,7 @@ function paste(data, direction){
   
   var $li = $('<li>' + data +'</li>\n');
   $li.addClass(direction);
-  $('#received').prepend($li);
+  $('#current').prepend($li);
   $li.hide().slideDown();
 
   var pastes = [];
@@ -200,6 +200,7 @@ $(document).ready(function() {
         $('#secret').val(secrets[0]); 
         listen();
         watch();
+        showRecentPastes();
         showlocalHistory();
       }
     }
@@ -217,9 +218,8 @@ $(document).ready(function() {
       return;
 
     listen();
-
     watch();
-
+    showRecentPastes();
     showlocalHistory();
   });
 
@@ -237,22 +237,49 @@ $(document).ready(function() {
   
 });
 
+function showRecentPastes(){
+
+
+  $.ajax({
+      url: server + '/' + secret + "/recent-data.json?device_id=" + deviceId,
+      cache: false,
+      success: function(response){
+        var recentPastes = [];
+        try{ recentPastes = JSON.parse(response); } catch(e){}
+
+        $('#recent').fadeOut(function(){
+          $(this).empty();
+          $.each(recentPastes, function(i,e){
+             var d = e.direction ? e.direction : 'in';
+             var $li = $('<li class="' + d + '">' + e.data +'</li>\n');
+            $('#recent').append($li);
+          });
+          if (recentPastes.length > 0)
+            $('#recent').prepend($('<li class="new-session">recently send to this secret</li>'));
+          $('#recent').fadeIn();
+        });
+    
+      }
+  });
+  
+}
+
 function showlocalHistory(){
 
   var oldPastes = localHistory[secret];
   if (oldPastes == null)
     oldPastes = [];
 
-  $('#received').fadeOut(function(){
+  $('#history').fadeOut(function(){
     $(this).empty();
     $.each(oldPastes, function(i,e){
        var d = e.direction ? e.direction : 'in';
        var $li = $('<li class="' + d + '">' + (e.msg != undefined ? e.msg : e) +'</li>\n');
-      $('#received').append($li);
+      $('#history').append($li);
     });
     if (oldPastes.length > 0)
-      $('#received').prepend($('<li class="new-session">locally stored localHistory for this secret</li>'));
-    $('#received').fadeIn();
+      $('#history').prepend($('<li class="new-session">locally stored history for this secret</li>'));
+    $('#history').fadeIn();
   });
 }
 
