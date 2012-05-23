@@ -3,11 +3,43 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>Cross copy ios client</string>
+	<string>CrossCopy</string>
+<<<<<<< HEAD:ios-client/crosscopy-ios-client/Info.plist
+	<key>CFBundleIconFiles</key>
+=======
+	<key>CFBundleExecutable</key>
+	<string>crosscopyiosclient</string>
+	<key>CFBundleIconFile</key>
+	<string>crosscopy-icon-57.png</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>crosscopy-icon-57.png</string>
+		<string>crosscopy-icon-114.png</string>
+		<string>crosscopy-icon-72.png</string>
+		<string>crosscopy-icon-144.png</string>
+	</array>
 	<key>CFBundleIdentifier</key>
-	<string>com.amelisoft.crosscopyiosclient</string>
+	<string>com.amelisoft.crosscopy</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>crosscopy-ios-client</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleSupportedPlatforms</key>
+>>>>>>> Sending / receiving files feature:ios-client/crosscopy-ios-client/bin/iPhoneSimulator/Debug/crosscopyiosclient.app/Info.plist
+	<array>
+		<string>Images/crosscopy-icon-57.png</string>
+		<string>Images/crosscopy-icon-114.png</string>
+		<string>Images/crosscopy-icon-72.png</string>
+		<string>Images/crosscopy-icon-144.png</string>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.amelisoft.crosscopy</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>1.1</string>
 	<key>MinimumOSVersion</key>
 	<string>3.1.3</string>
 	<key>UIDeviceFamily</key>
