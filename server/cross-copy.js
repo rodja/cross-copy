@@ -82,12 +82,17 @@ function updateWatchers(secret){
 server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
-  var secret = pathname.substring(5);   
+  var secret = pathname.split("/")[2];
+  if (secret.endsWith(".json")){
+    secret = secret.substr(0, secret.length - 5);
+    res.requestsJson = true;
+  }        
+  var filename = pathname.split("/")[3] || null
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id;  
   
-  console.log(req.method + ": " + pathname);
-
+  console.log(req.method + ": " + util.inspect(secret) + " " + filename);
+  
   if (watchers[secret] === undefined) watchers[secret] = [];
   if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];
    
@@ -107,10 +112,9 @@ server = http.createServer(function (req, res) {
       return;
     }
     
-    if (secret.indexOf('/') == -1){
+    if (filename === null){
     
-      if (secret.endsWith(".json")){
-        secret = secret.substr(0, secret.length - 5);
+      if (res.requestsJson){
         res.writeHead(200);
         res.end(JSON.stringify(messagecache[secret]));
         return;
@@ -139,14 +143,12 @@ server = http.createServer(function (req, res) {
       return;
     }
 
-    if (secret.endsWith("/recent-data.json")){
-
-      secret = secret.substr(0, secret.length - 17);
+    if (filename === "recent-data.json"){
       res.writeHead(200);
       res.end(JSON.stringify(messagecache[secret]));
-
-    } else if (filecache[secret] != undefined){
-      var file = filecache[secret];
+      return;
+    } else if (filecache[pathname] != undefined){
+      var file = filecache[pathname];
       fs.readFile(file.path, function(error, content) {
         if (error) {
           res.writeHead(500);
@@ -223,7 +225,7 @@ server = http.createServer(function (req, res) {
         }
         var file = files.file;
         if (file === undefined) file = files.data;
-        filecache[secret] = file;
+        filecache[pathname] = file;
 
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "/api/'+ secret + '"}');

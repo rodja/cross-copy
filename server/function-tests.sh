@@ -62,8 +62,8 @@ function testFetchingRecentPasteInJsonFormatWithDeviceId(){
   SECRET=`uuidgen`
 }
 
-#testSimpleTransfer
-#testFetchingRecentPaste
-#testFetchingTwoRecentPastes
+testSimpleTransfer
+testFetchingRecentPaste
+testFetchingTwoRecentPastes
 testFetchingRecentPasteInJsonFormatWithDeviceId
 echo "SUCSESS"
