@@ -4,8 +4,10 @@ SERVER=http://www.cross-copy.net
 QUIET=false 
 FETCH_RECENT_DATA=false
 PARAMETERS="?"
+VERBOSE=false
+JSON=''
 
-while getopts ":lqrk:" opt; do
+while getopts ":lqrvjd:k:" opt; do
   case $opt in
     q)
       QUIET=true
@@ -15,6 +17,15 @@ while getopts ":lqrk:" opt; do
       ;;
     r)
       FETCH_RECENT_DATA=true
+      ;;
+    j)
+      JSON=".json"
+      ;;
+    v)
+      VERBOSE=true
+      ;;
+    d)
+      PARAMETERS="${PARAMETERS}device_id=${OPTARG}&"
       ;;
     l)
       SERVER=http://localhost:8080
@@ -30,13 +41,17 @@ done
 
 if [ $# == 1 ]; then
   if [ $FETCH_RECENT_DATA == true ]; then
-    RECENT=`curl -s $SERVER/api/$1/recent-data.json`
+    CMD="curl -s $SERVER/api/$1/recent-data.json"
+    $VERBOSE && echo $CMD    
+    RECENT=`$CMD`
     echo $RECENT
     exit 0
   fi
 
   $QUIET || echo "waiting for pastes on secret '$1' on $SERVER"
-  PASTE=`curl -s $SERVER/api/$1$PARAMETERS`
+  CMD="curl -s $SERVER/api/$1$JSON$PARAMETERS"
+  $VERBOSE && echo $CMD    
+  PASTE=`$CMD`
   [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE  # complete internal urls
   echo $PASTE
 

@@ -109,6 +109,13 @@ server = http.createServer(function (req, res) {
     
     if (secret.indexOf('/') == -1){
     
+      if (secret.endsWith(".json")){
+        secret = secret.substr(0, secret.length - 5);
+        res.writeHead(200);
+        res.end(JSON.stringify(messagecache[secret]));
+        return;
+      }
+
       req.connection.on('close',function(){
          res.aborted = true;
          track("get-aborted");
@@ -135,9 +142,7 @@ server = http.createServer(function (req, res) {
     if (secret.endsWith("/recent-data.json")){
 
       secret = secret.substr(0, secret.length - 17);
-      console.log(secret + " msgs " + util.inspect(messagecache));
-      
-      res.writeHead(200);
+      res.writeHead(200);
       res.end(JSON.stringify(messagecache[secret]));
 
     } else if (filecache[secret] != undefined){
