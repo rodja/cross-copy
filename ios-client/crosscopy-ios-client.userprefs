@@ -1,12 +1,10 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="crosscopy-ios-client/UIObjects.cs">
+﻿<Properties GitUserInfo="UsingGIT">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="crosscopy-ios-client/AppDelegate.cs">
     <Files>
-      <File FileName="crosscopy-ios-client/AppDelegate.cs" Line="26" Column="3" />
-      <File FileName="crosscopy-ios-client/UIObjects.cs" Line="24" Column="6" />
-      <File FileName="crosscopy-ios-client/BusinessObjects.cs" Line="3" Column="11" />
-      <File FileName="crosscopy-ios-client/Helpers.cs" Line="90" Column="7" />
-      <File FileName="crosscopy-ios-client/Main.cs" Line="14" Column="4" />
+      <File FileName="crosscopy-ios-client/AppDelegate.cs" Line="10" Column="24" />
+      <File FileName="crosscopy-ios-client/Info.plist" />
+      <File FileName="crosscopy-ios-client/AppDelegate.cs" Line="35" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

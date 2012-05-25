@@ -3,6 +3,7 @@ using MonoTouch.Dialog;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using CrossCopy.iOSClient.Helpers;
+using System.Drawing;
 
 namespace CrossCopy.iOSClient.UI
 {
@@ -92,6 +93,52 @@ namespace CrossCopy.iOSClient.UI
 			{
 				ButtonTapped();
 			}
+		}
+	}
+	
+	public class AdvancedEntryElement : EntryElement
+	{
+		NSObject textFieldChangedObserver;
+		
+		static NSString cellKey = new NSString ("AdvancedEntryElement");      
+	    protected override NSString CellKey 
+		{ 
+	        get { return cellKey; }
+	    }
+		public event NSAction TextChanged;
+		
+		public AdvancedEntryElement (string caption, string placeholder, string value, NSAction textChanged) 
+			: base(caption, placeholder, value)
+		{
+			TextChanged += textChanged;
+		}
+		
+	    protected override UITextField CreateTextField (RectangleF frame)
+	    {
+	        UITextField tf = base.CreateTextField (frame);
+			textFieldChangedObserver = NSNotificationCenter.DefaultCenter.AddObserver(UITextField.TextFieldTextDidChangeNotification, (notification) =>
+			{
+			    if (notification.Object == tf)
+				{
+					HandleTextChanged(tf, new EventArgs());
+				}
+			});
+			
+	        return tf;
+	    }
+
+		void HandleTextChanged (object sender, EventArgs e)
+		{
+			if (TextChanged != null) 
+			{
+				TextChanged();
+			}
+		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			NSNotificationCenter.DefaultCenter.RemoveObserver(textFieldChangedObserver);
+			base.Dispose (disposing);
 		}
 	}
 	
