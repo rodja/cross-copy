@@ -89,13 +89,13 @@ server = http.createServer(function (req, res) {
   }        
   var filename = pathname.split("/")[3] || null
   var query = require('url').parse(req.url, true).query;    
-  var device = query.device_id;  
+  var device = query.device_id || guid();  
   
   console.log(req.method + ": " + util.inspect(secret) + " " + filename);
   
   if (watchers[secret] === undefined) watchers[secret] = [];
   if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];
-   
+  if (messagecache[secret] === undefined) messagecache[secret] = [];
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
 
@@ -115,7 +115,7 @@ server = http.createServer(function (req, res) {
     if (filename === null){
     
       console.log(util.inspect(messagecache[secret]));
-      if (res.requestsJson && messagecache[secret] && messagecache[secret] === []){
+      if (res.requestsJson && messagecache[secret] != []){
         res.writeHead(200);
         res.end(JSON.stringify(messagecache[secret]));
         return;
@@ -134,7 +134,7 @@ server = http.createServer(function (req, res) {
          updateWatchers(secret);
       });
   
-      if (device) res.device = device;
+      res.device = device;
       
       // if not asking for a file we will wait for the shared data
       waitingReceivers[secret].push(res); 
@@ -179,8 +179,6 @@ server = http.createServer(function (req, res) {
 
     req.on('data', function(chunk) {
 
-      if (messagecache[secret] === undefined) messagecache[secret] = [];
-      
       var msg = {data: chunk.toString(), id: guid(), sender: device};
       messagecache[secret].push(msg);
       setTimeout(function(){
@@ -192,7 +190,10 @@ server = http.createServer(function (req, res) {
         if (response.device !== device || !device){
           response.writeHead(200, header);
           track("get-200");
-          response.end(chunk);
+          if (response.requestsJson)
+            response.end(JSON.stringify(msg));
+          else
+            response.end(chunk);
         } else
           receiverWhoSendsTheData = response;
       });
