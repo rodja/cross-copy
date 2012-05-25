@@ -8,7 +8,11 @@ report(){
 }
 
 assertEqual(){
-  [[ $1 == $2 ]] || ( report "$3 (expected '$1' but was '$2')" && echo FAIL && exit 1 )
+  [[ "$1" == "$2" ]] || ( report "$3 (expected '$1' but was '$2')" && echo FAIL && exit 1 )
+}
+
+assertContains(){
+  echo "$2" | grep "$1" > /dev/null || ( report "$3 ('$2' should contain '$1')" && echo FAIL && exit 1 )
 }
 
 ##### FUNCTION TESTS
@@ -57,13 +61,26 @@ function testFetchingRecentPasteInJsonFormatWithDeviceId(){
   echo $FUNCNAME
   R=`$TEST -d $DEVICE_ID_1 $SECRET "$DATA"`
   assertEqual 0 $R "shoud have no direct deliverys"
+  R=`$TEST -j -d $DEVICE_ID_2 $SECRET`
+  D=`echo "$R" | grep -Po '"data":.*?[^\\\\]",'`
+  assertEqual '"data":"the message",' "$D" "should get recently stored data"
+  assertContains "$DEVICE_ID_1" "$R" "should include id of sender"
+  SECRET=`uuidgen`
+}
+
+function testWaitingForPasteAsJsonWithDeviceId(){
+  echo $FUNCNAME
+  R=`$TEST -d $DEVICE_ID_1 $SECRET "$DATA"`
+  assertEqual 0 $R "shoud have no direct deliverys"
   R=`$TEST -j -d $DEVICE_ID_2 $SECRET | grep -Po '"data":.*?[^\\\\]",'`
   assertEqual '"data":"the message",' "$R" "should get recently stored data"
   SECRET=`uuidgen`
 }
 
-testSimpleTransfer
-testFetchingRecentPaste
-testFetchingTwoRecentPastes
+#testSimpleTransfer
+#testFetchingRecentPaste
+#testFetchingTwoRecentPastes
 testFetchingRecentPasteInJsonFormatWithDeviceId
+
+wait
 echo "SUCSESS"

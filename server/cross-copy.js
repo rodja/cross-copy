@@ -178,12 +178,13 @@ server = http.createServer(function (req, res) {
 
     req.on('data', function(chunk) {
 
-     if (messagecache[secret] === undefined) messagecache[secret] = [];
-     var msg = {data: chunk.toString(), id: guid()};
-     messagecache[secret].push(msg);
-     setTimeout(function(){
+      if (messagecache[secret] === undefined) messagecache[secret] = [];
+      
+      var msg = {data: chunk.toString(), id: guid(), sender: device};
+      messagecache[secret].push(msg);
+      setTimeout(function(){
        messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
-     }, 1000 * (query.keep_for || 10) );
+      }, 1000 * (query.keep_for || 10) );
 
       var receiverWhoSendsTheData;
       waitingReceivers[secret].forEach(function(response){
@@ -194,18 +195,18 @@ server = http.createServer(function (req, res) {
         } else
           receiverWhoSendsTheData = response;
       });
-      
+
       track("put-" + waitingReceivers[secret].length);
 
       res.writeHead(200, header);
       res.end( (waitingReceivers[secret].length - (receiverWhoSendsTheData ? 1 : 0)) + '\n');
-  
+
       if (receiverWhoSendsTheData)
         waitingReceivers[secret] = [receiverWhoSendsTheData];
       else
         waitingReceivers[secret] = [];
 
-      updateWatchers(secret);
+updateWatchers(secret);
    });
 
   } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
