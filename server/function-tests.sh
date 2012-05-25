@@ -70,17 +70,18 @@ function testFetchingRecentPasteInJsonFormatWithDeviceId(){
 
 function testWaitingForPasteAsJsonWithDeviceId(){
   echo $FUNCNAME
+  ( M=`$TEST -j -d $DEVICE_ID_2 $SECRET | grep -Po '"data":.*?[^\\\\]",'`;   assertEqual '"data":"the message",' "$M" "should get newly submitted data" ) &
+  sleep 1
   R=`$TEST -d $DEVICE_ID_1 $SECRET "$DATA"`
   assertEqual 0 $R "shoud have no direct deliverys"
-  R=`$TEST -j -d $DEVICE_ID_2 $SECRET | grep -Po '"data":.*?[^\\\\]",'`
-  assertEqual '"data":"the message",' "$R" "should get recently stored data"
+  
   SECRET=`uuidgen`
 }
 
 #testSimpleTransfer
 #testFetchingRecentPaste
 #testFetchingTwoRecentPastes
-testFetchingRecentPasteInJsonFormatWithDeviceId
-
+#testFetchingRecentPasteInJsonFormatWithDeviceId
+testWaitingForPasteAsJsonWithDeviceId
 wait
 echo "SUCSESS"

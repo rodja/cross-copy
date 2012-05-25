@@ -114,9 +114,10 @@ server = http.createServer(function (req, res) {
     
     if (filename === null){
     
-      if (res.requestsJson){
+      console.log(util.inspect(messagecache[secret]));
+      if (res.requestsJson && messagecache[secret] && messagecache[secret] === []){
         res.writeHead(200);
-        res.end(JSON.stringify(messagecache[secret]));
+        res.end(JSON.stringify(messagecache[secret]));
         return;
       }
 

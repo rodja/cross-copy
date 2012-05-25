@@ -48,7 +48,7 @@ if [ $# == 1 ]; then
     exit 0
   fi
 
-  $QUIET || echo "waiting for pastes on secret '$1' on $SERVER"
+  $QUIET || echo "waiting for pastes with secret '$1' on $SERVER"
   CMD="curl -s $SERVER/api/$1$JSON$PARAMETERS"
   $VERBOSE && echo $CMD    
   PASTE=`$CMD`
