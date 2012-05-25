@@ -73,15 +73,15 @@ function testWaitingForPasteAsJsonWithDeviceId(){
   ( M=`$TEST -j -d $DEVICE_ID_2 $SECRET | grep -Po '"data":.*?[^\\\\]",'`;   assertEqual '"data":"the message",' "$M" "should get newly submitted data" ) &
   sleep 1
   R=`$TEST -d $DEVICE_ID_1 $SECRET "$DATA"`
-  assertEqual 0 $R "shoud have no direct deliverys"
+  assertEqual 1 $R "shoud have delivered directly"
   
   SECRET=`uuidgen`
 }
 
-#testSimpleTransfer
-#testFetchingRecentPaste
-#testFetchingTwoRecentPastes
-#testFetchingRecentPasteInJsonFormatWithDeviceId
+testSimpleTransfer
+testFetchingRecentPaste
+testFetchingTwoRecentPastes
+testFetchingRecentPasteInJsonFormatWithDeviceId
 testWaitingForPasteAsJsonWithDeviceId
 wait
 echo "SUCSESS"
