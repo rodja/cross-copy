@@ -7,7 +7,7 @@ PARAMETERS="?"
 VERBOSE=false
 JSON=''
 
-while getopts ":lqrvjd:k:" opt; do
+while getopts ":lqrvjs:d:k:" opt; do
   case $opt in
     q)
       QUIET=true
@@ -17,6 +17,9 @@ while getopts ":lqrvjd:k:" opt; do
       ;;
     r)
       FETCH_RECENT_DATA=true
+      ;;
+    s)
+      PARAMETERS="${PARAMETERS}since=${OPTARG}&"
       ;;
     j)
       JSON=".json"

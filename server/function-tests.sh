@@ -92,21 +92,24 @@ function testNotReceivingOwnPastesWhenRequestingJson(){
 
 function testFetchingOnlyUnknownRecentPastes(){
   echo $FUNCNAME
-  R=`$TEST -d $DEVICE_ID_1 $SECRET "$DATA"`
-  assertEqual 0 $R "shoud have no direct deliverys"
+  R=`$TEST -d $DEVICE_ID_1 $SECRET "msg1"`
+  R=`$TEST -d $DEVICE_ID_1 $SECRET "msg2"`
+  R=`$TEST -d $DEVICE_ID_1 $SECRET "msg3"`
   R=`$TEST -j -d $DEVICE_ID_2 $SECRET`
+  MSG2_ID=`echo "$R" | grep -Po '"data":"msg2","id":.*?[^\\\\]",' | awk -F"\"" '{print $8}'`
+  R=`$TEST -v -j -d $DEVICE_ID_2 -s $MSG2_ID $SECRET`
   D=`echo "$R" | grep -Po '"data":.*?[^\\\\]",'`
-  assertEqual '"data":"the message",' "$D" "should get recently stored data"
-  assertContains "$DEVICE_ID_1" "$R" "should include id of sender"
+  assertEqual '"data":"msg3",' "$D" "should get only the third message"
   SECRET=`uuidgen`
 }
 
 
-#testSimpleTransfer
-#testFetchingRecentPaste
-#testFetchingTwoRecentPastes
-#testFetchingRecentPasteInJsonFormatWithDeviceId
-#testWaitingForPasteAsJsonWithDeviceId
+testSimpleTransfer
+testFetchingRecentPaste
+testFetchingTwoRecentPastes
+testFetchingRecentPasteInJsonFormatWithDeviceId
+testWaitingForPasteAsJsonWithDeviceId
 testNotReceivingOwnPastesWhenRequestingJson
+testFetchingOnlyUnknownRecentPastes
 
 wait && echo "SUCSESS"

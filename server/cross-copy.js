@@ -115,11 +115,17 @@ server = http.createServer(function (req, res) {
     if (filename === null){
     
       if (res.requestsJson){
-        var messages = []; 
-        messagecache[secret].forEach(function(msg){
+        var messages = [];
+        var since = 0;
+        messagecache[secret].forEach(function(msg, i){
+          if (query.since === msg.id)
+            since += i+1;
           if (msg.sender !== device)
             messages.push(msg);
-        });    
+          else
+            since--;
+        });
+        messages = messages.splice(since);
         if (messages.length > 0){
           res.writeHead(200);
           res.end(JSON.stringify(messages));
