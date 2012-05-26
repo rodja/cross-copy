@@ -97,9 +97,13 @@ function testFetchingOnlyUnknownRecentPastes(){
   R=`$TEST -d $DEVICE_ID_1 $SECRET "msg3"`
   R=`$TEST -j -d $DEVICE_ID_2 $SECRET`
   MSG2_ID=`echo "$R" | grep -Po '"data":"msg2","id":.*?[^\\\\]",' | awk -F"\"" '{print $8}'`
-  R=`$TEST -v -j -d $DEVICE_ID_2 -s $MSG2_ID $SECRET`
+  R=`$TEST -j -d $DEVICE_ID_2 -s $MSG2_ID $SECRET`
   D=`echo "$R" | grep -Po '"data":.*?[^\\\\]",'`
   assertEqual '"data":"msg3",' "$D" "should get only the third message"
+  MSG3_ID=`echo "$R" | awk -F"\"" '{print $8}'`
+  ( M=`$TEST -j -d $DEVICE_ID_2 -s $MSG3_ID $SECRET | grep -Po '"data":.*?[^\\\\]",'`;   assertEqual '"data":"msg4",' "$M" "should get newly submitted data" ) &
+  sleep 1  
+  R=`$TEST -d $DEVICE_ID_1 $SECRET "msg4"`
   SECRET=`uuidgen`
 }
 

@@ -125,7 +125,8 @@ server = http.createServer(function (req, res) {
           else
             since--;
         });
-        messages = messages.splice(since);
+        if (since > 0)
+          messages = messages.splice(since);
         if (messages.length > 0){
           res.writeHead(200);
           res.end(JSON.stringify(messages));
