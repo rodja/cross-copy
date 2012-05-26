@@ -114,11 +114,17 @@ server = http.createServer(function (req, res) {
     
     if (filename === null){
     
-      console.log(util.inspect(messagecache[secret]));
-      if (res.requestsJson && messagecache[secret].length > 0){
-        res.writeHead(200);
-        res.end(JSON.stringify(messagecache[secret]));
-        return;
+      if (res.requestsJson){
+        var messages = []; 
+        messagecache[secret].forEach(function(msg){
+          if (msg.sender !== device)
+            messages.push(msg);
+        });    
+        if (messages.length > 0){
+          res.writeHead(200);
+          res.end(JSON.stringify(messages));
+          return;
+        }
       }
 
       req.connection.on('close',function(){
