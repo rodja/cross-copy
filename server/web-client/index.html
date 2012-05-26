@@ -26,7 +26,7 @@
 <link href='http://fonts.googleapis.com/css?family=Varela' rel='stylesheet' type='text/css'>
 
 <script type="text/javascript">
-
+  
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-31324545-1']);
   _gaq.push(['_setDomainName', 'cross-copy.net']);
@@ -38,6 +38,12 @@
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
+
+  window.onerror = function(message, url, lineNumber) {  
+    _gaq.push(['_trackEvent', "js-error", message, url, lineNumber]);
+    return true;
+  }; 
+
 
 
 function trackEvent(category, action){
