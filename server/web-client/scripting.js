@@ -69,8 +69,8 @@ function listen () {
   }
 
   var latestKnownMessageId = "";
-  if (history[secret] && history[secret].length > 0) 
-    latestKnownMessageId = history[secret][0].id;
+  if (localHistory[secret] && localHistory[secret].length > 0) 
+    latestKnownMessageId = localHistory[secret][0].id;
 
   receiverRequest = $.ajax({
       url: server + '/' + secret + ".json?device_id=" + deviceId + "&since=" + latestKnownMessageId,
@@ -242,12 +242,14 @@ function showlocalHistory(){
   if (oldPastes == null)
     oldPastes = [];
 
+
   $('#history').fadeOut(function(){
     $(this).empty();
     $.each(oldPastes, function(i,e){
-       if (e.data == null) return true; // continue
-       var $li = $('<li class="' + e.direction || 'in' + '">' + e.data +'</li>\n');
+       if (e.data === undefined) return true; // continue
+       var $li = $('<li class="' + (e.direction || 'in') + '">' + e.data +'</li>\n');
       $('#history').append($li);
+    console.log($li);
     });
     if (oldPastes.length > 0)
       $('#history').prepend($('<li class="new-session">locally stored history for this secret</li>'));

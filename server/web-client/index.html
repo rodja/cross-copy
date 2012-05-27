@@ -41,7 +41,7 @@
 
   window.onerror = function(message, url, lineNumber) {  
     _gaq.push(['_trackEvent', "js-error", message, url, lineNumber]);
-    return true;
+    return false;
   }; 
 
   function trackEvent(category, action){

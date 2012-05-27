@@ -221,7 +221,7 @@ server = http.createServer(function (req, res) {
       else
         waitingReceivers[secret] = [];
 
-updateWatchers(secret);
+      updateWatchers(secret);
    });
 
   } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
