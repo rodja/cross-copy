@@ -196,7 +196,7 @@ server = http.createServer(function (req, res) {
       messagecache[secret].push(msg);
       setTimeout(function(){
        messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
-      }, 1000 * (query.keep_for || 10) );
+      }, 1000 * (query.keep_for || 60) );
 
       var receiverWhoSendsTheData;
       waitingReceivers[secret].forEach(function(response){

@@ -249,7 +249,6 @@ function showlocalHistory(){
        if (e.data === undefined) return true; // continue
        var $li = $('<li class="' + (e.direction || 'in') + '">' + e.data +'</li>\n');
       $('#history').append($li);
-    console.log($li);
     });
     if (oldPastes.length > 0)
       $('#history').prepend($('<li class="new-session">locally stored history for this secret</li>'));
