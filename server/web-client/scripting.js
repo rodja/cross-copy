@@ -68,13 +68,17 @@ function listen () {
     uploader._handler._options.action = uploader._options.action;
   }
 
+  var latestKnownMessageId = "";
+  if (history[secret] && history[secret].length > 0) 
+    latestKnownMessageId = history[secret][0].id;
+
   receiverRequest = $.ajax({
-      url: server + '/' + secret + "?device_id=" + deviceId,
+      url: server + '/' + secret + ".json?device_id=" + deviceId + "&since=" + latestKnownMessageId,
       cache: false,
       success: function(response){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-        paste(response, "in");
+        paste(JSON.parse(response), "in");
       },
       error: function(xhr, status){
         trackEvent('error', 'GET');
@@ -123,23 +127,20 @@ function watch(){
 }
 
 
-function paste(data, direction){
+function paste(msg, direction){
 
-  if (data.indexOf('/api/' + secret) != -1)
-    data = '<a href="' + data + '">' + data.substring(('/api/' + secret).length + 1) + '</a>';
+  msg.direction = direction;
+
+  // convert relative file ref into hyperlink
+  if (msg.data.indexOf('/api/' + secret) != -1)
+    msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
   
-  var $li = $('<li>' + data +'</li>\n');
+  var $li = $('<li>' + msg.data +'</li>\n');
   $li.addClass(direction);
   $('#current').prepend($li);
   $li.hide().slideDown();
 
-  var pastes = [];
-  $("ul li").each(function() { 
-    var direction = $(this).attr('class');    
-    if (direction === 'in' || direction === 'out')   
-      pastes.push( {'direction': direction, 'msg' : $(this).text() });
-  });
-  localHistory[secret] = pastes;
+  localHistory[secret].unshift(msg);
   storage && storage.setItem('localHistory', JSON.stringify(localHistory, null, 2));
 }
 
@@ -169,7 +170,7 @@ function share(text){
         else {
           trackEvent('succsess', 'GET');
           $('#step-1 h2').css({color: ''});       
-          paste(text, "out");
+          paste({data: text}, "out");
           storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
         }
       },
@@ -188,7 +189,7 @@ $(document).ready(function() {
   if (deviceId == null) deviceId = guid();
   if (storage) storage.setItem('device_id', deviceId);
 
-  try{
+  //try{
 
     if (storage)
       localHistory = JSON.parse(storage.getItem('localHistory'));
@@ -200,11 +201,10 @@ $(document).ready(function() {
         $('#secret').val(secrets[0]); 
         listen();
         watch();
-        showRecentPastes();
         showlocalHistory();
       }
     }
-  } catch (e){ localHistory = {}; }
+  //} catch (e){ localHistory = {}; console.error(e);}
  
   
 
@@ -219,7 +219,6 @@ $(document).ready(function() {
 
     listen();
     watch();
-    showRecentPastes();
     showlocalHistory();
   });
 
@@ -237,33 +236,6 @@ $(document).ready(function() {
   
 });
 
-function showRecentPastes(){
-
-
-  $.ajax({
-      url: server + '/' + secret + "/recent-data.json?device_id=" + deviceId,
-      cache: false,
-      success: function(response){
-        var recentPastes = [];
-        try{ recentPastes = JSON.parse(response); } catch(e){}
-
-        $('#recent').fadeOut(function(){
-          $(this).empty();
-          $.each(recentPastes, function(i,e){
-             var d = e.direction ? e.direction : 'in';
-             var $li = $('<li class="' + d + '">' + e.data +'</li>\n');
-            $('#recent').append($li);
-          });
-          if (recentPastes.length > 0)
-            $('#recent').prepend($('<li class="new-session">recently send to this secret</li>'));
-          $('#recent').fadeIn();
-        });
-    
-      }
-  });
-  
-}
-
 function showlocalHistory(){
 
   var oldPastes = localHistory[secret];
@@ -273,8 +245,8 @@ function showlocalHistory(){
   $('#history').fadeOut(function(){
     $(this).empty();
     $.each(oldPastes, function(i,e){
-       var d = e.direction ? e.direction : 'in';
-       var $li = $('<li class="' + d + '">' + (e.msg != undefined ? e.msg : e) +'</li>\n');
+       if (e.data == null) return true; // continue
+       var $li = $('<li class="' + e.direction || 'in' + '">' + e.data +'</li>\n');
       $('#history').append($li);
     });
     if (oldPastes.length > 0)

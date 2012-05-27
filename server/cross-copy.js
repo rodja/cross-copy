@@ -83,7 +83,7 @@ server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
   var secret = pathname.split("/")[2];
-  if (secret.endsWith(".json")){
+  if (secret && secret.endsWith(".json")){
     secret = secret.substr(0, secret.length - 5);
     res.requestsJson = true;
   }        
@@ -92,7 +92,7 @@ server = http.createServer(function (req, res) {
   var device = query.device_id || guid();  
   
   console.log(req.method + ": " + util.inspect(secret) + " " + filename);
-  
+
   if (watchers[secret] === undefined) watchers[secret] = [];
   if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];
   if (messagecache[secret] === undefined) messagecache[secret] = [];
