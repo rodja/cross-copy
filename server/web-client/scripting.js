@@ -137,6 +137,14 @@ function paste(msg, direction){
   
   var $li = $('<li>' + msg.data +'</li>\n');
   $li.addClass(direction);
+  if (msg.keep_for){
+    $countdown = $("<div class='countdown'>" + msg.keep_for + "</div>");
+    $li.prepend($countdown);
+    setInterval(function(){
+      var keptFor = parseInt($countdown.text());
+      $countdown.text(keptFor - 1) 
+    }, 1000);
+  }
   $('#current').prepend($li);
   $li.hide().slideDown();
 
@@ -166,15 +174,10 @@ function share(text){
         console.log(response);
         response = JSON.parse(response);
 
-        if (response.deliveries == 0){
-          $('#step-1 h2').css({color: '#f00'});
-          trackEvent('error', 'lonley PUT');
-        } else {
-          trackEvent('succsess', 'GET');
-          $('#step-1 h2').css({color: ''});       
-          paste(response, "out");
-          storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
-        }
+        trackEvent('succsess', 'GET');
+        $('#step-1 h2').css({color: ''});       
+        paste(response, "out");
+        storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
       },
       error: function(xhr, status){
         $('#step-1 h2').css({color: '#f00'});

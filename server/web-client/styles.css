@@ -127,6 +127,14 @@ li {
   margin-bottom:0.8em;  
 }
 
+li .countdown{
+  font-size:65%;
+  position:relative;
+  top: 10px;
+  left: -25px;
+  color: #888;
+}
+
 .in {
   text-align:right;
 }
