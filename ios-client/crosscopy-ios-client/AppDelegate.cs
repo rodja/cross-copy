@@ -42,7 +42,7 @@ namespace CrossCopy.iOSClient
 		string secretValue;
 		List<DataItem> history;
 		
-		WebRequest getRequest, sendRequest;
+		WebRequest request;
 		CancellationTokenSource listenCancel;
 		CancellationToken listenToken;
 		
@@ -71,7 +71,7 @@ namespace CrossCopy.iOSClient
 				Autorotate = true, 
 				HidesBottomBarWhenPushed = true
 			};
-			
+
 			navigation = new UINavigationController();
 			navigation.PushViewController(dvc, false);
 			navigation.SetNavigationBarHidden(true, false);
@@ -115,6 +115,8 @@ namespace CrossCopy.iOSClient
 				},
 				(entries = new Section(section4Label))
 			};
+			
+			root.UnevenRows = true;
 			
 			secret.AutocapitalizationType = UITextAutocapitalizationType.None;
 			secret.ShouldReturn += delegate 
@@ -168,20 +170,18 @@ namespace CrossCopy.iOSClient
 				secretValue = secret.Value;
 			});
 			
-			Console.Out.WriteLine("Get data for secret: {0}", secretValue);
-			
 			if (!String.IsNullOrEmpty(secretValue))
 			{
-				if (getRequest != null)
+				if (request != null)
 				{
-					getRequest.Abort();
+					request.Abort();
 				}
 				
-				getRequest = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
-				getRequest.ContentType = "application/json";
-				getRequest.Method = "GET";
+				request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
+				request.ContentType = "application/json";
+				request.Method = "GET";
 				
-				using (HttpWebResponse response = getRequest.GetResponse() as HttpWebResponse)
+				using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
 				{
 					if (response.StatusCode != HttpStatusCode.OK)
 					{
@@ -193,7 +193,7 @@ namespace CrossCopy.iOSClient
 						var content = reader.ReadToEnd();
 				        if (!String.IsNullOrWhiteSpace(content)) 
 						{
-							Console.Out.WriteLine("For request {0} get data: \r\n {1}", getRequest.RequestUri.AbsoluteUri, content);
+							Console.Out.WriteLine("For request {0} get data: \r\n {1}", request.RequestUri.AbsoluteUri, content);
 							PasteData (content, DataItemDirection.In);
 						}
 				   }
@@ -232,8 +232,8 @@ namespace CrossCopy.iOSClient
 				}
 				else
 				{
-					StringElement entry = new StringElement(item.Data);
-					entry.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
+					UITextAlignment alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
+					var entry = UIHelper.CreateHtmlViewElement(null, item.Data, alignment);
 					entries.Insert(0, entry);
 				}
 				
@@ -242,30 +242,30 @@ namespace CrossCopy.iOSClient
 		
 		private void ShareData(string dataToShare)
 		{
-			if (!String.IsNullOrEmpty(secret.Value))
+			if (!String.IsNullOrEmpty(secretValue))
 			{
 				try
 				{
-					//listenCancel.Cancel();
-																	
-					if (sendRequest != null)
+					listenCancel.Cancel();
+					
+					if (request != null)
 					{
-						sendRequest.Abort();
+						request.Abort();
 					}
 					
-					sendRequest = HttpWebRequest.Create(SERVER + String.Format(API, secret.Value) + DeviceID);
-	                sendRequest.Method = "PUT";
-	                sendRequest.ContentType= "text";
+					request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
+	                request.Method = "PUT";
+	                request.ContentType = "text";
 	                var byteArray = Encoding.UTF8.GetBytes(dataToShare);
-	                sendRequest.ContentLength = byteArray.Length;     
+	                request.ContentLength = byteArray.Length; 
 					
-					using (var dataStream = sendRequest.GetRequestStream())
+					using (var dataStream = request.GetRequestStream())
 					{
 	                	dataStream.Write(byteArray, 0, byteArray.Length);
 	                	dataStream.Close();
 					}
 	                
-	                using (HttpWebResponse response = sendRequest.GetResponse() as HttpWebResponse)
+	                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
 					{
 						if (response.StatusCode != HttpStatusCode.OK)
 						{
@@ -277,8 +277,12 @@ namespace CrossCopy.iOSClient
 							var content = reader.ReadToEnd();
 					        if(!String.IsNullOrWhiteSpace(content)) 
 							{
-								Console.Out.WriteLine("For request {0} share data: \r\n {1}", sendRequest.RequestUri.AbsoluteUri, content);
+								Console.Out.WriteLine("For request {0} share data: \r\n {1}", request.RequestUri.AbsoluteUri, content);
 								PasteData (dataToShare, DataItemDirection.Out);
+							}
+							else 
+							{
+								Console.Out.WriteLine("Send response is empty");
 							}
 					   }
 					}
@@ -288,7 +292,7 @@ namespace CrossCopy.iOSClient
 					Console.Out.WriteLine("Exception {0}", ex.Message);
 				}
 				
-				//Listen();
+				Listen();
 			}
 		}
 		
@@ -298,24 +302,24 @@ namespace CrossCopy.iOSClient
 			{
 				try
 				{
-					//listenCancel.Cancel();
+					listenCancel.Cancel();
 																	
-					if (sendRequest != null)
+					if (request != null)
 					{
-						sendRequest.Abort();
+						request.Abort();
 					}
 					
 					using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 					{
-						sendRequest = HttpWebRequest.Create(SERVER + String.Format(API, secret.Value) + "/" + Path.GetFileName(filePath));
-						sendRequest.Method = "POST";
-						sendRequest.ContentType = "application/octet-stream";
-						sendRequest.ContentLength = fileStream.Length;
+						request = HttpWebRequest.Create(SERVER + String.Format(API, secret.Value) + "/" + Path.GetFileName(filePath));
+						request.Method = "POST";
+						request.ContentType = "application/octet-stream";
+						request.ContentLength = fileStream.Length;
 						
 						int buffLength = 1024 * 5;
 				        byte[] buffor = new byte[buffLength];
 				        
-				        using (var requestStream = sendRequest.GetRequestStream())
+				        using (var requestStream = request.GetRequestStream())
 						{
 					        while ((buffLength = fileStream.Read(buffor, 0, buffLength)) > 0)
 							{
@@ -324,7 +328,7 @@ namespace CrossCopy.iOSClient
 						}
 					}
 
-					using (HttpWebResponse response = sendRequest.GetResponse() as HttpWebResponse)
+					using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
 					{
 						if (response.StatusCode != HttpStatusCode.OK)
 						{
@@ -347,7 +351,7 @@ namespace CrossCopy.iOSClient
 					Console.Out.WriteLine("Exception: {0}", ex.Message);
 				}
 				
-				//Listen();
+				Listen();
 			}
 		}
 		

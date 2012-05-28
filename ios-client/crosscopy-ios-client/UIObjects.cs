@@ -63,6 +63,21 @@ namespace CrossCopy.iOSClient.UI
 			
         	View.BackgroundColor = color;
 		}
+		
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+			
+			UITapGestureRecognizer tapGesture = new UITapGestureRecognizer(this, new MonoTouch.ObjCRuntime.Selector("ViewTappedSelector:"));
+			tapGesture.CancelsTouchesInView = false;
+			this.TableView.AddGestureRecognizer(tapGesture);
+		}
+		
+		[Export( "ViewTappedSelector:" )]
+		public void ViewTapped ( UIGestureRecognizer sender )
+		{
+		    this.TableView.EndEditing(true);
+		}
 	}
 	
 	public class ImageButtonEntryElement : EntryElement
@@ -230,6 +245,42 @@ namespace CrossCopy.iOSClient.UI
             DismissWithClickedButtonIndex(0, true); 
         } 
     } 
+	
+	public class AdvancedWebView : UIWebView
+	{
+		public AdvancedWebView() : base()
+		{
+			ShouldStartLoad += OpenInSafari;
+		}
+		
+		bool OpenInSafari (UIWebView sender, NSUrlRequest request, UIWebViewNavigationType navType)
+		{
+			Console.Out.WriteLine("Request {0}, Navigation type {1}", request.Url.AbsoluteUrl, navType);
+			if (navType == UIWebViewNavigationType.LinkClicked)
+			{
+				UIApplication.SharedApplication.OpenUrl(request.Url);
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+	
+	public class AdvancedUIViewElement : UIViewElement, IElementSizing
+	{
+		public AdvancedUIViewElement(string caption, UIView view, bool transparent) 
+			: base(caption, view, transparent)
+		{
+			
+		}
+		
+		float IElementSizing.GetHeight (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+		{
+			return base.GetHeight (tableView, indexPath) + 10;
+		}
+	}
 }
 
 

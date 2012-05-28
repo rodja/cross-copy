@@ -1,8 +1,11 @@
 using System;
-using MonoTouch.UIKit;
 using System.Drawing;
 using System.Net.NetworkInformation;
 using MonoTouch.Foundation;
+using MonoTouch.Dialog;
+using MonoTouch.UIKit;
+using CrossCopy.iOSClient.UI;
+using System.Text.RegularExpressions;
 
 namespace CrossCopy.iOSClient.Helpers
 {
@@ -102,6 +105,29 @@ namespace CrossCopy.iOSClient.Helpers
             
             return res;
         }
+		
+		public static UIViewElement CreateHtmlViewElement(string caption, string value, UITextAlignment alignment)
+		{
+			var html = Regex.Replace(value, @"((http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?)", "<a href='$1'>$1</a>", RegexOptions.Compiled);
+			var style =	@"<style type='text/css'>body { color: #000; background-color:#fafafa; font-family: Helvetica, Arial, sans-serif; font-size:16px; float:" + ((alignment == UITextAlignment.Left) ? "left" : "right") + "; }</style>";
+			html = "<html><head>" + style + "</head><body>" + html + "</body>";
+			Console.Out.WriteLine("Parsed html: {0}", html);
+			
+			var web = new AdvancedWebView();
+			web.LoadHtmlString(html, null);
+					
+			var size = new UITextView().StringSize(html, 
+			                                       UIFont.SystemFontOfSize(10), 
+			                                       new SizeF(300, 2000), 
+			                                       UILineBreakMode.WordWrap);
+	
+			float width = size.Width;
+			float height = size.Height;
+			web.Bounds = new RectangleF(0, 0, width, height); 
+			web.Center = new PointF(width/2+5, height/2+5);
+
+			return new AdvancedUIViewElement(caption, web, false);
+		}
 	}
 	
 	public class DeviceHelper
