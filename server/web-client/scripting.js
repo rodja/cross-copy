@@ -140,10 +140,12 @@ function paste(msg, direction){
   if (msg.keep_for){
     $countdown = $("<div class='countdown'>" + msg.keep_for + "</div>");
     $li.prepend($countdown);
-    setInterval(function(){
+    $li.data("countdown_interval", setInterval(function(){
       var keptFor = parseInt($countdown.text());
-      $countdown.text(keptFor - 1) 
-    }, 1000);
+      if (keptFor > 0) { $countdown.text(keptFor - 1); return }
+      $countdown.fadeOut();
+      clearInterval($li.data("cuntdown_interval"));
+    }, 1000));
   }
   $('#current').prepend($li);
   $li.hide().slideDown();
