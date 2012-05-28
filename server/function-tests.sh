@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEST="../cmd-client/cross-copy -q -l"
+TEST="../cmd-client/cross-copy -q"
 
 report(){
   
