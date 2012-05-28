@@ -59,7 +59,7 @@ if [ $# == 1 ]; then
   echo $PASTE
 
 elif [ $# == 2 ]; then
-  curl -X PUT -s -d "$2" $SERVER/api/$1$PARAMETERS
+  curl -X PUT -s -d "$2" $SERVER/api/$1$JSON$PARAMETERS
 else
   echo "wrong number of arguments. usage:"
   echo "   $ cross-copy secred-code              # to receive data"

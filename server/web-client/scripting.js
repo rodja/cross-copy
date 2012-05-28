@@ -155,7 +155,7 @@ function share(text){
   trackEvent('data', 'submitted');
 
   $.ajax({
-      url: server + '/' + secret + "?device_id=" + deviceId,
+      url: server + '/' + secret + ".json?device_id=" + deviceId,
       cache: false,
       type: 'PUT',
       processData: false,
@@ -163,14 +163,16 @@ function share(text){
       data: text,
       dataType: "text",
       success: function(response){
-        if (response == 0){
+        console.log(response);
+        response = JSON.parse(response);
+
+        if (response.deliveries == 0){
           $('#step-1 h2').css({color: '#f00'});
           trackEvent('error', 'lonley PUT');
-        }
-        else {
+        } else {
           trackEvent('succsess', 'GET');
           $('#step-1 h2').css({color: ''});       
-          paste({data: text}, "out");
+          paste(response, "out");
           storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
         }
       },

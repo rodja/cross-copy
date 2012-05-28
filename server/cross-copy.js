@@ -183,20 +183,15 @@ server = http.createServer(function (req, res) {
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
     //console.log("PUT waitingReceivers  " + waitingReceivers[secret].length);
 
-    if (waitingReceivers[secret] == [] || waitingReceivers[secret].length == 0 || 
-       ( waitingReceivers[secret].length == 1 && waitingReceivers[secret][0].device === device && device !== undefined )){
-      res.writeHead(202, header);
-      res.end('0\n');
-      track("put-202");
-    }
-
+    
     req.on('data', function(chunk) {
 
+      var keepFor = (query.keep_for || 60);
       var msg = {data: chunk.toString(), id: guid(), sender: device};
       messagecache[secret].push(msg);
       setTimeout(function(){
        messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
-      }, 1000 * (query.keep_for || 60) );
+      }, 1000 * keepFor );
 
       var receiverWhoSendsTheData;
       waitingReceivers[secret].forEach(function(response){
@@ -214,7 +209,13 @@ server = http.createServer(function (req, res) {
       track("put-" + waitingReceivers[secret].length);
 
       res.writeHead(200, header);
-      res.end( (waitingReceivers[secret].length - (receiverWhoSendsTheData ? 1 : 0)) + '\n');
+      
+      msg.deliveries = (waitingReceivers[secret].length - (receiverWhoSendsTheData ? 1 : 0));
+      if (res.requestsJson){
+          msg.keep_for = keepFor; 
+          res.end(JSON.stringify(msg));
+      } else
+          res.end( deliveries + '\n');
 
       if (receiverWhoSendsTheData)
         waitingReceivers[secret] = [receiverWhoSendsTheData];
