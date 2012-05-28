@@ -68,13 +68,17 @@ function listen () {
     uploader._handler._options.action = uploader._options.action;
   }
 
+  var latestKnownMessageId = "";
+  if (localHistory[secret] && localHistory[secret].length > 0) 
+    latestKnownMessageId = localHistory[secret][0].id;
+
   receiverRequest = $.ajax({
-      url: server + '/' + secret + "?device_id=" + deviceId,
+      url: server + '/' + secret + ".json?device_id=" + deviceId + "&since=" + latestKnownMessageId,
       cache: false,
       success: function(response){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-        paste(response, "in");
+        paste(JSON.parse(response), "in");
       },
       error: function(xhr, status){
         trackEvent('error', 'GET');
@@ -123,23 +127,30 @@ function watch(){
 }
 
 
-function paste(data, direction){
+function paste(msg, direction){
 
-  if (data.indexOf('/api/' + secret) != -1)
-    data = '<a href="' + data + '">' + data.substring(('/api/' + secret).length + 1) + '</a>';
+  msg.direction = direction;
+
+  // convert relative file ref into hyperlink
+  if (msg.data.indexOf('/api/' + secret) != -1)
+    msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
   
-  var $li = $('<li>' + data +'</li>\n');
+  var $li = $('<li>' + msg.data +'</li>\n');
   $li.addClass(direction);
-  $('#received').prepend($li);
+  if (msg.keep_for){
+    $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
+    $li.prepend($countdown);
+    $li.data("countdown_interval", setInterval(function(){
+      var keptFor = parseInt($countdown.text());
+      if (keptFor > 0) { $countdown.text(keptFor - 1); return }
+      $countdown.fadeOut();
+      clearInterval($li.data("cuntdown_interval"));
+    }, 1000));
+  }
+  $('#current').prepend($li);
   $li.hide().slideDown();
 
-  var pastes = [];
-  $("ul li").each(function() { 
-    var direction = $(this).attr('class');    
-    if (direction === 'in' || direction === 'out')   
-      pastes.push( {'direction': direction, 'msg' : $(this).text() });
-  });
-  localHistory[secret] = pastes;
+  localHistory[secret].unshift(msg);
   storage && storage.setItem('localHistory', JSON.stringify(localHistory, null, 2));
 }
 
@@ -154,7 +165,7 @@ function share(text){
   trackEvent('data', 'submitted');
 
   $.ajax({
-      url: server + '/' + secret + "?device_id=" + deviceId,
+      url: server + '/' + secret + ".json?device_id=" + deviceId,
       cache: false,
       type: 'PUT',
       processData: false,
@@ -162,16 +173,13 @@ function share(text){
       data: text,
       dataType: "text",
       success: function(response){
-        if (response == 0){
-          $('#step-1 h2').css({color: '#f00'});
-          trackEvent('error', 'lonley PUT');
-        }
-        else {
-          trackEvent('succsess', 'GET');
-          $('#step-1 h2').css({color: ''});       
-          paste(text, "out");
-          storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
-        }
+        console.log(response);
+        response = JSON.parse(response);
+
+        trackEvent('succsess', 'GET');
+        $('#step-1 h2').css({color: ''});       
+        paste(response, "out");
+        storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
       },
       error: function(xhr, status){
         $('#step-1 h2').css({color: '#f00'});
@@ -188,7 +196,7 @@ $(document).ready(function() {
   if (deviceId == null) deviceId = guid();
   if (storage) storage.setItem('device_id', deviceId);
 
-  try{
+  //try{
 
     if (storage)
       localHistory = JSON.parse(storage.getItem('localHistory'));
@@ -203,7 +211,7 @@ $(document).ready(function() {
         showlocalHistory();
       }
     }
-  } catch (e){ localHistory = {}; }
+  //} catch (e){ localHistory = {}; console.error(e);}
  
   
 
@@ -217,9 +225,7 @@ $(document).ready(function() {
       return;
 
     listen();
-
     watch();
-
     showlocalHistory();
   });
 
@@ -243,16 +249,17 @@ function showlocalHistory(){
   if (oldPastes == null)
     oldPastes = [];
 
-  $('#received').fadeOut(function(){
+
+  $('#history').fadeOut(function(){
     $(this).empty();
     $.each(oldPastes, function(i,e){
-       var d = e.direction ? e.direction : 'in';
-       var $li = $('<li class="' + d + '">' + (e.msg != undefined ? e.msg : e) +'</li>\n');
-      $('#received').append($li);
+       if (e.data === undefined) return true; // continue
+       var $li = $('<li class="' + (e.direction || 'in') + '">' + e.data +'</li>\n');
+      $('#history').append($li);
     });
     if (oldPastes.length > 0)
-      $('#received').prepend($('<li class="new-session">locally stored localHistory for this secret</li>'));
-    $('#received').fadeIn();
+      $('#history').prepend($('<li class="new-session">locally stored history for this secret</li>'));
+    $('#history').fadeIn();
   });
 }
 

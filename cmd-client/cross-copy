@@ -1,28 +1,65 @@
 #!/bin/bash
 
 SERVER=http://www.cross-copy.net
+QUIET=false 
+FETCH_RECENT_DATA=false
+PARAMETERS="?"
+VERBOSE=false
+JSON=''
 
-while getopts ":l" opt; do
+while getopts ":lqrvjs:d:k:" opt; do
   case $opt in
+    q)
+      QUIET=true
+      ;;
+    k)
+      PARAMETERS="${PARAMETERS}keep_for=${OPTARG}&"
+      ;;
+    r)
+      FETCH_RECENT_DATA=true
+      ;;
+    s)
+      PARAMETERS="${PARAMETERS}since=${OPTARG}&"
+      ;;
+    j)
+      JSON=".json"
+      ;;
+    v)
+      VERBOSE=true
+      ;;
+    d)
+      PARAMETERS="${PARAMETERS}device_id=${OPTARG}&"
+      ;;
     l)
       SERVER=http://localhost:8080
-      echo "using localhost instead of cross-copy.net"
-      shift $((OPTIND-1)); OPTIND=1
+      $QUIET || echo "using localhost instead of cross-copy.net"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
-      shift $((OPTIND-1)); OPTIND=1
+      exit 1
       ;;
   esac
+  shift $((OPTIND-1)); OPTIND=1
 done
 
 if [ $# == 1 ]; then
-  echo "waiting for pastes on secret '$1' on $SERVER"
-  PASTE=`curl -s $SERVER/api/$1`
-  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE
+  if [ $FETCH_RECENT_DATA == true ]; then
+    CMD="curl -s $SERVER/api/$1/recent-data.json"
+    $VERBOSE && echo $CMD    
+    RECENT=`$CMD`
+    echo $RECENT
+    exit 0
+  fi
+
+  $QUIET || echo "waiting for pastes with secret '$1' on $SERVER"
+  CMD="curl -s $SERVER/api/$1$JSON$PARAMETERS"
+  $VERBOSE && echo $CMD    
+  PASTE=`$CMD`
+  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE  # complete internal urls
   echo $PASTE
+
 elif [ $# == 2 ]; then
-  curl -X PUT -s -d "$2" $SERVER/api/$1
+  curl -X PUT -s -d "$2" $SERVER/api/$1$JSON$PARAMETERS
 else
   echo "wrong number of arguments. usage:"
   echo "   $ cross-copy secred-code              # to receive data"

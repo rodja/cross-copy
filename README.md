@@ -1,6 +1,6 @@
 # About
 
-*cross copy* (http://www.cross-copy.net) attacs the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The only thing which needs to be done on all participating devices is to agree on a secret phrase and connect to a RESTful Web Service (written in node.js). The hosted [Web App](http://www.cross-copy.net) provides a neat interface for doing so in any modern Browser (not IE). There is also a commandline tool for sending and receiving stuff when working on a remote system via ssh or similar (of course you can also use curl directly).
+*cross copy* (http://www.cross-copy.net) solves the problem when you  spontaneously need to transfer data between different devices (eg. "inter-device copy and paste") and don't want any setup or login. The only thing which needs to be done on all participating devices is to agree on a secret phrase and connect to a RESTful Web Service (written in node.js). The hosted [Web App](http://www.cross-copy.net) provides a neat interface for doing so in any modern Browser (not IE). There is also a commandline tool for sending and receiving stuff when working on a remote system via ssh or similar (of course you can also use curl directly).
 
 ## Use Cases
 
@@ -12,11 +12,15 @@
 
 ## Service API
 
-The web-client uses the hostname http://www.cross-copy.net
+The official server is available through http://www.cross-copy.net
 
 ### waiting for data to appear "on the given phrase" (long polling)
 
     GET   /api/<secret code>
+
+### lists data which had been recently added to "the given phrase"
+
+    GET   /api/<secret code>/recent-data.json
 
 ### send data in body to all waiting clients    
 
@@ -32,7 +36,12 @@ The web-client uses the hostname http://www.cross-copy.net
 
 ### parameters
 
-If the parameter device_id=<uuid> is added to the above urls for GET & PUT,  you wont receive the data you send out with the same uuid. 
+#### Device
+If the parameter device_id=[uuid] is added to the above urls for GET & PUT,  you wont receive the data you send out with the same uuid. 
+
+#### Keep on server
+By adding the parameter keep_for=[time in seconds] to the PUT url, you can modify the time until the data will be not longer available in recent-data.json
+
 
 ## License
 

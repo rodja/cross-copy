@@ -1,113 +1,51 @@
 using System;
-using MonoTouch.UIKit;
 using System.Drawing;
+using System.Net.NetworkInformation;
+using MonoTouch.Foundation;
+using MonoTouch.Dialog;
+using MonoTouch.UIKit;
+using CrossCopy.iOSClient.UI;
+using System.Text.RegularExpressions;
 
 namespace CrossCopy.iOSClient.Helpers
 {
+	public enum MessageBoxResult
+    {
+        OK,
+        Cancel
+    }
+
 	public class UIHelper
 	{
-		/// <summary>
-		/// Creates the label.
-		/// </summary>
-		/// <returns>
-		/// The label.
-		/// </returns>
-		/// <param name='text'>
-		/// Text.
-		/// </param>
-		/// <param name='textColor'>
-		/// Text color.
-		/// </param>
-		/// <param name='backgroundColor'>
-		/// Background color.
-		/// </param>
-		/// <param name='fontName'>
-		/// Font name.
-		/// </param>
-		/// <param name='fontSize'>
-		/// Font size.
-		/// </param>
-		/// <param name='x'>
-		/// X.
-		/// </param>
-		/// <param name='y'>
-		/// Y.
-		/// </param>
-		/// <param name='width'>
-		/// Width.
-		/// </param>
-		/// <param name='height'>
-		/// Height.
-		/// </param>
-		public static UILabel CreateLabel(string text, UIColor textColor, UIColor backgroundColor, string fontName, float fontSize, float x, float y, float width, float height)
+		public static UILabel CreateLabel (string text, UIFont font, int size, UITextAlignment alignment, UIColor textColor, UIColor backgroundColor)
 		{
-			UILabel label = new UILabel();
-			label.Frame = new RectangleF (x, y, width, height);
+			var label = new UILabel ();
+	        var frame = label.Frame;
+	        frame.Inflate(0, size);
+	        label.Frame = frame;
+			label.Font = font;
 	        label.Text = text;
+	        label.TextAlignment = alignment;
 			label.TextColor = textColor;
-			label.BackgroundColor = backgroundColor;
-        	label.Font = UIFont.FromName(fontName, fontSize);
+	        label.BackgroundColor = backgroundColor;
 			return label;
 		}
 		
-		/// <summary>
-		/// Creates the text field.
-		/// </summary>
-		/// <returns>
-		/// The text field.
-		/// </returns>
-		/// <param name='text'>
-		/// Text.
-		/// </param>
-		/// <param name='placeholder'>
-		/// Placeholder.
-		/// </param>
-		/// <param name='x'>
-		/// X.
-		/// </param>
-		/// <param name='y'>
-		/// Y.
-		/// </param>
-		/// <param name='width'>
-		/// Width.
-		/// </param>
-		/// <param name='height'>
-		/// Height.
-		/// </param>
-		public static UITextField CreateTextField(string text, string placeholder, float x, float y, float width, float height)
+		public static UILabel CreateLabel (string text, bool bold, int size, UITextAlignment alignment, UIColor textColor)
 		{
-			UITextField txtField = new UITextField();
-			txtField.Frame = new RectangleF (x, y, width, height);
-			txtField.BorderStyle = UITextBorderStyle.RoundedRect;
-		    txtField.Text = text;
-			txtField.Placeholder = placeholder;
-			return txtField;
+			UIFont font;
+			if (bold)
+			{
+				font = UIFont.BoldSystemFontOfSize(size);
+			}
+			else
+			{
+				font = UIFont.SystemFontOfSize(size);
+			}
+			
+			return CreateLabel(text, font, size, alignment, textColor, UIColor.Clear);
 		}
 		
-		/// <summary>
-		/// Creates the text button.
-		/// </summary>
-		/// <returns>
-		/// The text button.
-		/// </returns>
-		/// <param name='title'>
-		/// Title.
-		/// </param>
-		/// <param name='x'>
-		/// X.
-		/// </param>
-		/// <param name='y'>
-		/// Y.
-		/// </param>
-		/// <param name='width'>
-		/// Width.
-		/// </param>
-		/// <param name='height'>
-		/// Height.
-		/// </param>
-		/// <param name='darkTextColor'>
-		/// Dark text color.
-		/// </param>
 		public static UIButton CreateTextButton(string title, float x, float y, float width, float height, UIColor titleColor, UIColor backgroundColor)
 		{
 			var frame = new RectangleF (x, y, width, height);
@@ -125,27 +63,6 @@ namespace CrossCopy.iOSClient.Helpers
 			return button;
 		}
 		
-		/// <summary>
-		/// Creates the image button.
-		/// </summary>
-		/// <returns>
-		/// The image button.
-		/// </returns>
-		/// <param name='image'>
-		/// Image.
-		/// </param>
-		/// <param name='x'>
-		/// X.
-		/// </param>
-		/// <param name='y'>
-		/// Y.
-		/// </param>
-		/// <param name='width'>
-		/// Width.
-		/// </param>
-		/// <param name='height'>
-		/// Height.
-		/// </param>
 		public static UIButton CreateImageButton(string image, float x, float y, float width, float height)
 		{
 			var button = CreateTextButton("", x, y, width, height, UIColor.Black, UIColor.White);
@@ -154,26 +71,82 @@ namespace CrossCopy.iOSClient.Helpers
 			return button;
 		}
 		
-		/// <summary>
-		/// Shows the alert.
-		/// </summary>
-		/// <param name='title'>
-		/// Title.
-		/// </param>
-		/// <param name='message'>
-		/// Message.
-		/// </param>
-		/// <param name='buttonText'>
-		/// Button text.
-		/// </param>
 		public static void ShowAlert(string title, string message, string buttonText)
 		{
-			UIAlertView alert = new UIAlertView();
-			alert.Title = title;
-			alert.AddButton(buttonText);
-			alert.Message = message;
-			alert.Show();
+			UIApplication.SharedApplication.InvokeOnMainThread(delegate
+			{
+				UIAlertView alert = new UIAlertView();
+				alert.Title = title;
+				alert.AddButton(buttonText);
+				alert.Message = message;
+				alert.Show();
+			});
 		}
+
+    	public static MessageBoxResult ShowMessageBox(string caption, string message)
+        {
+            MessageBoxResult res = MessageBoxResult.Cancel;
+			
+			int clicked = -1;
+		    var alert = new UIAlertView (caption, message,  null, "Cancel", "OK");
+		    alert.Show ();
+		    alert.Clicked += (sender, buttonArgs) => {
+		        clicked = buttonArgs.ButtonIndex;
+		    };    
+		    while (clicked == -1)
+			{
+				NSRunLoop.Current.RunUntil (NSDate.FromTimeIntervalSinceNow (0.5));
+		    }
+		
+		    if (clicked == 1)
+			{
+				res = MessageBoxResult.OK;
+			}
+            
+            return res;
+        }
+		
+		public static UIViewElement CreateHtmlViewElement(string caption, string value, UITextAlignment alignment)
+		{
+			var html = Regex.Replace(value, @"((http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?)", "<a href='$1'>$1</a>", RegexOptions.Compiled);
+			var style =	@"<style type='text/css'>body { color: #000; background-color:#fafafa; font-family: Helvetica, Arial, sans-serif; font-size:16px; float:" + ((alignment == UITextAlignment.Left) ? "left" : "right") + "; }</style>";
+			html = "<html><head>" + style + "</head><body>" + html + "</body>";
+			Console.Out.WriteLine("Parsed html: {0}", html);
+			
+			var web = new AdvancedWebView();
+			web.LoadHtmlString(html, null);
+					
+			var size = new UITextView().StringSize(html, 
+			                                       UIFont.SystemFontOfSize(10), 
+			                                       new SizeF(300, 2000), 
+			                                       UILineBreakMode.WordWrap);
+	
+			float width = size.Width;
+			float height = size.Height;
+			web.Bounds = new RectangleF(0, 0, width, height); 
+			web.Center = new PointF(width/2+5, height/2+5);
+
+			return new AdvancedUIViewElement(caption, web, false);
+		}
+	}
+	
+	public class DeviceHelper
+	{
+		public static string GetMacAddress()
+	    {
+	        string macAddresses = "";
+	
+	        foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+	        {
+	            if (nic.OperationalStatus == OperationalStatus.Up)
+	            {
+	                macAddresses += nic.GetPhysicalAddress().ToString();
+	                break;
+	            }
+	        }
+			
+	        return macAddresses;
+	    }
 	}
 }
 

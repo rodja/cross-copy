@@ -25,9 +25,10 @@
 
 var port = 8080;
 
-var getters = {};
+var waitingReceivers = {};
 var watchers = {};
 var filecache = {};
+var messagecache = {};
 
 var header = {'Content-Type': 'text/plain'}
 
@@ -39,6 +40,18 @@ var path = require('path');
 var formidable = require('./scriby-node-formidable-19219c8');
 var util = require('util');
 
+// guid generator from http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+function guid() {
+    var S4 = function() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 function track(pageName){
   var options = {
     host: 'www.google-analytics.com',
@@ -46,7 +59,7 @@ function track(pageName){
   };
 
   http.get(options, function(res) {
-    //console.log("Got response: " + res.statusCode);
+    //console.log("Got receiverWhoSendsTheData: " + res.statusCode);
   }).on('error', function(e) {
     //console.log("Got error: " + e.message);
   });
@@ -57,9 +70,9 @@ track("server-started");
 function updateWatchers(secret){
   var untouched = [];     
   watchers[secret].forEach(function(watcher){
-    if (watcher.knownNumberOfListeners != getters[secret].length){
+    if (watcher.knownNumberOfListeners != waitingReceivers[secret].length){
       watcher.writeHead(200, header);
-      watcher.end(getters[secret].length + '\n');
+      watcher.end(waitingReceivers[secret].length + '\n');
     } else untouched.push(watcher);
   });
   watchers[secret] = untouched;
@@ -68,24 +81,28 @@ function updateWatchers(secret){
 server = http.createServer(function (req, res) {
 
   var pathname = require('url').parse(req.url).pathname;
-  var secret = pathname.substring(5);   
+  var secret = pathname.split("/")[2];
+  if (secret && secret.endsWith(".json")){
+    secret = secret.substr(0, secret.length - 5);
+    res.requestsJson = true;
+  }        
+  var filename = pathname.split("/")[3] || null
   var query = require('url').parse(req.url, true).query;    
-  var device = query.device_id;  
+  var device = query.device_id || guid();  
   
-  //console.log(util.inspect(filecache));
-  //console.log(util.inspect(getters));
+  console.log(req.method + ": " + util.inspect(secret) + " " + filename);
 
   if (watchers[secret] === undefined) watchers[secret] = [];
-  if (getters[secret] === undefined) getters[secret] = [];
-   
+  if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];
+  if (messagecache[secret] === undefined) messagecache[secret] = [];
 
   if (req.method === 'GET' && pathname.indexOf('/api') == 0) {
 
     if (query.watch == 'listeners') {
 
-      if (getters[secret].length != query.count){
+      if (waitingReceivers[secret].length != query.count){
         res.writeHead(200, header);
-        res.end(getters[secret].length + '\n');
+        res.end(waitingReceivers[secret].length + '\n');
       } else{
         res.knownNumberOfListeners = query.count;
         watchers[secret].push(res);
@@ -94,34 +111,57 @@ server = http.createServer(function (req, res) {
       return;
     }
     
-    req.socket.secret = secret;
-    req.connection.on('close',function(){
-       res.aborted = true;
-       track("get-aborted");
-      
-       var livingGetters = [];
-       getters[secret].forEach(function(getter){
-         if (!getter.aborted) livingGetters.push(getter);
-       });
+    if (filename === null){
+    
+      if (res.requestsJson){
+        var messages = [];
+        var since = 0;
+        messagecache[secret].forEach(function(msg, i){
+          if (query.since === msg.id)
+            since += i+1;
+          if (msg.sender !== device)
+            messages.push(msg);
+          else
+            since--;
+        });
+        if (since > 0)
+          messages = messages.splice(since);
+        if (messages.length > 0){
+          res.writeHead(200);
+          res.end(JSON.stringify(messages));
+          return;
+        }
+      }
 
-       getters[secret] = livingGetters;        
-       updateWatchers(secret);
-    });
+      req.connection.on('close',function(){
+         res.aborted = true;
+         track("get-aborted");
+        
+         var livingwaitingReceivers = [];
+         waitingReceivers[secret].forEach(function(response){
+           if (!response.aborted) livingwaitingReceivers.push(response);
+         });
 
-    if (secret.indexOf('/') == -1){
-      
-      if (device) res.device = device;
+         waitingReceivers[secret] = livingwaitingReceivers;        
+         updateWatchers(secret);
+      });
+  
+      res.device = device;
       
       // if not asking for a file we will wait for the shared data
-      getters[secret].push(res); 
+      waitingReceivers[secret].push(res); 
       track("get-waiting");
       
       updateWatchers(secret);
       return;
     }
 
-    if (filecache[secret] != undefined){
-      var file = filecache[secret];
+    if (filename === "recent-data.json"){
+      res.writeHead(200);
+      res.end(JSON.stringify(messagecache[secret]));
+      return;
+    } else if (filecache[pathname] != undefined){
+      var file = filecache[pathname];
       fs.readFile(file.path, function(error, content) {
         if (error) {
           res.writeHead(500);
@@ -140,36 +180,46 @@ server = http.createServer(function (req, res) {
     }
  
   } else if (req.method === 'PUT' && pathname.indexOf('/api') == 0) {
-    //console.log("PUT getters  " + getters[secret].length);
+    //console.log("PUT waitingReceivers  " + waitingReceivers[secret].length);
 
-    if (getters[secret] == [] || getters[secret].length == 0 || 
-       ( getters[secret].length == 1 && getters[secret][0].device === device )){
-      res.writeHead(404, header);
-      res.end('0\n');
-      track("put-404");
-      return;
-    }
-
+    
     req.on('data', function(chunk) {
-      var getterWhoSendsTheData;
-      getters[secret].forEach(function(getter){
-        if (getter.device !== device || !device){
-          getter.writeHead(200, header);
+
+      var keepFor = (query.keep_for || 60);
+      var msg = {data: chunk.toString(), id: guid(), sender: device};
+      messagecache[secret].push(msg);
+      setTimeout(function(){
+       messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
+      }, 1000 * keepFor );
+
+      var receiverWhoSendsTheData;
+      waitingReceivers[secret].forEach(function(response){
+        if (response.device !== device || !device){
+          response.writeHead(200, header);
           track("get-200");
-          getter.end(chunk);
+          if (response.requestsJson)
+            response.end(JSON.stringify(msg));
+          else
+            response.end(chunk);
         } else
-          getterWhoSendsTheData = getter;
+          receiverWhoSendsTheData = response;
       });
-      
-      track("put-" + getters[secret].length);
+
+      track("put-" + waitingReceivers[secret].length);
 
       res.writeHead(200, header);
-      res.end( (getters[secret].length - (getterWhoSendsTheData ? 1 : 0)) + '\n');
-  
-      if (getterWhoSendsTheData)
-        getters[secret] = [getterWhoSendsTheData];
+      
+      msg.deliveries = (waitingReceivers[secret].length - (receiverWhoSendsTheData ? 1 : 0));
+      if (res.requestsJson){
+          msg.keep_for = keepFor; 
+          res.end(JSON.stringify(msg));
+      } else
+          res.end( deliveries + '\n');
+
+      if (receiverWhoSendsTheData)
+        waitingReceivers[secret] = [receiverWhoSendsTheData];
       else
-        getters[secret] = [];
+        waitingReceivers[secret] = [];
 
       updateWatchers(secret);
    });
@@ -191,7 +241,7 @@ server = http.createServer(function (req, res) {
         }
         var file = files.file;
         if (file === undefined) file = files.data;
-        filecache[secret] = file;
+        filecache[pathname] = file;
 
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "/api/'+ secret + '"}');
