@@ -75,10 +75,14 @@ function listen () {
   receiverRequest = $.ajax({
       url: server + '/' + secret + ".json?device_id=" + deviceId + "&since=" + latestKnownMessageId,
       cache: false,
-      success: function(response){
+      dataType: "json",
+      success: function(res){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-        paste(JSON.parse(response), "in");
+        console.log(res);
+        $.each(res, function(i, msg){
+          paste(msg, "in");
+        });
       },
       error: function(xhr, status){
         trackEvent('error', 'GET');
@@ -171,11 +175,8 @@ function share(text){
       processData: false,
       crossDomain: false,
       data: text,
-      dataType: "text",
+      dataType: "json",
       success: function(response){
-        console.log(response);
-        response = JSON.parse(response);
-
         trackEvent('succsess', 'GET');
         $('#step-1 h2').css({color: ''});       
         paste(response, "out");
