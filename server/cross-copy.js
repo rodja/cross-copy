@@ -35,6 +35,7 @@ var header = {'Content-Type': 'text/plain'}
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var ce = require('cloneextend');
 
 // using a fork of formidable be make octstream parsing possible
 var formidable = require('./scriby-node-formidable-19219c8');
@@ -90,7 +91,7 @@ server = http.createServer(function (req, res) {
   var query = require('url').parse(req.url, true).query;    
   var device = query.device_id || guid();  
   
-  console.log(req.method + ": " + util.inspect(secret) + " " + filename);
+  //console.log(req.method + ": " + util.inspect(secret) + " " + filename);
 
   if (watchers[secret] === undefined) watchers[secret] = [];
   if (waitingReceivers[secret] === undefined) waitingReceivers[secret] = [];
@@ -187,7 +188,7 @@ server = http.createServer(function (req, res) {
 
       var keepFor = (query.keep_for || 60);
       var msg = {data: chunk.toString(), id: guid(), sender: device};
-      messagecache[secret].push(msg);
+      messagecache[secret].push(ce.clone(msg));
       setTimeout(function(){
        messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
       }, 1000 * keepFor );
@@ -198,7 +199,7 @@ server = http.createServer(function (req, res) {
           response.writeHead(200, header);
           track("get-200");
           if (response.requestsJson)
-            response.end(JSON.stringify(msg));
+            response.end(JSON.stringify([msg]));
           else
             response.end(chunk);
         } else
@@ -214,7 +215,7 @@ server = http.createServer(function (req, res) {
           msg.keep_for = keepFor; 
           res.end(JSON.stringify(msg));
       } else
-          res.end( deliveries + '\n');
+          res.end( msg.deliveries + '\n');
 
       if (receiverWhoSendsTheData)
         waitingReceivers[secret] = [receiverWhoSendsTheData];
@@ -226,10 +227,11 @@ server = http.createServer(function (req, res) {
 
   } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
 
-    if (secret.indexOf('/') == -1) {
+    if (!filename) {
       track("post-403");
       res.writeHead(403);
       res.end();
+      return;
     }
 
     var form = new formidable.IncomingForm();
@@ -244,7 +246,7 @@ server = http.createServer(function (req, res) {
         filecache[pathname] = file;
 
         res.writeHead(200, {'content-type': 'text/plain'});
-        res.end('{"url": "/api/'+ secret + '"}');
+        res.end('{"url": "'+ pathname + '"}');
         track("post-200");
         
         setTimeout(function(){ 

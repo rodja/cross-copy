@@ -75,10 +75,14 @@ function listen () {
   receiverRequest = $.ajax({
       url: server + '/' + secret + ".json?device_id=" + deviceId + "&since=" + latestKnownMessageId,
       cache: false,
-      success: function(response){
+      dataType: "json",
+      success: function(res){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-        paste(JSON.parse(response), "in");
+        console.log(res);
+        $.each(res, function(i, msg){
+          paste(msg, "in");
+        });
       },
       error: function(xhr, status){
         trackEvent('error', 'GET');
@@ -131,6 +135,7 @@ function paste(msg, direction){
 
   msg.direction = direction;
 
+  console.log(msg);
   // convert relative file ref into hyperlink
   if (msg.data.indexOf('/api/' + secret) != -1)
     msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
@@ -138,7 +143,7 @@ function paste(msg, direction){
   var $li = $('<li>' + msg.data +'</li>\n');
   $li.addClass(direction);
   if (msg.keep_for){
-    $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
+    var $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
     $li.prepend($countdown);
     $li.data("countdown_interval", setInterval(function(){
       var keptFor = parseInt($countdown.text());
@@ -171,11 +176,8 @@ function share(text){
       processData: false,
       crossDomain: false,
       data: text,
-      dataType: "text",
+      dataType: "json",
       success: function(response){
-        console.log(response);
-        response = JSON.parse(response);
-
         trackEvent('succsess', 'GET');
         $('#step-1 h2').css({color: ''});       
         paste(response, "out");
