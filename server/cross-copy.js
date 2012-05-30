@@ -35,6 +35,7 @@ var header = {'Content-Type': 'text/plain'}
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var ce = require('cloneextend');
 
 // using a fork of formidable be make octstream parsing possible
 var formidable = require('./scriby-node-formidable-19219c8');
@@ -188,7 +189,7 @@ server = http.createServer(function (req, res) {
 
       var keepFor = (query.keep_for || 60);
       var msg = {data: chunk.toString(), id: guid(), sender: device};
-      messagecache[secret].push(msg);
+      messagecache[secret].push(ce.clone(msg));
       setTimeout(function(){
        messagecache[secret].splice(messagecache[secret].indexOf(msg), 1);
       }, 1000 * keepFor );
@@ -215,7 +216,7 @@ server = http.createServer(function (req, res) {
           msg.keep_for = keepFor; 
           res.end(JSON.stringify(msg));
       } else
-          res.end( deliveries + '\n');
+          res.end( msg.deliveries + '\n');
 
       if (receiverWhoSendsTheData)
         waitingReceivers[secret] = [receiverWhoSendsTheData];
