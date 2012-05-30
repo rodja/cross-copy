@@ -200,7 +200,7 @@ server = http.createServer(function (req, res) {
           response.writeHead(200, header);
           track("get-200");
           if (response.requestsJson)
-            response.end(JSON.stringify(msg));
+            response.end(JSON.stringify([msg]));
           else
             response.end(chunk);
         } else
@@ -228,10 +228,11 @@ server = http.createServer(function (req, res) {
 
   } else if (req.method === 'POST' && pathname.indexOf('/api') == 0) {
 
-    if (secret.indexOf('/') == -1) {
+    if (!filename) {
       track("post-403");
       res.writeHead(403);
       res.end();
+      return;
     }
 
     var form = new formidable.IncomingForm();
@@ -246,7 +247,7 @@ server = http.createServer(function (req, res) {
         filecache[pathname] = file;
 
         res.writeHead(200, {'content-type': 'text/plain'});
-        res.end('{"url": "/api/'+ secret + '"}');
+        res.end('{"url": "'+ pathname + '"}');
         track("post-200");
         
         setTimeout(function(){ 

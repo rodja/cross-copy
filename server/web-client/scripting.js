@@ -135,6 +135,7 @@ function paste(msg, direction){
 
   msg.direction = direction;
 
+  console.log(msg);
   // convert relative file ref into hyperlink
   if (msg.data.indexOf('/api/' + secret) != -1)
     msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
