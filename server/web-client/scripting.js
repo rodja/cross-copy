@@ -143,7 +143,7 @@ function paste(msg, direction){
   var $li = $('<li>' + msg.data +'</li>\n');
   $li.addClass(direction);
   if (msg.keep_for){
-    $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
+    var $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
     $li.prepend($countdown);
     $li.data("countdown_interval", setInterval(function(){
       var keptFor = parseInt($countdown.text());
