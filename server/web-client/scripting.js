@@ -53,8 +53,6 @@ function guid() {
 
 function listen () {
 
-  secret = encodeURI($('#secret').val());
-
   if (receiverRequest != undefined)
     receiverRequest.abort();
 
@@ -79,7 +77,6 @@ function listen () {
       success: function(res){
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
-        console.log(res);
         $.each(res, function(i, msg){
           paste(msg, "in");
         });
@@ -132,10 +129,8 @@ function watch(){
 
 
 function paste(msg, direction){
-
   msg.direction = direction;
 
-  console.log(msg);
   // convert relative file ref into hyperlink
   if (msg.data.indexOf('/api/' + secret) != -1)
     msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
@@ -198,24 +193,17 @@ $(document).ready(function() {
   if (deviceId == null) deviceId = guid();
   if (storage) storage.setItem('device_id', deviceId);
 
-  //try{
+  if (storage)
+    localHistory = JSON.parse(storage.getItem('localHistory'));
+  if (localHistory == null) localHistory = {};
 
-    if (storage)
-      localHistory = JSON.parse(storage.getItem('localHistory'));
-    if (localHistory == null) localHistory = {};
-
-    if (storage){
-      var secrets = JSON.parse(storage.getItem('secrets'));
-      if (secrets != null && secrets.length > 0){
-        $('#secret').val(secrets[0]); 
-        listen();
-        watch();
-        showlocalHistory();
-      }
+  if (storage){
+    var secrets = JSON.parse(storage.getItem('secrets'));
+    if (secrets != null && secrets.length > 0){
+      $('#secret').val(secrets[0]); 
+      onNewSecret();
     }
-  //} catch (e){ localHistory = {}; console.error(e);}
- 
-  
+  }
 
   $('#secret').focus();
   $('#secret').select();
@@ -223,12 +211,8 @@ $(document).ready(function() {
   $('#step-2 p').hide();
 
   $('#secret').keyup(function (e){
-    if (secret == encodeURI($('#secret').val()))
-      return;
-
-    listen();
-    watch();
-    showlocalHistory();
+    if (secret != encodeURI($('#secret').val()))
+      onNewSecret();
   });
 
   $('#data').keyup(function (e){
@@ -245,12 +229,23 @@ $(document).ready(function() {
   
 });
 
+function onNewSecret(){
+  secret = encodeURI($('#secret').val());
+  showlocalHistory();
+  listen();
+  watch();
+}
+
 function showlocalHistory(){
+  if (localHistory[secret] == null)
+    localHistory[secret] = [];
 
-  var oldPastes = localHistory[secret];
-  if (oldPastes == null)
-    oldPastes = [];
-
+  try{
+    // using a copy of history so it won't get manipulated while fading...
+    var oldPastes = JSON.parse(JSON.stringify(localHistory[secret]));
+  } catch(e){
+    var oldPastes = [];  
+  }
 
   $('#history').fadeOut(function(){
     $(this).empty();
