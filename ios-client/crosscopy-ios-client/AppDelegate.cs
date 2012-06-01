@@ -31,6 +31,7 @@ namespace CrossCopy.iOSClient
 		static UIColor backgroundColor = new UIColor (224 / 255.0f, 224 / 255.0f, 224 / 255.0f, 1.0f);
 		static UIColor lightTextColor = new UIColor (163 / 255.0f, 163 / 255.0f, 163 / 255.0f, 1.0f);
 		static UIColor darkTextColor = new UIColor (102 / 255.0f, 102 / 255.0f, 102 / 255.0f, 1.0f);
+		static UIImagePickerController imagePicker;
 		#endregion
 		
 		#region Private members
@@ -110,7 +111,7 @@ namespace CrossCopy.iOSClient
 				new Section (section3Label) 
 				{
 					(data = new ImageButtonEntryElement (" ", "or type text", "", "Images/browse.png", delegate {
-						ShowDirectoryTree(BaseDir, true);
+						ShowImagePicker();
 					}))
 				},
 				(entries = new Section(section4Label))
@@ -298,6 +299,16 @@ namespace CrossCopy.iOSClient
 		
 		private void ShareFile(string filePath)
 		{
+			using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			{
+				byte[] fileByteArray = new byte[fileStream.Length];
+            	fileStream.Read(fileByteArray, 0, fileByteArray.Length);
+				ShareFile(filePath, fileByteArray);
+			}
+		}
+		
+		private void ShareFile(string filePath, byte[] fileByteArray)
+		{
 			if (secret != null && !String.IsNullOrEmpty(secret.Value))
 			{
 				try
@@ -309,25 +320,17 @@ namespace CrossCopy.iOSClient
 						request.Abort();
 					}
 					
-					using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-					{
-						request = HttpWebRequest.Create(SERVER + String.Format(API, secret.Value) + "/" + Path.GetFileName(filePath));
-						request.Method = "POST";
-						request.ContentType = "application/octet-stream";
-						request.ContentLength = fileStream.Length;
+					request = HttpWebRequest.Create(SERVER + String.Format(API, secret.Value) + "/" + Path.GetFileName(filePath));
+					request.Method = "POST";
+					request.ContentType = "application/octet-stream";
+					((HttpWebRequest)request).AllowWriteStreamBuffering = false;
+					request.ContentLength = fileByteArray.Length;
 						
-						int buffLength = 1024 * 5;
-				        byte[] buffor = new byte[buffLength];
-				        
-				        using (var requestStream = request.GetRequestStream())
-						{
-					        while ((buffLength = fileStream.Read(buffor, 0, buffLength)) > 0)
-							{
-					            requestStream.Write(buffor, 0, buffLength);
-							}
-						}
+					using (var requestStream = request.GetRequestStream())
+					{
+						requestStream.Write(fileByteArray, 0, fileByteArray.Length);	
 					}
-
+					
 					using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
 					{
 						if (response.StatusCode != HttpStatusCode.OK)
@@ -353,6 +356,32 @@ namespace CrossCopy.iOSClient
 				
 				Listen();
 			}
+		}
+		
+		public void UploadFile()
+		{
+			LoadingView loading = new LoadingView();
+			loading.Show("Uploading files, please wait ...");
+			
+			foreach (string filePath in selectedFilePathArray)
+			{
+				ShareFile(filePath);
+			}
+			selectedFilePathArray.Clear();
+			
+			loading.Hide();
+		}
+		
+		public void UploadFile(string filePath, byte[] fileByteArray)
+		{
+			LoadingView loading = new LoadingView();
+			loading.Show("Uploading files, please wait ...");
+			
+			ShareFile(filePath, fileByteArray);
+			
+			selectedFilePathArray.Clear();
+			
+			loading.Hide();
 		}
 		
 		public static int DownloadFile(string remoteFilename, string localFilename)
@@ -401,6 +430,61 @@ namespace CrossCopy.iOSClient
 			return bytesProcessed;
 		}
 		
+		private void ShowImagePicker()
+		{
+			imagePicker = new UIImagePickerController();
+			imagePicker.SourceType = UIImagePickerControllerSourceType.PhotoLibrary;
+			imagePicker.MediaTypes = UIImagePickerController.AvailableMediaTypes (UIImagePickerControllerSourceType.PhotoLibrary);
+			
+			imagePicker.FinishedPickingMedia += (sender, e) => {
+				bool isImage = (e.Info[UIImagePickerController.MediaType].ToString() == "public.image");
+				NSUrl referenceUrl = e.Info[UIImagePickerController.ReferenceUrl] as NSUrl;
+				UIImage image  = null;
+				NSUrl mediaUrl = null;
+					
+				if (isImage)
+				{
+					image = e.Info[UIImagePickerController.OriginalImage] as UIImage;
+				}
+				else
+				{
+					mediaUrl = e.Info[UIImagePickerController.MediaURL] as NSUrl;
+				}
+				
+				UploadMedia (image, referenceUrl, mediaUrl);
+				
+				imagePicker.DismissModalViewControllerAnimated(true);
+			}; 
+			
+			imagePicker.Canceled += (sender, e) => {
+				imagePicker.DismissModalViewControllerAnimated(true);
+			}; 
+       		
+			navigation.PresentModalViewController(imagePicker, true);
+		}
+		
+		private void UploadMedia (UIImage image, NSUrl referenceUrl, NSUrl mediaUrl)
+		{
+			byte[] mediaByteArray;
+			if (image != null) 
+			{
+				ByteHelper.ImageToByteArray (image, out mediaByteArray);
+			}
+			else if (mediaUrl != null)
+			{
+				ByteHelper.VideoToByteArray (mediaUrl, out mediaByteArray);
+			}
+			else
+			{
+				Console.Out.WriteLine("No media to upload!");
+				return;
+			}
+			
+			ThreadPool.QueueUserWorkItem (o => {
+				UploadFile (referenceUrl.AbsoluteString, mediaByteArray);
+			});
+		}
+		
 		private void ShowDirectoryTree(string basePath, bool pushing)
 		{
 			RootElement root = new RootElement(basePath, new RadioGroup (0))
@@ -420,17 +504,7 @@ namespace CrossCopy.iOSClient
 				else
 				{
 					navigation.PopToRootViewController(true);
-					
-					LoadingView loading = new LoadingView();
-					loading.Show("Uploading files, please wait ...");
-					
-					foreach (string filePath in selectedFilePathArray)
-					{
-						ShareFile(filePath);
-					}
-					selectedFilePathArray.Clear();
-					
-					loading.Hide();
+					UploadFile();
 				}
             });
 			btnSelect.TintColor = UIColor.Black;

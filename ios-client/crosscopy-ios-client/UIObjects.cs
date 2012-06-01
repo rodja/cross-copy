@@ -241,8 +241,10 @@ namespace CrossCopy.iOSClient.UI
     
         public void Hide() 
         {
-			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false; 
-            DismissWithClickedButtonIndex(0, true); 
+			InvokeOnMainThread(delegate() { 
+				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false; 
+            	DismissWithClickedButtonIndex(0, true); 
+			});
         } 
     } 
 	

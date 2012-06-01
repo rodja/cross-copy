@@ -148,5 +148,27 @@ namespace CrossCopy.iOSClient.Helpers
 	        return macAddresses;
 	    }
 	}
+	
+	public class ByteHelper
+	{
+		public static void ImageToByteArray (UIImage image, out byte[] mediaByteArray)
+		{
+			using (NSData imgData = image.AsJPEG ()) 
+			{
+				mediaByteArray = new byte[imgData.Length];
+				System.Runtime.InteropServices.Marshal.Copy (imgData.Bytes, mediaByteArray, 0, Convert.ToInt32 (imgData.Length));
+			}
+			image.Dispose ();
+		}
+
+		public static void VideoToByteArray (NSUrl mediaUrl, out byte[] mediaByteArray)
+		{
+			using (NSData videoData = NSData.FromUrl (mediaUrl)) 
+			{
+				mediaByteArray = new byte[videoData.Length];
+				System.Runtime.InteropServices.Marshal.Copy (videoData.Bytes, mediaByteArray, 0, Convert.ToInt32 (videoData.Length));
+			}
+		}
+	}
 }
 
