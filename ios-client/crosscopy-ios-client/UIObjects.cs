@@ -197,24 +197,61 @@ namespace CrossCopy.iOSClient.UI
 	
 	public class DataImageStringElement : ImageStringElement
 	{
+		UIActivityIndicatorView activity;
 		public string Data;
 		
 		public DataImageStringElement(string caption, UIImage image, string data) 
 			: base (caption, image)
 		{
 			this.Data = data;
+			InitActivity();
 		}
 		
 		public DataImageStringElement(string caption, string value, UIImage image, string data) 
 			: base(caption, value, image)
 		{
 			this.Data = data;
+			InitActivity();
 		}
 		
 		public DataImageStringElement(string caption, NSAction tapped, UIImage image, string data) 
 			: base(caption, tapped, image)
 		{
 			this.Data = data;
+			InitActivity();
+		}
+				
+		private void InitActivity()
+		{
+			activity = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = base.GetCell (tv);
+			var sbounds = UIScreen.MainScreen.Bounds;
+			activity.Frame = new RectangleF ((sbounds.Width - 30), 4, 20, 20);
+			cell.AccessoryView = activity;
+			return cell;
+		}
+		
+		public bool Animating 
+		{
+			get 
+			{
+				return activity.IsAnimating;
+			}
+			set 
+			{
+				if (value)
+				{
+					activity.StartAnimating ();
+				}
+				else
+				{
+					activity.StopAnimating ();
+				}
+			}
 		}
 	}
 	

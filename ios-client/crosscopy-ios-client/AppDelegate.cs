@@ -50,6 +50,8 @@ namespace CrossCopy.iOSClient
 		List<string> selectedFilePathArray;
 		#endregion
 		
+		public delegate void EventDelegate(object sender, DownloadDataCompletedEventArgs e);
+		
 		#region Methods
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
@@ -216,18 +218,10 @@ namespace CrossCopy.iOSClient
 					DataImageStringElement entry = new DataImageStringElement(Path.GetFileName(data.Substring(apiUrl.Length + 1)), 
 					                                                          (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
 					                                                          data);
-					entry.Tapped += delegate {
-						MessageBoxResult result = UIHelper.ShowMessageBox("Download file", String.Format("Do you want to download file {0}?", entry.Caption));
-						if (result == MessageBoxResult.OK)
-						{
-							LoadingView loading = new LoadingView(); 
-							loading.Show ("Downloading, please wait..."); 
-							
-							DownloadFile(SERVER + entry.Data, Path.Combine(BaseDir, entry.Caption));
-                        	
-							loading.Hide();	
-						}
-					};
+					
+					DownloadFileAsync(SERVER + entry.Data, Path.Combine(BaseDir, entry.Caption), delegate { entry.Animating = false; });
+					
+					entry.Animating = true;
 					entry.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
 					entries.Insert(0, entry);
 				}
@@ -375,13 +369,25 @@ namespace CrossCopy.iOSClient
 		public void UploadFile(string filePath, byte[] fileByteArray)
 		{
 			LoadingView loading = new LoadingView();
-			loading.Show("Uploading files, please wait ...");
+			loading.Show("Uploading file, please wait ...");
 			
 			ShareFile(filePath, fileByteArray);
 			
 			selectedFilePathArray.Clear();
 			
 			loading.Hide();
+		}
+		
+		public static void DownloadFileAsync(string remoteFilePath, string localFilePath, EventDelegate dwnldCompletedDelegate)
+		{
+			var url = new Uri(remoteFilePath);
+			var webClient = new WebClient();
+			webClient.DownloadDataCompleted += (s, e) => {
+			    var bytes = e.Result; 
+			    File.WriteAllBytes (localFilePath, bytes);  
+			};
+			webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(dwnldCompletedDelegate);
+			webClient.DownloadDataAsync(url);
 		}
 		
 		public static int DownloadFile(string remoteFilename, string localFilename)
