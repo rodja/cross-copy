@@ -43,15 +43,15 @@ function testFetchingRecentPaste(){
 
 function testFetchingTwoRecentPastes(){
   echo $FUNCNAME
-  R=`$TEST -k 2 $SECRET "1"`
-  R=`$TEST -k 1 $SECRET "2"`
+  R=`$TEST -k 4 $SECRET "1"`
+  R=`$TEST -k 2 $SECRET "2"`
   R=`$TEST -r $SECRET | grep -Po '"data":.*?[^\\\\]",'`
   assertEqual '"data":"1",
 "data":"2",' "$R" "should get both messages"
-  sleep 1
+  sleep 2
   R=`$TEST -r $SECRET | grep -Po '"data":.*?[^\\\\]",'`
   assertEqual '"data":"1",' "$R" "second message should have been kept for only a second"
-  sleep 1
+  sleep 2
   R=`$TEST -r $SECRET | grep -Po '"data":.*?[^\\\\]",'`
   assertEqual '' "$R" "first message should have been kept for only two seconds"
   SECRET=`uuidgen`
