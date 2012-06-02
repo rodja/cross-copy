@@ -15,6 +15,7 @@ using MonoTouch.UIKit;
 using CrossCopy.iOSClient.BL;
 using CrossCopy.iOSClient.UI;
 using CrossCopy.iOSClient.Helpers;
+using MonoTouch.MediaPlayer;
 
 namespace CrossCopy.iOSClient
 {
@@ -34,6 +35,7 @@ namespace CrossCopy.iOSClient
 		static UIColor lightTextColor = new UIColor (163 / 255.0f, 163 / 255.0f, 163 / 255.0f, 1.0f);
 		static UIColor darkTextColor = new UIColor (102 / 255.0f, 102 / 255.0f, 102 / 255.0f, 1.0f);
 		static UIImagePickerController imagePicker;
+		static MPMoviePlayerController moviePlayer;
 		#endregion
 		
 		#region Private members
@@ -178,7 +180,7 @@ namespace CrossCopy.iOSClient
 			receiveClient.CancelAsync();
 			receiveClient.DownloadStringAsync(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)));
 		}
-		
+				
 		private void PasteData(string data, DataItemDirection direction)
 		{
 			UIApplication.SharedApplication.InvokeOnMainThread(delegate
@@ -193,12 +195,18 @@ namespace CrossCopy.iOSClient
 					DataImageStringElement entry = new DataImageStringElement(Path.GetFileName(data.Substring(apiUrl.Length + 1)), 
 					                                                          (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
 					                                                          data);
-					
-					DownloadFileAsync(SERVER + entry.Data, Path.Combine(BaseDir, entry.Caption), delegate { entry.Animating = false; });
-					
-					entry.Animating = true;
+					entry.Tapped += delegate { OpenFile (entry.Caption); };
 					entry.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
 					entries.Insert(0, entry);
+					if (item.Direction == DataItemDirection.In)
+					{
+						entry.Animating = true;
+						DownloadFileAsync(SERVER + entry.Data, Path.Combine(BaseDir, entry.Caption), delegate { entry.Animating = false; });
+					}
+					else
+					{
+						entry.Animating = false;
+					}
 				}
 				else
 				{
@@ -361,6 +369,72 @@ namespace CrossCopy.iOSClient
 			}
 			
 			return bytesProcessed;
+		}
+		
+		private void OpenFile(string fileName)
+		{
+			var sbounds = UIScreen.MainScreen.Bounds;
+			string filePath = Path.Combine (BaseDir, fileName);
+			string ext = Path.GetExtension (fileName);
+			
+			if (ext.ToUpper() == ".MOV" || ext.ToUpper() == ".M4V") 
+			{
+				var movieController = new AdvancedUIViewController();
+				moviePlayer = new MPMoviePlayerController(NSUrl.FromFilename(filePath));
+				moviePlayer.View.Frame = new RectangleF(sbounds.X, sbounds.Y-20, sbounds.Width, sbounds.Height);
+				moviePlayer.ControlStyle = MPMovieControlStyle.Fullscreen;
+				moviePlayer.View.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
+				moviePlayer.ShouldAutoplay = true;
+				moviePlayer.PrepareToPlay();
+				moviePlayer.Play();
+				
+				var btnClose = UIButton.FromType(UIButtonType.RoundedRect);
+				btnClose.Frame = new RectangleF (3, 7, 60, 30);
+				btnClose.SetTitle ("Close", UIControlState.Normal);
+				btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
+				btnClose.TouchDown += delegate {
+					movieController.DismissModalViewControllerAnimated (true);
+				};
+				
+				movieController.View.AddSubview(moviePlayer.View);
+				movieController.View.AddSubview (btnClose);
+				navigation.PresentModalViewController (movieController, true);
+			}
+			else if (ext.ToUpper() == ".JPG" || ext.ToUpper() == ".PNG") 
+			{
+				var imageController = new AdvancedUIViewController(); 
+				
+				var imageView = new UIImageView (UIImage.FromFile (filePath));
+				imageView.Frame = sbounds;
+				imageView.UserInteractionEnabled = true;
+				imageView.ClipsToBounds = true;
+				imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
+				
+				var btnClose = UIButton.FromType(UIButtonType.RoundedRect);
+				btnClose.Frame = new RectangleF ((sbounds.Width / 2) - 50, 20, 100, 30);
+				btnClose.SetTitle ("Close", UIControlState.Normal);
+				btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
+				btnClose.TouchDown += delegate {
+					imageController.DismissModalViewControllerAnimated (true);
+				};
+				
+				var scrollView = new UIScrollView(sbounds);
+				scrollView.ClipsToBounds = true;
+				scrollView.ContentSize = sbounds.Size;
+				scrollView.BackgroundColor = UIColor.Gray;
+		        scrollView.MinimumZoomScale = 1.0f;
+				scrollView.MaximumZoomScale = 3.0f; 
+				scrollView.MultipleTouchEnabled = true;
+				scrollView.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
+				scrollView.ViewForZoomingInScrollView = delegate(UIScrollView sv) {
+				    return imageView;
+				};
+				 
+				scrollView.AddSubview(imageView);
+				imageController.View.AddSubview(scrollView);
+				imageController.View.AddSubview (btnClose);
+				navigation.PresentModalViewController (imageController, true);
+			}
 		}
 		
 		private void ShowImagePicker()

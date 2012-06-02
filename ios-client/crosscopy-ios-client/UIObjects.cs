@@ -320,6 +320,14 @@ namespace CrossCopy.iOSClient.UI
 			return base.GetHeight (tableView, indexPath) + 10;
 		}
 	}
+	
+	public class AdvancedUIViewController : UIViewController
+	{
+		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+		{
+			return true;
+		}
+	}
 }
 
 
