@@ -78,6 +78,7 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="MonoTouch.Dialog-1" />
+    <Reference Include="System.Json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Json;
 using System.Net;
 using System.Net.Cache;
 using System.Text;
@@ -102,7 +103,7 @@ namespace CrossCopy.iOSClient
                     return;
                 }
 
-                PasteData (e.Result, DataItemDirection.Out);
+                PasteData (JsonObject.Parse(e.Result)["data"], DataItemDirection.Out);
             };
 
 			Listen ();
@@ -214,7 +215,7 @@ namespace CrossCopy.iOSClient
 			if (String.IsNullOrEmpty(secretValue))
                 return;
 
-            shareClient.UploadString(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)), "PUT", dataToShare);
+            shareClient.UploadStringAsync(new Uri(String.Format("{0}/api/{1}.json{2}", SERVER, secretValue, DeviceID)), "PUT", dataToShare);
     
 		}
 		
