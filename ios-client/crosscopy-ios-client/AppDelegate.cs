@@ -45,11 +45,10 @@ namespace CrossCopy.iOSClient
 		List<DataItem> history;
 		
 		WebRequest request;
-		CancellationTokenSource listenCancel;
-		CancellationToken listenToken;
-		
-		WebClient webClient = new WebClient();
-		
+	
+		WebClient shareClient = new WebClient();
+		WebClient receiveClient = new WebClient();
+        
 		List<string> selectedFilePathArray;
 		#endregion
 		
@@ -84,8 +83,8 @@ namespace CrossCopy.iOSClient
 			
 			window.RootViewController = navigation;
 			
-			webClient.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-			webClient.DownloadStringCompleted += (sender, e) => { 
+			receiveClient.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+			receiveClient.DownloadStringCompleted += (sender, e) => { 
 				if (e.Cancelled) return;
 				if (e.Error != null) {
 					Console.Out.WriteLine("Error fetching data: {0}", e.Error.Message);
@@ -96,6 +95,16 @@ namespace CrossCopy.iOSClient
                 Listen ();
 			};
 			
+            shareClient.UploadStringCompleted += (sender, e) => {
+                if (e.Cancelled || String.IsNullOrWhiteSpace(e.Result)) return;
+                if (e.Error != null) {
+                    Console.Out.WriteLine("Error sharing data: {0}", e.Error.Message);
+                    return;
+                }
+
+                PasteData (e.Result, DataItemDirection.Out);
+            };
+
 			Listen ();
 			
 			return true;
@@ -165,8 +174,8 @@ namespace CrossCopy.iOSClient
 			secretValue = secret.Value;
 			if (secretValue.Length == 0)
 				return;
-			webClient.CancelAsync();
-			webClient.DownloadStringAsync(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)));
+			receiveClient.CancelAsync();
+			receiveClient.DownloadStringAsync(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)));
 		}
 		
 		private void PasteData(string data, DataItemDirection direction)
@@ -202,55 +211,11 @@ namespace CrossCopy.iOSClient
 		
 		private void ShareData(string dataToShare)
 		{
-			if (!String.IsNullOrEmpty(secretValue))
+			if (String.IsNullOrEmpty(secretValue))
                 return;
 
-			try
-			{
-				
-				if (request != null)
-				{
-					request.Abort();
-				}
-				
-				request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
-                request.Method = "PUT";
-                request.ContentType = "text";
-                var byteArray = Encoding.UTF8.GetBytes(dataToShare);
-                request.ContentLength = byteArray.Length; 
-				
-				using (var dataStream = request.GetRequestStream())
-				{
-                	dataStream.Write(byteArray, 0, byteArray.Length);
-                	dataStream.Close();
-				}
-                
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-				{
-					if (response.StatusCode != HttpStatusCode.OK)
-					{
-						Console.Out.WriteLine("Error fetching data. Server returned status code: {0}", response.StatusCode);
-					}
-					
-				   	using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-				   	{
-						var content = reader.ReadToEnd();
-				        if(!String.IsNullOrWhiteSpace(content)) 
-						{
-							Console.Out.WriteLine("For request {0} share data: \r\n {1}", request.RequestUri.AbsoluteUri, content);
-							PasteData (dataToShare, DataItemDirection.Out);
-						}
-						else 
-						{
-							Console.Out.WriteLine("Send response is empty");
-						}
-				   }
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.Out.WriteLine("Exception {0}", ex.Message);
-			}
+            shareClient.UploadString(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)), "PUT", dataToShare);
+    
 		}
 		
 		private void ShareFile(string filePath)
@@ -269,7 +234,6 @@ namespace CrossCopy.iOSClient
 			{
 				try
 				{
-					listenCancel.Cancel();
 																	
 					if (request != null)
 					{
