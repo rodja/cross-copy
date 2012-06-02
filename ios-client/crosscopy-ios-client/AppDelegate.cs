@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Cache;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,6 +48,8 @@ namespace CrossCopy.iOSClient
 		CancellationTokenSource listenCancel;
 		CancellationToken listenToken;
 		
+		WebClient webClient = new WebClient();
+		
 		List<string> selectedFilePathArray;
 		#endregion
 		
@@ -80,6 +83,16 @@ namespace CrossCopy.iOSClient
 			navigation.SetNavigationBarHidden(true, false);
 			
 			window.RootViewController = navigation;
+			
+			webClient.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+			webClient.DownloadStringCompleted += (sender, e) => { 
+				if (e.Cancelled) return;
+				if (e.Error != null) {
+					Console.Out.WriteLine("Error fetching data: {0}", e.Error.Message);
+					Listen ();
+			    }
+				PasteData (e.Result, DataItemDirection.In);
+			};
 			
 			Listen ();
 			
@@ -147,61 +160,11 @@ namespace CrossCopy.iOSClient
 		
 		private void Listen ()
 		{
-			listenCancel = new CancellationTokenSource();
-			listenToken = listenCancel.Token;
-			
-			var listenTask = Task.Factory.StartNew(() =>
-            {
-                while (true)
-                {
-					if (listenToken.IsCancellationRequested)
-			        {
-			            Console.Out.WriteLine("Listen task cancelled");
-			            break;
-			        }
-					
-					GetData();
-					
-                    Thread.Sleep(500);
-                }
-            });
-		}
-		
-		private void GetData()
-		{
-			UIApplication.SharedApplication.InvokeOnMainThread (delegate {
-				secretValue = secret.Value;
-			});
-			
-			if (!String.IsNullOrEmpty(secretValue))
-			{
-				if (request != null)
-				{
-					request.Abort();
-				}
-				
-				request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
-				request.ContentType = "application/json";
-				request.Method = "GET";
-				
-				using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-				{
-					if (response.StatusCode != HttpStatusCode.OK)
-					{
-						Console.Out.WriteLine("Error fetching data. Server returned status code: {0}", response.StatusCode);
-					}
-					
-				   	using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-				   	{
-						var content = reader.ReadToEnd();
-				        if (!String.IsNullOrWhiteSpace(content)) 
-						{
-							Console.Out.WriteLine("For request {0} get data: \r\n {1}", request.RequestUri.AbsoluteUri, content);
-							PasteData (content, DataItemDirection.In);
-						}
-				   }
-				}
-			}
+			secretValue = secret.Value;
+			if (secretValue.Length == 0)
+				return;
+			webClient.CancelAsync();
+			webClient.DownloadStringAsync(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)));
 		}
 		
 		private void PasteData(string data, DataItemDirection direction)

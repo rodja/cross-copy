@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>CrossCopy</string>
+	<string>cross copy</string>
 	<key>CFBundleExecutable</key>
 	<string>crosscopyiosclient</string>
 	<key>CFBundleIconFile</key>
@@ -16,7 +16,7 @@
 		<string>Images/crosscopy-icon-144.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>com.amelisoft.crosscopy</string>
+	<string>net.crosscopy.app</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -41,6 +41,8 @@
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
+	<key>UIPrerenderedIcon</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

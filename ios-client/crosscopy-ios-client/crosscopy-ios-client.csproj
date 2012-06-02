@@ -104,4 +104,7 @@
     <Content Include="Images\upload.png" />
     <Content Include="Images\browse.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ITunesArtwork Include="iTunesArtwork" />
+  </ItemGroup>
 </Project>
