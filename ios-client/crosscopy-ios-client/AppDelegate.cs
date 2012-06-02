@@ -90,8 +90,10 @@ namespace CrossCopy.iOSClient
 				if (e.Error != null) {
 					Console.Out.WriteLine("Error fetching data: {0}", e.Error.Message);
 					Listen ();
+                    return;
 			    }
 				PasteData (e.Result, DataItemDirection.In);
+                Listen ();
 			};
 			
 			Listen ();
@@ -201,56 +203,53 @@ namespace CrossCopy.iOSClient
 		private void ShareData(string dataToShare)
 		{
 			if (!String.IsNullOrEmpty(secretValue))
+                return;
+
+			try
 			{
-				try
+				
+				if (request != null)
 				{
-					listenCancel.Cancel();
-					
-					if (request != null)
-					{
-						request.Abort();
-					}
-					
-					request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
-	                request.Method = "PUT";
-	                request.ContentType = "text";
-	                var byteArray = Encoding.UTF8.GetBytes(dataToShare);
-	                request.ContentLength = byteArray.Length; 
-					
-					using (var dataStream = request.GetRequestStream())
-					{
-	                	dataStream.Write(byteArray, 0, byteArray.Length);
-	                	dataStream.Close();
-					}
-	                
-	                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-					{
-						if (response.StatusCode != HttpStatusCode.OK)
-						{
-							Console.Out.WriteLine("Error fetching data. Server returned status code: {0}", response.StatusCode);
-						}
-						
-					   	using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-					   	{
-							var content = reader.ReadToEnd();
-					        if(!String.IsNullOrWhiteSpace(content)) 
-							{
-								Console.Out.WriteLine("For request {0} share data: \r\n {1}", request.RequestUri.AbsoluteUri, content);
-								PasteData (dataToShare, DataItemDirection.Out);
-							}
-							else 
-							{
-								Console.Out.WriteLine("Send response is empty");
-							}
-					   }
-					}
-				}
-				catch (Exception ex)
-				{
-					Console.Out.WriteLine("Exception {0}", ex.Message);
+					request.Abort();
 				}
 				
-				Listen();
+				request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + DeviceID);
+                request.Method = "PUT";
+                request.ContentType = "text";
+                var byteArray = Encoding.UTF8.GetBytes(dataToShare);
+                request.ContentLength = byteArray.Length; 
+				
+				using (var dataStream = request.GetRequestStream())
+				{
+                	dataStream.Write(byteArray, 0, byteArray.Length);
+                	dataStream.Close();
+				}
+                
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+				{
+					if (response.StatusCode != HttpStatusCode.OK)
+					{
+						Console.Out.WriteLine("Error fetching data. Server returned status code: {0}", response.StatusCode);
+					}
+					
+				   	using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+				   	{
+						var content = reader.ReadToEnd();
+				        if(!String.IsNullOrWhiteSpace(content)) 
+						{
+							Console.Out.WriteLine("For request {0} share data: \r\n {1}", request.RequestUri.AbsoluteUri, content);
+							PasteData (dataToShare, DataItemDirection.Out);
+						}
+						else 
+						{
+							Console.Out.WriteLine("Send response is empty");
+						}
+				   }
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.Out.WriteLine("Exception {0}", ex.Message);
 			}
 		}
 		
