@@ -284,6 +284,44 @@ namespace CrossCopy.iOSClient.UI
 			});
         } 
     } 
+
+    public class ProgressView : UIAlertView 
+    { 
+        private UIProgressView progress; 
+    
+        public void Show(string title) 
+        { 
+            InvokeOnMainThread(delegate() { 
+            
+                Title = title; 
+            
+                progress = new UIProgressView ();
+                progress.Frame = new RectangleF (30f, 80f, 225f, 80f);
+                progress.Style = UIProgressViewStyle.Default;
+                progress.Progress = 0;
+                AddSubview (progress);
+
+                Show();
+
+                UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
+            });
+        } 
+    
+        public void Hide() 
+        {
+            InvokeOnMainThread(delegate() { 
+                UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false; 
+                DismissWithClickedButtonIndex(0, true); 
+            });
+        } 
+
+        public void Update(int percent)
+        {
+            InvokeOnMainThread(delegate() { 
+                progress.Progress = (float)(percent / 100); 
+            });
+        }
+    } 
 	
 	public class AdvancedWebView : UIWebView
 	{

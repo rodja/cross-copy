@@ -312,7 +312,44 @@ namespace CrossCopy.iOSClient
 			
 			loading.Hide();
 		}
-		
+
+        public void UploadFileAsync(string filePath, byte[] fileByteArray)
+        {
+            if (String.IsNullOrEmpty(secretValue))
+                return;
+
+            var loading = new LoadingView();
+            loading.Show("Uploading file, please wait ...");
+
+            var client = new WebClient ();
+            client.Headers["content-type"] = "application/octet-stream";
+            client.Encoding = Encoding.UTF8;
+            client.UploadDataCompleted += (sender, e) => {
+                loading.Hide();
+
+                if (e.Cancelled) 
+                {
+                    Console.Out.WriteLine("Upload file cancelled.");
+                    return;
+                }
+
+                if (e.Error != null) 
+                {
+                    Console.Out.WriteLine("Error uploading file: {0}", e.Error.Message);
+                    return;
+                }
+
+                string response = System.Text.Encoding.UTF8.GetString (e.Result);
+                if (!String.IsNullOrEmpty(response))
+                {
+                    ShareData(string.Format("{0}{1}", SERVER, response));
+                }
+            };
+
+            Uri fileUri = new Uri(String.Format("{0}/api/{1}/{2}", SERVER, secretValue, UrlHelper.GetFileName(filePath)));
+            client.UploadDataAsync(fileUri, "POST", fileByteArray);
+        }
+
 		public static void DownloadFileAsync(string remoteFilePath, string localFilePath, EventDelegate dwnldCompletedDelegate)
 		{
 			var url = new Uri(remoteFilePath);
@@ -487,9 +524,11 @@ namespace CrossCopy.iOSClient
 				return;
 			}
 			
-			ThreadPool.QueueUserWorkItem (o => {
-				UploadFile (referenceUrl.AbsoluteString, mediaByteArray);
-			});
+            UploadFileAsync(referenceUrl.AbsoluteString, mediaByteArray);
+//			ThreadPool.QueueUserWorkItem (o => {
+//
+//				UploadFile (referenceUrl.AbsoluteString, mediaByteArray);
+//			});
 		}
 		
 		private void ShowDirectoryTree(string basePath, bool pushing)
