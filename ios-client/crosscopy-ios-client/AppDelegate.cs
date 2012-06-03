@@ -27,7 +27,7 @@ namespace CrossCopy.iOSClient
         const string API = @"/api/{0}";
         static string DeviceID = string.Format (
                 "?device_id={0}",
-                Guid.NewGuid()
+                Guid.NewGuid ()
             );
         static string BaseDir = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
         static UIImage imgFolder = UIImage.FromFile ("Images/folder.png");
@@ -135,7 +135,7 @@ namespace CrossCopy.iOSClient
                 }
 
                 PasteData (
-                    JsonObject.Parse(e.Result)["data"],
+                    JsonObject.Parse (e.Result) ["data"],
                     DataItemDirection.Out
                 );
             };
@@ -171,7 +171,7 @@ namespace CrossCopy.iOSClient
             );
             var subcaptionLabel = UIHelper.CreateLabel (
                 "Open this App or cross-copy.net on different devices and choose the same secret. " + 
-                                                        "You can then transfer stuff between them without any further setup.",
+                "You can then transfer stuff between them without any further setup.",
                 false,
                 13,
                 39,
@@ -201,7 +201,7 @@ namespace CrossCopy.iOSClient
                 secretsSection.Insert (
                     secretsSection.Elements.Count,
                     UITableViewRowAnimation.Fade,
-                    CreateImageButtonStringElement(newSecret)
+                    CreateImageButtonStringElement (newSecret)
                 );
                 secretEntry.Value = "";
                 secretEntry.ResignFirstResponder (false);
@@ -224,7 +224,9 @@ namespace CrossCopy.iOSClient
                 SERVER,
                 secretValue,
                 DeviceID
-            )));
+            )
+            )
+            );
         }
 
         private Element CreateDataItemElement (DataItem item)
@@ -285,7 +287,12 @@ namespace CrossCopy.iOSClient
                 return;
 
             shareClient.UploadStringAsync (
-                new Uri(String.Format("{0}/api/{1}.json{2}", SERVER, secretValue, DeviceID)),
+                new Uri (String.Format (
+                "{0}/api/{1}.json{2}",
+                SERVER,
+                secretValue,
+                DeviceID
+            )),
                 "PUT",
                 dataToShare
             );
@@ -297,10 +304,15 @@ namespace CrossCopy.iOSClient
             if (String.IsNullOrEmpty (secretValue))
                 return;
 
-            var loading = new LoadingView ();
+            LoadingView loading = new LoadingView ();
             loading.Show ("Uploading file, please wait ...");
 
-            var client = new WebClient ();
+            string destinationPath = String.Format (
+                "/api/{0}/{1}",
+                secretValue,
+                UrlHelper.GetFileName(filePath)
+            );
+            WebClient client = new WebClient ();
             client.Headers ["content-type"] = "application/octet-stream";
             client.Encoding = Encoding.UTF8;
             client.UploadDataCompleted += (sender, e) => {
@@ -320,6 +332,7 @@ namespace CrossCopy.iOSClient
                 }
 
                 string response = System.Text.Encoding.UTF8.GetString (e.Result);
+
                 if (!String.IsNullOrEmpty (response)) {
                     ShareData (string.Format ("{0}{1}", SERVER, response));
                 }
@@ -329,8 +342,9 @@ namespace CrossCopy.iOSClient
                 "{0}/api/{1}/{2}",
                 SERVER,
                 secretValue,
-                UrlHelper.GetFileName(filePath)
-            ));
+                UrlHelper.GetFileName (filePath)
+            )
+            );
             client.UploadDataAsync (fileUri, "POST", fileByteArray);
         }
 
@@ -402,7 +416,7 @@ namespace CrossCopy.iOSClient
                 moviePlayer = new MPMoviePlayerController (NSUrl.FromFilename (filePath));
                 moviePlayer.View.Frame = new RectangleF (
                     sbounds.X,
-                    sbounds.Y-20,
+                    sbounds.Y - 20,
                     sbounds.Width,
                     sbounds.Height
                 );
