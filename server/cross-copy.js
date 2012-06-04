@@ -161,6 +161,7 @@ server = http.createServer(function (req, res) {
       res.writeHead(200);
       res.end(JSON.stringify(messagecache[secret]));
       return;
+
     } else if (filecache[pathname] != undefined){
       var file = filecache[pathname];
       fs.readFile(file.path, function(error, content) {
@@ -241,8 +242,7 @@ server = http.createServer(function (req, res) {
           track("post-500");
           return;
         }
-        var file = files.file;
-        if (file === undefined) file = files.data;
+        var file = files.file || files.data;
         filecache[pathname] = file;
 
         res.writeHead(200, {'content-type': 'text/plain'});
