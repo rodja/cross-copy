@@ -136,6 +136,7 @@ function paste(msg, direction){
     msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
   
   var $li = $('<li>' + msg.data +'</li>\n');
+  $li.autolink();
   $li.addClass(direction);
   if (msg.keep_for){
     var $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
@@ -252,6 +253,7 @@ function showlocalHistory(){
     $.each(oldPastes, function(i,e){
        if (e.data === undefined) return true; // continue
        var $li = $('<li class="' + (e.direction || 'in') + '">' + e.data +'</li>\n');
+      $li.autolink();
       $('#history').append($li);
     });
     if (oldPastes.length > 0)
