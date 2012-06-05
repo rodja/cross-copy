@@ -268,6 +268,9 @@ server = http.createServer(function (req, res) {
         case '.png':
             contentType = 'image/png';
             break;
+        case '.ico':
+            contentType = 'image/x-icon';
+            break;
         case '.js':
             contentType = 'text/javascript';
             break;
