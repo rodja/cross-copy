@@ -8,10 +8,12 @@ VERBOSE=false
 JSON=''
 
 function usage(){
-  echo "usage:"
-  echo "   $ cross-copy secred-code                   # to receive data"
-  echo "   $ cross-copy secred-code 'some data'       # to send a message"
-  echo "   $ cross-copy secred-code 'some-file.ext'  # to send a file"
+  echo "usage: cross-copy [options...] <secred-code> [ 'message' | <filename> ]"
+  echo "To transfer data from one device to the other"
+  echo "  1. choose a shared secred"
+  echo "  2. listen for data on receiving device with cross-copy <secred-code>"
+  echo "  3. share text with cross-copy <secred-code> \"your message\""
+  echo "      or a file with cross-copy <secred-code> <filename>"
 }
 
 while getopts ":lhqrvjs:d:k:" opt; do
