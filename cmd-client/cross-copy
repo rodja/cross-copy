@@ -65,8 +65,13 @@ if [ $# == 1 ]; then
   CMD="curl -s $SERVER/api/$1$JSON$PARAMETERS"
   $VERBOSE && echo $CMD    
   PASTE=`$CMD`
-  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE  # complete internal urls
-  echo $PASTE
+  # download file if it's an internal uri
+  if [[ $PASTE == /api/${1}* ]]; then
+    PASTE=${SERVER}$PASTE
+    wget $PASTE
+  else
+    echo $PASTE
+  fi
 
 elif [ $# == 2 ]; then
   PATE=$2
