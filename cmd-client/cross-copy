@@ -7,8 +7,18 @@ PARAMETERS="?"
 VERBOSE=false
 JSON=''
 
-while getopts ":lqrvjs:d:k:" opt; do
+function usage(){
+  echo "usage:"
+  echo "   $ cross-copy secred-code                   # to receive data"
+  echo "   $ cross-copy secred-code 'some data'       # to send a message"
+  echo "   $ cross-copy secred-code 'some-file.ext'  # to send a file"
+}
+
+while getopts ":lhqrvjs:d:k:" opt; do
   case $opt in
+    h) usage
+       exit 0
+      ;;
     q)
       QUIET=true
       ;;
@@ -59,9 +69,12 @@ if [ $# == 1 ]; then
   echo $PASTE
 
 elif [ $# == 2 ]; then
-  curl -X PUT -s -d "$2" $SERVER/api/$1$JSON$PARAMETERS
+  PATE=$2
+  [ -f "$2" ] && curl -q -F "file=@$2" "http://www.cross-copy.net/api/$1/$2" > /dev/null && PASTE="/api/$1/$2"
+  DELIVERIES=`curl -X PUT -s -d "$PASTE" "$SERVER/api/$1$JSON$PARAMETERS"`
+  echo "$DELIVERIES direct deliveries"
+  [[ $DELIVERIES == 0 ]] && echo "(you should wait for data on the other device while sending somthing)"
 else
-  echo "wrong number of arguments. usage:"
-  echo "   $ cross-copy secred-code              # to receive data"
-  echo "   $ cross-copy secred-code 'some data'  # to send data"
+  echo "wrong number of arguments."
+  usage
 fi
