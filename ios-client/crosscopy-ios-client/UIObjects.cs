@@ -33,9 +33,15 @@ namespace CrossCopy.iOSClient.UI
             base.ViewWillAppear (animated);
             if (HidesBottomBarWhenPushed) {
                 if (this.NavigationController != null) {
-                    this.NavigationController.SetNavigationBarHidden (true, true);
+                    this.NavigationController.SetNavigationBarHidden (
+                        true,
+                        true
+                    );
                 } else {
-                    this.NavigationController.SetNavigationBarHidden (false, true);
+                    this.NavigationController.SetNavigationBarHidden (
+                        false,
+                        true
+                    );
                 }
             }
         }
@@ -64,7 +70,7 @@ namespace CrossCopy.iOSClient.UI
             
             UITapGestureRecognizer tapGesture = new UITapGestureRecognizer (
                 this,
-                new MonoTouch.ObjCRuntime.Selector("ViewTappedSelector:")
+                new MonoTouch.ObjCRuntime.Selector ("ViewTappedSelector:")
             );
             tapGesture.CancelsTouchesInView = false;
             this.TableView.AddGestureRecognizer (tapGesture);
@@ -345,7 +351,12 @@ namespace CrossCopy.iOSClient.UI
                 Title = title; 
             
                 activityView = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.WhiteLarge); 
-                activityView.Frame = new System.Drawing.RectangleF (122, 50, 40, 40); 
+                activityView.Frame = new System.Drawing.RectangleF (
+                    122,
+                    50,
+                    40,
+                    40
+                ); 
                 AddSubview (activityView); 
                 activityView.StartAnimating (); 
                 Show ();

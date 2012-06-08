@@ -25,15 +25,33 @@ namespace CrossCopy.iOSClient
         #region Constants
         const string SERVER = @"http://www.cross-copy.net";
         const string API = @"/api/{0}";
-        static string DeviceID = string.Format("?device_id={0}", Guid.NewGuid());
+        static string DeviceID = string.Format (
+                "?device_id={0}",
+                Guid.NewGuid()
+            );
         static string BaseDir = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
-        static UIImage imgFolder = UIImage.FromFile("Images/folder.png");
-        static UIImage imgFile = UIImage.FromFile("Images/file.png");
-        static UIImage imgDownload = UIImage.FromFile("Images/download.png");
-        static UIImage imgUpload = UIImage.FromFile("Images/upload.png");
-        static UIColor backgroundColor = new UIColor (224 / 255.0f, 224 / 255.0f, 224 / 255.0f, 1.0f);
-        static UIColor lightTextColor = new UIColor (163 / 255.0f, 163 / 255.0f, 163 / 255.0f, 1.0f);
-        static UIColor darkTextColor = new UIColor (102 / 255.0f, 102 / 255.0f, 102 / 255.0f, 1.0f);
+        static UIImage imgFolder = UIImage.FromFile ("Images/folder.png");
+        static UIImage imgFile = UIImage.FromFile ("Images/file.png");
+        static UIImage imgDownload = UIImage.FromFile ("Images/download.png");
+        static UIImage imgUpload = UIImage.FromFile ("Images/upload.png");
+        static UIColor backgroundColor = new UIColor (
+                224 / 255.0f,
+                224 / 255.0f,
+                224 / 255.0f,
+                1.0f
+            );
+        static UIColor lightTextColor = new UIColor (
+                163 / 255.0f,
+                163 / 255.0f,
+                163 / 255.0f,
+                1.0f
+            );
+        static UIColor darkTextColor = new UIColor (
+                102 / 255.0f,
+                102 / 255.0f,
+                102 / 255.0f,
+                1.0f
+            );
         static UIImagePickerController imagePicker;
         static MPMoviePlayerController moviePlayer;
         #endregion
@@ -46,35 +64,35 @@ namespace CrossCopy.iOSClient
         Section secretsSection, entriesSection;
         Secret currentSecret;
         string secretValue = string.Empty;
-        
         WebRequest request;
-    
-        WebClient shareClient = new WebClient();
-        WebClient receiveClient = new WebClient();
-        
+        WebClient shareClient = new WebClient ();
+        WebClient receiveClient = new WebClient ();
         List<string> selectedFilePathArray;
         #endregion
         
         #region Public props
         public static History HistoryData { get; set; }
-        public delegate void EventDelegate(object sender, DownloadDataCompletedEventArgs e);
+        public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
         #endregion
 
         #region Methods
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
-            StoreHelper.Load();
+            StoreHelper.Load ();
 
             window = new UIWindow (UIScreen.MainScreen.Bounds);
             window.MakeKeyAndVisible ();
             
-            if (selectedFilePathArray == null)
-            {
-                selectedFilePathArray = new List<string>();
+            if (selectedFilePathArray == null) {
+                selectedFilePathArray = new List<string> ();
             }
             
-            var root = CreateRootElement();
-            var dvc = new StyledDialogViewController(root, null, backgroundColor)
+            var root = CreateRootElement ();
+            var dvc = new StyledDialogViewController (
+                root,
+                null,
+                backgroundColor
+            )
             {
                 Autorotate = true, 
                 HidesBottomBarWhenPushed = true
@@ -83,17 +101,21 @@ namespace CrossCopy.iOSClient
                 secretValue = string.Empty;
             };
 
-            navigation = new UINavigationController();
-            navigation.PushViewController(dvc, false);
-            navigation.SetNavigationBarHidden(true, false);
+            navigation = new UINavigationController ();
+            navigation.PushViewController (dvc, false);
+            navigation.SetNavigationBarHidden (true, false);
             
             window.RootViewController = navigation;
             
-            receiveClient.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+            receiveClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
             receiveClient.DownloadStringCompleted += (sender, e) => { 
-                if (e.Cancelled) return;
+                if (e.Cancelled)
+                    return;
                 if (e.Error != null) {
-                    Console.Out.WriteLine("Error fetching data: {0}", e.Error.Message);
+                    Console.Out.WriteLine (
+                        "Error fetching data: {0}",
+                        e.Error.Message
+                    );
                     Listen ();
                     return;
                 }
@@ -102,13 +124,20 @@ namespace CrossCopy.iOSClient
             };
             
             shareClient.UploadStringCompleted += (sender, e) => {
-                if (e.Cancelled || String.IsNullOrWhiteSpace(e.Result)) return;
+                if (e.Cancelled || String.IsNullOrWhiteSpace (e.Result))
+                    return;
                 if (e.Error != null) {
-                    Console.Out.WriteLine("Error sharing data: {0}", e.Error.Message);
+                    Console.Out.WriteLine (
+                        "Error sharing data: {0}",
+                        e.Error.Message
+                    );
                     return;
                 }
 
-                PasteData (JsonObject.Parse(e.Result)["data"], DataItemDirection.Out);
+                PasteData (
+                    JsonObject.Parse(e.Result)["data"],
+                    DataItemDirection.Out
+                );
             };
 
             Listen ();
@@ -122,19 +151,33 @@ namespace CrossCopy.iOSClient
 
         public override void DidEnterBackground (UIApplication application)
         {
-            StoreHelper.Save();
+            StoreHelper.Save ();
         }
         
         public override void WillTerminate (UIApplication application)
         {
-            StoreHelper.Save();
+            StoreHelper.Save ();
         }
         
         private RootElement CreateRootElement ()
         {
-            var captionLabel = UIHelper.CreateLabel ("cross copy", true, 32, 32, UITextAlignment.Center, UIColor.Black);
-            var subcaptionLabel = UIHelper.CreateLabel ("Open this App or cross-copy.net on different devices and choose the same secret. " + 
-                                                        "You can then transfer stuff between them without any further setup.", false, 13, 39, UITextAlignment.Center, lightTextColor);
+            var captionLabel = UIHelper.CreateLabel (
+                "cross copy",
+                true,
+                32,
+                32,
+                UITextAlignment.Center,
+                UIColor.Black
+            );
+            var subcaptionLabel = UIHelper.CreateLabel (
+                "Open this App or cross-copy.net on different devices and choose the same secret. " + 
+                                                        "You can then transfer stuff between them without any further setup.",
+                false,
+                13,
+                39,
+                UITextAlignment.Center,
+                lightTextColor
+            );
             
             var root = new RootElement ("CrossCopy") 
             {
@@ -149,16 +192,20 @@ namespace CrossCopy.iOSClient
                 }
             };
             
-            secretsSection.AddAll(from s in AppDelegate.HistoryData.Secrets select (Element)CreateImageButtonStringElement(s));
+            secretsSection.AddAll (from s in AppDelegate.HistoryData.Secrets select (Element)CreateImageButtonStringElement (s));
 
             secretEntry.AutocapitalizationType = UITextAutocapitalizationType.None;
             secretEntry.ShouldReturn += delegate {
-                var newSecret = new Secret(secretEntry.Value);
-                AppDelegate.HistoryData.Secrets.Add(newSecret);
-                secretsSection.Insert (secretsSection.Elements.Count, UITableViewRowAnimation.Fade, CreateImageButtonStringElement(newSecret));
+                var newSecret = new Secret (secretEntry.Value);
+                AppDelegate.HistoryData.Secrets.Add (newSecret);
+                secretsSection.Insert (
+                    secretsSection.Elements.Count,
+                    UITableViewRowAnimation.Fade,
+                    CreateImageButtonStringElement(newSecret)
+                );
                 secretEntry.Value = "";
-                secretEntry.ResignFirstResponder(false);
-                DisplaySecretDetail(newSecret);
+                secretEntry.ResignFirstResponder (false);
+                DisplaySecretDetail (newSecret);
 
                 return true;
             };
@@ -168,11 +215,16 @@ namespace CrossCopy.iOSClient
         
         private void Listen ()
         {
-            if (String.IsNullOrEmpty(secretValue))
+            if (String.IsNullOrEmpty (secretValue))
                 return;
-            Console.Out.WriteLine("Listen for secret: {0}", secretValue);
-            receiveClient.CancelAsync();
-            receiveClient.DownloadStringAsync(new Uri(String.Format("{0}/api/{1}{2}", SERVER, secretValue, DeviceID)));
+            Console.Out.WriteLine ("Listen for secret: {0}", secretValue);
+            receiveClient.CancelAsync ();
+            receiveClient.DownloadStringAsync (new Uri (String.Format (
+                "{0}/api/{1}{2}",
+                SERVER,
+                secretValue,
+                DeviceID
+            )));
         }
 
         private Element CreateDataItemElement (DataItem item)
@@ -181,251 +233,247 @@ namespace CrossCopy.iOSClient
 
             string apiUrl = string.Format (API, secretValue);
             if (item.Data.IndexOf (apiUrl) != -1) {
-                var dataElement = new DataImageStringElement (Path.GetFileName (item.Data.Substring (apiUrl.Length + 1)), (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload, item.Data);
+                var dataElement = new DataImageStringElement (
+                    Path.GetFileName (item.Data.Substring (apiUrl.Length + 1)),
+                    (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
+                    item.Data
+                );
                 dataElement.Tapped += delegate {
                     OpenFile (dataElement.Caption);
                 };
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
-                if (item.Direction == DataItemDirection.In) 
-                {
+                if (item.Direction == DataItemDirection.In) {
                     dataElement.Animating = true;
-                    DownloadFileAsync (SERVER + dataElement.Data, Path.Combine (BaseDir, dataElement.Caption), delegate {
+                    DownloadFileAsync (SERVER + dataElement.Data, Path.Combine (
+                        BaseDir,
+                        dataElement.Caption
+                    ), delegate {
                         dataElement.Animating = false;
-                    });
-                }
-                else 
-                {
+                    }
+                    );
+                } else {
                     dataElement.Animating = false;
                 }
 
                 element = (Element)dataElement;
-            }
-            else 
-            {
+            } else {
                 UITextAlignment alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
-                var htmlElement = UIHelper.CreateHtmlViewElement (null, item.Data, alignment);
+                var htmlElement = UIHelper.CreateHtmlViewElement (
+                    null,
+                    item.Data,
+                    alignment
+                );
                 element = (Element)htmlElement;
             }
 
             return element;
-        }               
-        private void PasteData(string data, DataItemDirection direction)
+        }
+
+        private void PasteData (string data, DataItemDirection direction)
         {
-            UIApplication.SharedApplication.InvokeOnMainThread(delegate
-            { 
-                DataItem item = new DataItem(data, direction, DateTime.Now);
-                currentSecret.DataItems.Insert(0, item);
+            UIApplication.SharedApplication.InvokeOnMainThread (delegate { 
+                DataItem item = new DataItem (data, direction, DateTime.Now);
+                currentSecret.DataItems.Insert (0, item);
                 entriesSection.Insert (0, CreateDataItemElement (item));
-            });
+            }
+            );
         }
         
-        private void ShareData(string dataToShare)
+        private void ShareData (string dataToShare)
         {
-            if (String.IsNullOrEmpty(secretValue))
+            if (String.IsNullOrEmpty (secretValue))
                 return;
 
-            shareClient.UploadStringAsync(new Uri(String.Format("{0}/api/{1}.json{2}", SERVER, secretValue, DeviceID)), "PUT", dataToShare);
+            shareClient.UploadStringAsync (
+                new Uri(String.Format("{0}/api/{1}.json{2}", SERVER, secretValue, DeviceID)),
+                "PUT",
+                dataToShare
+            );
     
         }
         
-        private void ShareFile(string filePath)
+        private void ShareFile (string filePath)
         {
-            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            {
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
                 byte[] fileByteArray = new byte[fileStream.Length];
-                fileStream.Read(fileByteArray, 0, fileByteArray.Length);
-                ShareFile(filePath, fileByteArray);
+                fileStream.Read (fileByteArray, 0, fileByteArray.Length);
+                ShareFile (filePath, fileByteArray);
             }
         }
         
-        private void ShareFile(string filePath, byte[] fileByteArray)
+        private void ShareFile (string filePath, byte[] fileByteArray)
         {
-            if (!String.IsNullOrEmpty(secretValue))
-            {
-                try
-                {
-                    if (request != null)
-                    {
-                        request.Abort();
+            if (!String.IsNullOrEmpty (secretValue)) {
+                try {
+                    if (request != null) {
+                        request.Abort ();
                     }
                     
-                    request = HttpWebRequest.Create(SERVER + String.Format(API, secretValue) + "/" + Path.GetFileName(filePath));
+                    request = HttpWebRequest.Create (SERVER + String.Format (
+                        API,
+                        secretValue
+                    ) + "/" + Path.GetFileName (filePath));
                     request.Method = "POST";
                     request.ContentType = "application/octet-stream";
                     ((HttpWebRequest)request).AllowWriteStreamBuffering = false;
                     request.ContentLength = fileByteArray.Length;
                         
-                    using (var requestStream = request.GetRequestStream())
-                    {
-                        requestStream.Write(fileByteArray, 0, fileByteArray.Length);    
+                    using (var requestStream = request.GetRequestStream()) {
+                        requestStream.Write (
+                            fileByteArray,
+                            0,
+                            fileByteArray.Length
+                        );    
                     }
                     
-                    using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-                    {
-                        if (response.StatusCode != HttpStatusCode.OK)
-                        {
-                            Console.Out.WriteLine("Error fetching data. Server returned status code: {0}", response.StatusCode);
+                    using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {
+                        if (response.StatusCode != HttpStatusCode.OK) {
+                            Console.Out.WriteLine (
+                                "Error fetching data. Server returned status code: {0}",
+                                response.StatusCode
+                            );
                         }
                         
-                        using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                        {
-                            var content = reader.ReadToEnd();
-                            if (!String.IsNullOrWhiteSpace(content)) 
-                            {
-                                Console.Out.WriteLine("Share file: \r\n {0}", content);
-                                ShareData(response.ResponseUri.AbsoluteUri);
+                        using (StreamReader reader = new StreamReader(response.GetResponseStream())) {
+                            var content = reader.ReadToEnd ();
+                            if (!String.IsNullOrWhiteSpace (content)) {
+                                Console.Out.WriteLine (
+                                    "Share file: \r\n {0}",
+                                    content
+                                );
+                                ShareData (response.ResponseUri.AbsoluteUri);
                             }
-                       }
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.Out.WriteLine("Exception: {0}", ex.Message);
+                } catch (Exception ex) {
+                    Console.Out.WriteLine ("Exception: {0}", ex.Message);
                 }
                 
-                Listen();
+                Listen ();
             }
-        }
-        
-        public void UploadFile()
-        {
-            LoadingView loading = new LoadingView();
-            loading.Show("Uploading files, please wait ...");
-            
-            foreach (string filePath in selectedFilePathArray)
-            {
-                ShareFile(filePath);
-            }
-            selectedFilePathArray.Clear();
-            
-            loading.Hide();
-        }
-        
-        public void UploadFile(string filePath, byte[] fileByteArray)
-        {
-            LoadingView loading = new LoadingView();
-            loading.Show("Uploading file, please wait ...");
-            
-            ShareFile(filePath, fileByteArray);
-            
-            selectedFilePathArray.Clear();
-            
-            loading.Hide();
         }
 
-        public void UploadFileAsync(string filePath, byte[] fileByteArray)
+        public void UploadFileAsync (string filePath, byte[] fileByteArray)
         {
-            if (String.IsNullOrEmpty(secretValue))
+            if (String.IsNullOrEmpty (secretValue))
                 return;
 
-            var loading = new LoadingView();
-            loading.Show("Uploading file, please wait ...");
+            var loading = new LoadingView ();
+            loading.Show ("Uploading file, please wait ...");
 
             var client = new WebClient ();
-            client.Headers["content-type"] = "application/octet-stream";
+            client.Headers ["content-type"] = "application/octet-stream";
             client.Encoding = Encoding.UTF8;
             client.UploadDataCompleted += (sender, e) => {
-                loading.Hide();
+                loading.Hide ();
 
-                if (e.Cancelled) 
-                {
-                    Console.Out.WriteLine("Upload file cancelled.");
+                if (e.Cancelled) {
+                    Console.Out.WriteLine ("Upload file cancelled.");
                     return;
                 }
 
-                if (e.Error != null) 
-                {
-                    Console.Out.WriteLine("Error uploading file: {0}", e.Error.Message);
+                if (e.Error != null) {
+                    Console.Out.WriteLine (
+                        "Error uploading file: {0}",
+                        e.Error.Message
+                    );
                     return;
                 }
 
                 string response = System.Text.Encoding.UTF8.GetString (e.Result);
-                if (!String.IsNullOrEmpty(response))
-                {
-                    ShareData(string.Format("{0}{1}", SERVER, response));
+                if (!String.IsNullOrEmpty (response)) {
+                    ShareData (string.Format ("{0}{1}", SERVER, response));
                 }
             };
 
-            Uri fileUri = new Uri(String.Format("{0}/api/{1}/{2}", SERVER, secretValue, UrlHelper.GetFileName(filePath)));
-            client.UploadDataAsync(fileUri, "POST", fileByteArray);
+            Uri fileUri = new Uri (String.Format (
+                "{0}/api/{1}/{2}",
+                SERVER,
+                secretValue,
+                UrlHelper.GetFileName(filePath)
+            ));
+            client.UploadDataAsync (fileUri, "POST", fileByteArray);
         }
 
-        public static void DownloadFileAsync(string remoteFilePath, string localFilePath, EventDelegate dwnldCompletedDelegate)
+        public static void DownloadFileAsync (string remoteFilePath, string localFilePath, EventDelegate dwnldCompletedDelegate)
         {
-            var url = new Uri(remoteFilePath);
-            var webClient = new WebClient();
+            var url = new Uri (remoteFilePath);
+            var webClient = new WebClient ();
             webClient.DownloadDataCompleted += (s, e) => {
                 var bytes = e.Result; 
                 File.WriteAllBytes (localFilePath, bytes);  
             };
-            webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(dwnldCompletedDelegate);
-            webClient.DownloadDataAsync(url);
+            webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler (dwnldCompletedDelegate);
+            webClient.DownloadDataAsync (url);
         }
         
-        public static int DownloadFile(string remoteFilename, string localFilename)
+        public static int DownloadFile (string remoteFilename, string localFilename)
         {
             int bytesProcessed = 0;
          
-            Stream remoteStream  = null;
-            Stream localStream   = null;
+            Stream remoteStream = null;
+            Stream localStream = null;
             WebResponse response = null;
             
-            try
-            {
-                WebRequest request = WebRequest.Create(remoteFilename);
-                if (request != null)
-                {
-                    response = request.GetResponse();
-                    if (response != null)
-                    {
-                        remoteStream = response.GetResponseStream();
+            try {
+                WebRequest request = WebRequest.Create (remoteFilename);
+                if (request != null) {
+                    response = request.GetResponse ();
+                    if (response != null) {
+                        remoteStream = response.GetResponseStream ();
             
-                        localStream = File.Create(localFilename);
+                        localStream = File.Create (localFilename);
             
                         byte[] buffer = new byte[1024];
                         int bytesRead;
             
-                        do
-                        {
-                            bytesRead = remoteStream.Read (buffer, 0, buffer.Length);
+                        do {
+                            bytesRead = remoteStream.Read (
+                                buffer,
+                                0,
+                                buffer.Length
+                            );
                             localStream.Write (buffer, 0, bytesRead);
                             bytesProcessed += bytesRead;
                         } while (bytesRead > 0);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Console.Out.WriteLine(e.Message);
-            }
-            finally
-            {
-                if (response != null) response.Close();
-                if (remoteStream != null) remoteStream.Close();
-                if (localStream != null) localStream.Close();
+            } catch (Exception e) {
+                Console.Out.WriteLine (e.Message);
+            } finally {
+                if (response != null)
+                    response.Close ();
+                if (remoteStream != null)
+                    remoteStream.Close ();
+                if (localStream != null)
+                    localStream.Close ();
             }
             
             return bytesProcessed;
         }
         
-        private void OpenFile(string fileName)
+        private void OpenFile (string fileName)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
             string filePath = Path.Combine (BaseDir, fileName);
             string ext = Path.GetExtension (fileName);
             
-            if (ext.ToUpper() == ".MOV" || ext.ToUpper() == ".M4V") 
-            {
-                var movieController = new AdvancedUIViewController();
-                moviePlayer = new MPMoviePlayerController(NSUrl.FromFilename(filePath));
-                moviePlayer.View.Frame = new RectangleF(sbounds.X, sbounds.Y-20, sbounds.Width, sbounds.Height);
+            if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
+                var movieController = new AdvancedUIViewController ();
+                moviePlayer = new MPMoviePlayerController (NSUrl.FromFilename (filePath));
+                moviePlayer.View.Frame = new RectangleF (
+                    sbounds.X,
+                    sbounds.Y-20,
+                    sbounds.Width,
+                    sbounds.Height
+                );
                 moviePlayer.ControlStyle = MPMovieControlStyle.Fullscreen;
                 moviePlayer.View.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
                 moviePlayer.ShouldAutoplay = true;
-                moviePlayer.PrepareToPlay();
-                moviePlayer.Play();
+                moviePlayer.PrepareToPlay ();
+                moviePlayer.Play ();
                 
-                var btnClose = UIButton.FromType(UIButtonType.RoundedRect);
+                var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
                 btnClose.Frame = new RectangleF (3, 7, 60, 30);
                 btnClose.SetTitle ("Close", UIControlState.Normal);
                 btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
@@ -433,13 +481,11 @@ namespace CrossCopy.iOSClient
                     movieController.DismissModalViewControllerAnimated (true);
                 };
                 
-                movieController.View.AddSubview(moviePlayer.View);
+                movieController.View.AddSubview (moviePlayer.View);
                 movieController.View.AddSubview (btnClose);
                 navigation.PresentModalViewController (movieController, true);
-            }
-            else if (ext.ToUpper() == ".JPG" || ext.ToUpper() == ".PNG") 
-            {
-                var imageController = new AdvancedUIViewController(); 
+            } else if (ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
+                var imageController = new AdvancedUIViewController (); 
                 
                 var imageView = new UIImageView (UIImage.FromFile (filePath));
                 imageView.Frame = sbounds;
@@ -447,15 +493,20 @@ namespace CrossCopy.iOSClient
                 imageView.ClipsToBounds = true;
                 imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
                 
-                var btnClose = UIButton.FromType(UIButtonType.RoundedRect);
-                btnClose.Frame = new RectangleF ((sbounds.Width / 2) - 50, 20, 100, 30);
+                var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
+                btnClose.Frame = new RectangleF (
+                    (sbounds.Width / 2) - 50,
+                    20,
+                    100,
+                    30
+                );
                 btnClose.SetTitle ("Close", UIControlState.Normal);
                 btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
                 btnClose.TouchDown += delegate {
                     imageController.DismissModalViewControllerAnimated (true);
                 };
                 
-                var scrollView = new UIScrollView(sbounds);
+                var scrollView = new UIScrollView (sbounds);
                 scrollView.ClipsToBounds = true;
                 scrollView.ContentSize = sbounds.Size;
                 scrollView.BackgroundColor = UIColor.Gray;
@@ -467,90 +518,79 @@ namespace CrossCopy.iOSClient
                     return imageView;
                 };
                  
-                scrollView.AddSubview(imageView);
-                imageController.View.AddSubview(scrollView);
+                scrollView.AddSubview (imageView);
+                imageController.View.AddSubview (scrollView);
                 imageController.View.AddSubview (btnClose);
                 navigation.PresentModalViewController (imageController, true);
             }
         }
         
-        private void ShowImagePicker()
+        private void ShowImagePicker ()
         {
-            imagePicker = new UIImagePickerController();
+            imagePicker = new UIImagePickerController ();
             imagePicker.SourceType = UIImagePickerControllerSourceType.PhotoLibrary;
             imagePicker.MediaTypes = UIImagePickerController.AvailableMediaTypes (UIImagePickerControllerSourceType.PhotoLibrary);
             
             imagePicker.FinishedPickingMedia += (sender, e) => {
-                bool isImage = (e.Info[UIImagePickerController.MediaType].ToString() == "public.image");
-                NSUrl referenceUrl = e.Info[UIImagePickerController.ReferenceUrl] as NSUrl;
-                UIImage image  = null;
+                bool isImage = (e.Info [UIImagePickerController.MediaType].ToString () == "public.image");
+                NSUrl referenceUrl = e.Info [UIImagePickerController.ReferenceUrl] as NSUrl;
+                UIImage image = null;
                 NSUrl mediaUrl = null;
                     
-                if (isImage)
-                {
-                    image = e.Info[UIImagePickerController.OriginalImage] as UIImage;
-                }
-                else
-                {
-                    mediaUrl = e.Info[UIImagePickerController.MediaURL] as NSUrl;
+                if (isImage) {
+                    image = e.Info [UIImagePickerController.OriginalImage] as UIImage;
+                } else {
+                    mediaUrl = e.Info [UIImagePickerController.MediaURL] as NSUrl;
                 }
                 
                 UploadMedia (image, referenceUrl, mediaUrl);
                 
-                imagePicker.DismissModalViewControllerAnimated(true);
+                imagePicker.DismissModalViewControllerAnimated (true);
             }; 
             
             imagePicker.Canceled += (sender, e) => {
-                imagePicker.DismissModalViewControllerAnimated(true);
+                imagePicker.DismissModalViewControllerAnimated (true);
             }; 
             
-            navigation.PresentModalViewController(imagePicker, true);
+            navigation.PresentModalViewController (imagePicker, true);
         }
         
         private void UploadMedia (UIImage image, NSUrl referenceUrl, NSUrl mediaUrl)
         {
             byte[] mediaByteArray;
-            if (image != null) 
-            {
+            if (image != null) {
                 ByteHelper.ImageToByteArray (image, out mediaByteArray);
-            }
-            else if (mediaUrl != null)
-            {
+            } else if (mediaUrl != null) {
                 ByteHelper.VideoToByteArray (mediaUrl, out mediaByteArray);
-            }
-            else
-            {
-                Console.Out.WriteLine("No media to upload!");
+            } else {
+                Console.Out.WriteLine ("No media to upload!");
                 return;
             }
             
-            UploadFileAsync(referenceUrl.AbsoluteString, mediaByteArray);
+            UploadFileAsync (referenceUrl.AbsoluteString, mediaByteArray);
         }
 
-        private ImageButtonStringElement CreateImageButtonStringElement(Secret secret)
+        private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
             return new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
                       delegate {
-                        DisplaySecretDetail (secret);
-                      }, 
+                DisplaySecretDetail (secret);
+            }, 
                       delegate {
-                        AppDelegate.HistoryData.Secrets.Remove(secret);
-                        Element found = null;
-                        foreach (var element in secretsSection.Elements)
-                        {
-                            if (element.Caption == secret.Phrase)
-                            {
-                                found = element;
-                                break;
-                            }
-                        }
+                AppDelegate.HistoryData.Secrets.Remove (secret);
+                Element found = null;
+                foreach (var element in secretsSection.Elements) {
+                    if (element.Caption == secret.Phrase) {
+                        found = element;
+                        break;
+                    }
+                }
                         
-                        if (found != null)
-                        {
-                            secretsSection.Remove (found);
-                        }
-                      }
-                    );
+                if (found != null) {
+                    secretsSection.Remove (found);
+                }
+            }
+            );
         }
 
         private void DisplaySecretDetail (Secret s)
@@ -573,27 +613,34 @@ namespace CrossCopy.iOSClient
             dataEntry.ShouldReturn += delegate {
                 UIApplication.SharedApplication.InvokeOnMainThread (delegate {
                     dataEntry.GetContainerTableView ().EndEditing (true);
-                } );
+                }
+                );
                 
-                ShareData(dataEntry.Value);
+                ShareData (dataEntry.Value);
                 
                 return true;
-            } ;
+            };
 
             entriesSection.Elements.AddRange (
                 from d in s.DataItems
-                select ((Element)CreateDataItemElement(d)));
+                select ((Element)CreateDataItemElement (d))
+            );
 
             subRoot.UnevenRows = true;
 
-            var dvc = new StyledDialogViewController (subRoot, true, null, backgroundColor);
+            var dvc = new StyledDialogViewController (
+                subRoot,
+                true,
+                null,
+                backgroundColor
+            );
             dvc.HidesBottomBarWhenPushed = false;
-            navigation.SetNavigationBarHidden(false, true);
+            navigation.SetNavigationBarHidden (false, true);
             navigation.PushViewController (dvc, true);
 
             secretValue = s.Phrase;
             currentSecret = s;
-            Listen();
+            Listen ();
         }
         #endregion
     }
