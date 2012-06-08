@@ -30,8 +30,6 @@ namespace CrossCopy.iOSClient
                 Guid.NewGuid ()
             );
         static string BaseDir = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
-        static UIImage imgFolder = UIImage.FromFile ("Images/folder.png");
-        static UIImage imgFile = UIImage.FromFile ("Images/file.png");
         static UIImage imgDownload = UIImage.FromFile ("Images/download.png");
         static UIImage imgUpload = UIImage.FromFile ("Images/upload.png");
         static UIColor backgroundColor = new UIColor (
@@ -64,7 +62,6 @@ namespace CrossCopy.iOSClient
         Section secretsSection, entriesSection;
         Secret currentSecret;
         string secretValue = string.Empty;
-        WebRequest request;
         WebClient shareClient = new WebClient ();
         WebClient receiveClient = new WebClient ();
         List<string> selectedFilePathArray;
