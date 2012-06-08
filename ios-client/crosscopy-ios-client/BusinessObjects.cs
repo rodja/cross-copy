@@ -6,13 +6,13 @@ using System.ComponentModel;
 
 namespace CrossCopy.iOSClient.BL
 {
-	[System.Diagnostics.DebuggerDisplay("History - Secrets {Secrets.Count}")]
+    [System.Diagnostics.DebuggerDisplay("History - Secrets {Secrets.Count}")]
     [XmlRoot("history")]
     public class History
     {
-        public History()
+        public History ()
         {
-            Secrets = new List<Secret>();
+            Secrets = new List<Secret> ();
         }
 
         [XmlElement("secret")]
@@ -22,19 +22,20 @@ namespace CrossCopy.iOSClient.BL
     [System.Diagnostics.DebuggerDisplay("Secret - {Phrase} {DataItems.Count}")]
     public class Secret
     {
-        public Secret() 
+        public Secret ()
         {
-            DataItems = new List<DataItem>();
+            DataItems = new List<DataItem> ();
         }
         
-        public Secret(string phrase) 
+        public Secret (string phrase)
         {
-            Phrase =  phrase;
-            DataItems = new List<DataItem>();
+            Phrase = phrase;
+            DataItems = new List<DataItem> ();
         }
 
         [XmlAttribute("phrase")]
         public string Phrase { get; set; }
+
         [XmlElement("dataitem")]
         public List<DataItem> DataItems { get; set; }
 
@@ -43,7 +44,7 @@ namespace CrossCopy.iOSClient.BL
     [System.Diagnostics.DebuggerDisplay("DataItem - {Data}")]
     public class DataItem
     {
-        public DataItem()
+        public DataItem ()
         {
         }
         
@@ -59,10 +60,10 @@ namespace CrossCopy.iOSClient.BL
 
         [XmlIgnore]
         public DataItemDirection Direction { get; set; }
+
         [XmlAttribute("direction")]
         [EditorBrowsable(EditorBrowsableState.Never), Browsable(false)]
-        public int DirectionInt 
-        {
+        public int DirectionInt {
             get { return (int)Direction; }
             set { Direction = (DataItemDirection)value; }
         }
