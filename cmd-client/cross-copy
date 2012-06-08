@@ -7,8 +7,20 @@ PARAMETERS="?"
 VERBOSE=false
 JSON=''
 
-while getopts ":lqrvjs:d:k:" opt; do
+function usage(){
+  echo "usage: cross-copy [options...] <secred-code> [ 'message' | <filename> ]"
+  echo "To transfer data from one device to the other"
+  echo "  1. choose a shared secred"
+  echo "  2. listen for data on receiving device with cross-copy <secred-code>"
+  echo "  3. share text with cross-copy <secred-code> \"your message\""
+  echo "      or a file with cross-copy <secred-code> <filename>"
+}
+
+while getopts ":lhqrvjs:d:k:" opt; do
   case $opt in
+    h) usage
+       exit 0
+      ;;
     q)
       QUIET=true
       ;;
@@ -55,13 +67,21 @@ if [ $# == 1 ]; then
   CMD="curl -s $SERVER/api/$1$JSON$PARAMETERS"
   $VERBOSE && echo $CMD    
   PASTE=`$CMD`
-  [[ $PASTE == /api/${1}* ]] && PASTE=${SERVER}$PASTE  # complete internal urls
-  echo $PASTE
+  # download file if it's an internal uri
+  if [[ $PASTE == /api/${1}* ]]; then
+    PASTE=${SERVER}$PASTE
+    wget $PASTE
+  else
+    echo $PASTE
+  fi
 
 elif [ $# == 2 ]; then
-  curl -X PUT -s -d "$2" $SERVER/api/$1$JSON$PARAMETERS
+  PATE=$2
+  [ -f "$2" ] && curl -q -F "file=@$2" "http://www.cross-copy.net/api/$1/$2" > /dev/null && PASTE="/api/$1/$2"
+  DELIVERIES=`curl -X PUT -s -d "$PASTE" "$SERVER/api/$1$JSON$PARAMETERS"`
+  echo "$DELIVERIES direct deliveries"
+  [[ $DELIVERIES == 0 ]] && echo "(you should wait for data on the other device while sending somthing)"
 else
-  echo "wrong number of arguments. usage:"
-  echo "   $ cross-copy secred-code              # to receive data"
-  echo "   $ cross-copy secred-code 'some data'  # to send data"
+  echo "wrong number of arguments."
+  usage
 fi

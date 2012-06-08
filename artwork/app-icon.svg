@@ -164,6 +164,16 @@
        y2="515.42859"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(1.0315145,0,0,1.0039067,-30.03179,22.36888)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5997"
+       id="linearGradient3107"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.7248338,0,0,1.14064,1479.9491,22.60328)"
+       x1="-2.8571429"
+       y1="515.42859"
+       x2="1022.8571"
+       y2="515.42859" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -172,17 +182,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.24748737"
-     inkscape:cx="-533.56871"
-     inkscape:cy="312.14136"
+     inkscape:zoom="0.175"
+     inkscape:cx="532.24165"
+     inkscape:cy="-50.86957"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1600"
-     inkscape:window-height="843"
-     inkscape:window-x="0"
-     inkscape:window-y="26"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="833"
+     inkscape:window-height="414"
+     inkscape:window-x="372"
+     inkscape:window-y="222"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -490,5 +500,204 @@
          id="tspan3930"
          x="505.07626"
          y="1266.5145">iOS</tspan></text>
+    <rect
+       style="fill:url(#linearGradient3107);fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3075"
+       width="1769.1865"
+       height="1179.7478"
+       x="1475.021"
+       y="20.647898" />
+    <rect
+       transform="matrix(1.7208944,0,0,1.1367334,1489.9379,26.596584)"
+       y="-1.7142857"
+       x="-2.8571429"
+       height="1034.2858"
+       width="1025.7142"
+       id="rect3077"
+       style="fill:#cbcccd;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter5712)"
+       inkscape:export-filename="/home/rodja/Projects/cross-copy/artwork/cross-copy-ad.png"
+       inkscape:export-xdpi="9.1800003"
+       inkscape:export-ydpi="9.1800003" />
+    <g
+       style="fill:#ffffff;fill-opacity:1"
+       transform="matrix(7.2321146,0,0,7.2321146,1453.9023,-3.6853)"
+       id="g3079">
+      <circle
+         d="m 51.866,63.75 c 0,8.532799 -6.9172,15.45 -15.45,15.45 -8.532799,0 -15.449999,-6.917201 -15.449999,-15.45 0,-8.532799 6.9172,-15.45 15.449999,-15.45 8.5328,0 15.45,6.917201 15.45,15.45 z"
+         style="fill:#ffffff;fill-opacity:1"
+         sodipodi:ry="15.45"
+         sodipodi:rx="15.45"
+         sodipodi:cy="63.75"
+         sodipodi:cx="36.416"
+         i:knockout="Off"
+         cx="36.416"
+         cy="63.75"
+         r="15.45"
+         id="circle3081" />
+      <rect
+         style="fill:#ffffff;fill-opacity:1"
+         x="58.118999"
+         y="47.926998"
+         i:knockout="Off"
+         transform="matrix(0.4543,-0.8908,0.8908,0.4543,-35.4254,100.0826)"
+         width="11.72"
+         height="62.058998"
+         id="rect3083" />
+      <rect
+         style="fill:#ffffff;fill-opacity:1"
+         x="58.118999"
+         y="18.594"
+         i:knockout="Off"
+         transform="matrix(-0.4543,-0.8909,0.8909,-0.4543,48.8347,129.1622)"
+         width="11.721"
+         height="62.060001"
+         id="rect3085" />
+      <circle
+         d="m 107.034,92.583 c 0,8.5328 -6.9172,15.45 -15.45,15.45 -8.5328,0 -15.45,-6.9172 -15.45,-15.45 0,-8.532799 6.9172,-15.45 15.45,-15.45 8.5328,0 15.45,6.917201 15.45,15.45 z"
+         style="fill:#ffffff;fill-opacity:1"
+         sodipodi:ry="15.45"
+         sodipodi:rx="15.45"
+         sodipodi:cy="92.583"
+         sodipodi:cx="91.584"
+         i:knockout="Off"
+         cx="91.584"
+         cy="92.583"
+         r="15.45"
+         id="circle3087" />
+      <circle
+         d="m 107.034,35.417 c 0,8.532799 -6.9172,15.45 -15.45,15.45 -8.5328,0 -15.45,-6.917201 -15.45,-15.45 0,-8.532799 6.9172,-15.45 15.45,-15.45 8.5328,0 15.45,6.917201 15.45,15.45 z"
+         style="fill:#ffffff;fill-opacity:1"
+         sodipodi:ry="15.45"
+         sodipodi:rx="15.45"
+         sodipodi:cy="35.417"
+         sodipodi:cx="91.584"
+         i:knockout="Off"
+         cx="91.584"
+         cy="35.417"
+         r="15.45"
+         id="circle3089" />
+    </g>
+    <g
+       id="g3091"
+       transform="matrix(7.2321146,0,0,7.2321146,1448.3324,-20.5083)"
+       style="fill:#000000;fill-opacity:1">
+      <circle
+         id="circle3093"
+         r="15.45"
+         cy="63.75"
+         cx="36.416"
+         i:knockout="Off"
+         sodipodi:cx="36.416"
+         sodipodi:cy="63.75"
+         sodipodi:rx="15.45"
+         sodipodi:ry="15.45"
+         style="fill:#000000;fill-opacity:1"
+         d="m 51.866,63.75 c 0,8.532799 -6.9172,15.45 -15.45,15.45 -8.532799,0 -15.449999,-6.917201 -15.449999,-15.45 0,-8.532799 6.9172,-15.45 15.449999,-15.45 8.5328,0 15.45,6.917201 15.45,15.45 z" />
+      <rect
+         id="rect3095"
+         height="62.058998"
+         width="11.72"
+         transform="matrix(0.4543,-0.8908,0.8908,0.4543,-35.4254,100.0826)"
+         i:knockout="Off"
+         y="47.926998"
+         x="58.118999"
+         style="fill:#000000;fill-opacity:1" />
+      <rect
+         id="rect3097"
+         height="62.060001"
+         width="11.721"
+         transform="matrix(-0.4543,-0.8909,0.8909,-0.4543,48.8347,129.1622)"
+         i:knockout="Off"
+         y="18.594"
+         x="58.118999"
+         style="fill:#000000;fill-opacity:1" />
+      <circle
+         id="circle3099"
+         r="15.45"
+         cy="92.583"
+         cx="91.584"
+         i:knockout="Off"
+         sodipodi:cx="91.584"
+         sodipodi:cy="92.583"
+         sodipodi:rx="15.45"
+         sodipodi:ry="15.45"
+         style="fill:#000000;fill-opacity:1"
+         d="m 107.034,92.583 c 0,8.5328 -6.9172,15.45 -15.45,15.45 -8.5328,0 -15.45,-6.9172 -15.45,-15.45 0,-8.532799 6.9172,-15.45 15.45,-15.45 8.5328,0 15.45,6.917201 15.45,15.45 z" />
+      <circle
+         id="circle3101"
+         r="15.45"
+         cy="35.417"
+         cx="91.584"
+         i:knockout="Off"
+         sodipodi:cx="91.584"
+         sodipodi:cy="35.417"
+         sodipodi:rx="15.45"
+         sodipodi:ry="15.45"
+         style="fill:#000000;fill-opacity:1"
+         d="m 107.034,35.417 c 0,8.532799 -6.9172,15.45 -15.45,15.45 -8.5328,0 -15.45,-6.917201 -15.45,-15.45 0,-8.532799 6.9172,-15.45 15.45,-15.45 8.5328,0 15.45,6.917201 15.45,15.45 z" />
+    </g>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3103"
+       y="1266.5145"
+       x="2005.0763"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"><tspan
+         y="1266.5145"
+         x="2005.0763"
+         id="tspan3105"
+         sodipodi:role="line">Ad-Banner</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3129"
+       y="360.28076"
+       x="2760.5691"
+       style="font-size:250px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#fffdff;fill-opacity:1;stroke:none;font-family:Standard Symbols L;-inkscape-font-specification:Standard Symbols L Bold"
+       xml:space="preserve"><tspan
+         y="360.28076"
+         x="2804.0261"
+         id="tspan3131"
+         sodipodi:role="line">cross </tspan><tspan
+         y="672.78076"
+         x="2760.5691"
+         id="tspan3133"
+         sodipodi:role="line">copy</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:250px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Standard Symbols L;-inkscape-font-specification:Standard Symbols L Bold"
+       x="2752.5691"
+       y="352.28076"
+       id="text3109"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3113"
+         x="2796.0261"
+         y="352.28076">cross </tspan><tspan
+         sodipodi:role="line"
+         id="tspan3115"
+         x="2752.5691"
+         y="664.78076">copy</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3117"
+       y="1046.6666"
+       x="2370.6299"
+       style="font-size:140px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Standard Symbols L;-inkscape-font-specification:Standard Symbols L"
+       xml:space="preserve"><tspan
+         sodipodi:role="line"
+         id="tspan3123"
+         x="2370.6299"
+         y="1046.6666">inter-device file transfer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:140px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Standard Symbols L;-inkscape-font-specification:Standard Symbols L"
+       x="2366.6299"
+       y="1038.6666"
+       id="text3125"
+       sodipodi:linespacing="125%"><tspan
+         y="1038.6666"
+         x="2366.6299"
+         id="tspan3127"
+         sodipodi:role="line">inter-device file transfer</tspan></text>
   </g>
 </svg>
