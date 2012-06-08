@@ -291,67 +291,6 @@ namespace CrossCopy.iOSClient
             );
     
         }
-        
-        private void ShareFile (string filePath)
-        {
-            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
-                byte[] fileByteArray = new byte[fileStream.Length];
-                fileStream.Read (fileByteArray, 0, fileByteArray.Length);
-                ShareFile (filePath, fileByteArray);
-            }
-        }
-        
-        private void ShareFile (string filePath, byte[] fileByteArray)
-        {
-            if (!String.IsNullOrEmpty (secretValue)) {
-                try {
-                    if (request != null) {
-                        request.Abort ();
-                    }
-                    
-                    request = HttpWebRequest.Create (SERVER + String.Format (
-                        API,
-                        secretValue
-                    ) + "/" + Path.GetFileName (filePath));
-                    request.Method = "POST";
-                    request.ContentType = "application/octet-stream";
-                    ((HttpWebRequest)request).AllowWriteStreamBuffering = false;
-                    request.ContentLength = fileByteArray.Length;
-                        
-                    using (var requestStream = request.GetRequestStream()) {
-                        requestStream.Write (
-                            fileByteArray,
-                            0,
-                            fileByteArray.Length
-                        );    
-                    }
-                    
-                    using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {
-                        if (response.StatusCode != HttpStatusCode.OK) {
-                            Console.Out.WriteLine (
-                                "Error fetching data. Server returned status code: {0}",
-                                response.StatusCode
-                            );
-                        }
-                        
-                        using (StreamReader reader = new StreamReader(response.GetResponseStream())) {
-                            var content = reader.ReadToEnd ();
-                            if (!String.IsNullOrWhiteSpace (content)) {
-                                Console.Out.WriteLine (
-                                    "Share file: \r\n {0}",
-                                    content
-                                );
-                                ShareData (response.ResponseUri.AbsoluteUri);
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    Console.Out.WriteLine ("Exception: {0}", ex.Message);
-                }
-                
-                Listen ();
-            }
-        }
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray)
         {
