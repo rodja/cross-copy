@@ -16,7 +16,7 @@
 		<string>Images/crosscopy-icon-144.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>com.amelisoft.crosscopy</string>
+	<string>net.crosscopy.app</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
