@@ -292,7 +292,8 @@ namespace CrossCopy.iOSClient
                 SERVER,
                 secretValue,
                 DeviceID
-            )),
+            )
+            ),
                 "PUT",
                 dataToShare
             );
@@ -310,7 +311,7 @@ namespace CrossCopy.iOSClient
             string destinationPath = String.Format (
                 "/api/{0}/{1}",
                 secretValue,
-                UrlHelper.GetFileName(filePath)
+                UrlHelper.GetFileName (filePath)
             );
             WebClient client = new WebClient ();
             client.Headers ["content-type"] = "application/octet-stream";
@@ -334,17 +335,11 @@ namespace CrossCopy.iOSClient
                 string response = System.Text.Encoding.UTF8.GetString (e.Result);
 
                 if (!String.IsNullOrEmpty (response)) {
-                    ShareData (string.Format ("{0}{1}", SERVER, response));
+                    ShareData (destinationPath);
                 }
             };
 
-            Uri fileUri = new Uri (String.Format (
-                "{0}/api/{1}/{2}",
-                SERVER,
-                secretValue,
-                UrlHelper.GetFileName (filePath)
-            )
-            );
+            Uri fileUri = new Uri (SERVER + destinationPath);
             client.UploadDataAsync (fileUri, "POST", fileByteArray);
         }
 
