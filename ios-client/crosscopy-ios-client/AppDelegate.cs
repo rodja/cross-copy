@@ -39,15 +39,15 @@ namespace CrossCopy.iOSClient
                 1.0f
             );
         static UIColor lightTextColor = new UIColor (
-                163 / 255.0f,
-                163 / 255.0f,
-                163 / 255.0f,
+                115 / 255.0f,
+                115 / 255.0f,
+                115 / 255.0f,
                 1.0f
             );
         static UIColor darkTextColor = new UIColor (
-                102 / 255.0f,
-                102 / 255.0f,
-                102 / 255.0f,
+                80 / 255.0f,
+                80 / 255.0f,
+                80 / 255.0f,
                 1.0f
             );
         static UIImagePickerController imagePicker;
@@ -166,23 +166,23 @@ namespace CrossCopy.iOSClient
                 UITextAlignment.Center,
                 UIColor.Black
             );
-            var subcaptionLabel = UIHelper.CreateLabel (
-                "Open this App or cross-copy.net on different devices and choose the same secret. " + 
-                "You can then transfer stuff between them without any further setup.",
+            UILabel subcaptionLabel = UIHelper.CreateLabel (
+                "Open this App or the page www.cross-copy.net on different devices and choose the same secret. " + 
+                "You can then transfer messages and files between them without any further setup.",
                 false,
-                13,
-                39,
+                15,
+                85,
                 UITextAlignment.Center,
                 lightTextColor
             );
-            
-            var root = new RootElement ("CrossCopy") 
+
+            var root = new RootElement ("secrets") 
             {
-                new Section (captionLabel, subcaptionLabel),
+                new Section (captionLabel,subcaptionLabel),
                 (secretsSection = new Section ()),
                 new Section () 
                 {
-                    (secretEntry = new AdvancedEntryElement (" ", "pick another secret", "", 
+                    (secretEntry = new AdvancedEntryElement (" ", "choose new secret", "", 
                                                                        delegate { 
                                                                         secretValue = secretEntry.Value; 
                                                                         Listen(); }))
@@ -543,17 +543,17 @@ namespace CrossCopy.iOSClient
             var subRoot = new RootElement (s.Phrase) 
             {
                 new Section () {
-                    (pickPhoto = new StyledStringElement ("Pick a photo", delegate { ShowImagePicker(); }))
+                    (pickPhoto = new StyledStringElement ("Share Photo", delegate { ShowImagePicker(); }))
                 },
                 new Section () {
-                    (dataEntry = new AdvancedEntryElement (" ", "enter message", "", delegate {}))
+                    (dataEntry = new AdvancedEntryElement (" ", "... or type a message", "", delegate {}))
                 },
                 (entriesSection = new Section ())
             };
 
             pickPhoto.Alignment = UITextAlignment.Center;
-            pickPhoto.BackgroundColor = lightTextColor;
-            pickPhoto.TextColor = darkTextColor;
+            pickPhoto.BackgroundColor = UIColor.LightGray;
+            pickPhoto.TextColor = UIColor.Black;
 
             dataEntry.ShouldReturn += delegate {
                 UIApplication.SharedApplication.InvokeOnMainThread (delegate {
