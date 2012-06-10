@@ -177,10 +177,10 @@ namespace CrossCopy.iOSClient
             );
             captionLabel.Frame = new Rectangle(0,10,320,40);
             subcaptionLabel.Frame = new Rectangle(20,55,280,100);
-            UIView header = new UIView(new Rectangle(00,0,300,130));
+            UIView header = new UIView(new Rectangle(00,0,300,145));
             header.AddSubviews(captionLabel, subcaptionLabel);
 
-            var root = new RootElement ("secrets") 
+            var root = new RootElement ("Secrets") 
             {
                 new Section (header),
                 (secretsSection = new Section ()),
@@ -546,19 +546,14 @@ namespace CrossCopy.iOSClient
         {
             var subRoot = new RootElement (s.Phrase) 
             {
-                new Section () {
-                    (pickPhoto = new StyledStringElement ("Share Photo", delegate { ShowImagePicker(); }))
-                },
-                new Section () {
+                new Section ("Share") {
+                    (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
                     (dataEntry = new AdvancedEntryElement (" ", "... or type a message", "", delegate {}))
                 },
-                (entriesSection = new Section ())
+                (entriesSection = new Section ("History"))
             };
 
-            pickPhoto.Alignment = UITextAlignment.Center;
-            pickPhoto.BackgroundColor = UIColor.LightGray;
-            pickPhoto.TextColor = UIColor.Black;
-
+            pickPhoto.Accessory = UITableViewCellAccessory.DisclosureIndicator;
             dataEntry.ShouldReturn += delegate {
                 UIApplication.SharedApplication.InvokeOnMainThread (delegate {
                     dataEntry.GetContainerTableView ().EndEditing (true);
