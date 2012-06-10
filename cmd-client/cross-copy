@@ -76,8 +76,11 @@ if [ $# == 1 ]; then
   fi
 
 elif [ $# == 2 ]; then
-  PATE=$2
-  [ -f "$2" ] && curl -q -F "file=@$2" "http://www.cross-copy.net/api/$1/$2" > /dev/null && PASTE="/api/$1/$2"
+  PASTE=$2
+  FILE=$(basename "$2")
+  [ -f "$2" ] && curl -q -F "file=@$2" "$SERVER/api/$1/$FILE" > /dev/null && PASTE="/api/$1/$FILE"
+  echo $PASTE
+  
   DELIVERIES=`curl -X PUT -s -d "$PASTE" "$SERVER/api/$1$JSON$PARAMETERS"`
   echo "$DELIVERIES direct deliveries"
   [[ $DELIVERIES == 0 ]] && echo "(you should wait for data on the other device while sending somthing)"
