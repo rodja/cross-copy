@@ -175,10 +175,17 @@ namespace CrossCopy.iOSClient
                 UITextAlignment.Center,
                 lightTextColor
             );
-            captionLabel.Frame = new Rectangle(0,10,320,40);
-            subcaptionLabel.Frame = new Rectangle(20,55,280,100);
-            UIView header = new UIView(new Rectangle(00,0,300,145));
-            header.AddSubviews(captionLabel, subcaptionLabel);
+
+
+            captionLabel.Frame = new Rectangle (0, 10, 320, 40);
+            subcaptionLabel.Frame = new Rectangle (20, 55, 280, 100);
+            UIView header = new UIView (new Rectangle (
+                00,
+                0,
+                300,
+                (AppDelegate.HistoryData.Secrets.Count == 0) ? 130 : 145
+            ));
+            header.AddSubviews (captionLabel, subcaptionLabel);
 
             var root = new RootElement ("Secrets") 
             {
@@ -186,7 +193,7 @@ namespace CrossCopy.iOSClient
                 (secretsSection = new Section ()),
                 new Section () 
                 {
-                    (secretEntry = new AdvancedEntryElement (" ", "choose new secret", "", 
+                    (secretEntry = new AdvancedEntryElement ("New", "enter secret", "", 
                                                                        delegate { 
                                                                         secretValue = secretEntry.Value; 
                                                                         Listen(); }))
@@ -210,6 +217,9 @@ namespace CrossCopy.iOSClient
 
                 return true;
             };
+            secretEntry.ReturnKeyType = UIReturnKeyType.Go;
+            if (secretsSection.Count == 0)
+                secretEntry.BecomeFirstResponder (true);
             
             return root;
         }
@@ -559,7 +569,7 @@ namespace CrossCopy.iOSClient
                 }
                 );
                 
-                ShareData (dataEntry.Value.Trim());
+                ShareData (dataEntry.Value.Trim ());
                 
                 return true;
             };
