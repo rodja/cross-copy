@@ -167,18 +167,22 @@ namespace CrossCopy.iOSClient
                 UIColor.Black
             );
             UILabel subcaptionLabel = UIHelper.CreateLabel (
-                "Open this App or the page www.cross-copy.net on different devices and choose the same secret. " + 
+                "Open this App or http://cross-copy.net on different devices and choose the same secret. " + 
                 "You can then transfer messages and files between them without any further setup.",
                 false,
-                15,
+                14,
                 85,
                 UITextAlignment.Center,
                 lightTextColor
             );
+            captionLabel.Frame = new Rectangle(0,10,320,40);
+            subcaptionLabel.Frame = new Rectangle(20,55,280,100);
+            UIView header = new UIView(new Rectangle(00,0,300,130));
+            header.AddSubviews(captionLabel, subcaptionLabel);
 
             var root = new RootElement ("secrets") 
             {
-                new Section (captionLabel,subcaptionLabel),
+                new Section (header),
                 (secretsSection = new Section ()),
                 new Section () 
                 {

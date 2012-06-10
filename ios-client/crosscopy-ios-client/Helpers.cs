@@ -22,7 +22,7 @@ namespace CrossCopy.iOSClient.Helpers
 	{
 		public static UILabel CreateLabel (string text, UIFont font, int fontSize, int labelSize, UITextAlignment alignment, UIColor textColor, UIColor backgroundColor)
 		{
-			var label = new UILabel (new Rectangle(0,20,300,0));
+			var label = new UILabel (new Rectangle(0,20,300,100));
 	        label.Lines = 0;
             label.LineBreakMode = UILineBreakMode.WordWrap;
 	        label.Font = font;
@@ -30,8 +30,7 @@ namespace CrossCopy.iOSClient.Helpers
 	        label.TextAlignment = alignment;
 			label.TextColor = textColor;
 	        label.BackgroundColor = backgroundColor;
-            label.SizeToFit();
-			return label;
+            return label;
 		}
 		
 		public static UILabel CreateLabel (string text, bool bold, int fontSize, int labelSize, UITextAlignment alignment, UIColor textColor)
