@@ -179,21 +179,16 @@ namespace CrossCopy.iOSClient
 
             captionLabel.Frame = new Rectangle (0, 10, 320, 40);
             subcaptionLabel.Frame = new Rectangle (20, 55, 280, 100);
-            UIView header = new UIView (new Rectangle (
-                00,
-                0,
-                300,
-                (AppDelegate.HistoryData.Secrets.Count == 0) ? 130 : 145
-            ));
+            UIView header = new UIView (new Rectangle (0, 0, 300, 145));
             header.AddSubviews (captionLabel, subcaptionLabel);
 
             var root = new RootElement ("Secrets") 
             {
                 new Section (header),
-                (secretsSection = new Section ()),
+                (secretsSection = new Section ("Secrets")),
                 new Section () 
                 {
-                    (secretEntry = new AdvancedEntryElement ("New", "enter secret", "", 
+                    (secretEntry = new AdvancedEntryElement ("Secret", "enter new phrase", "", 
                                                                        delegate { 
                                                                         secretValue = secretEntry.Value; 
                                                                         Listen(); }))
@@ -206,6 +201,10 @@ namespace CrossCopy.iOSClient
             secretEntry.ShouldReturn += delegate {
                 var newSecret = new Secret (secretEntry.Value);
                 AppDelegate.HistoryData.Secrets.Add (newSecret);
+
+                if (root.Count == 2)
+                    root.Insert (1, secretsSection);
+
                 secretsSection.Insert (
                     secretsSection.Elements.Count,
                     UITableViewRowAnimation.Fade,
@@ -218,9 +217,10 @@ namespace CrossCopy.iOSClient
                 return true;
             };
             secretEntry.ReturnKeyType = UIReturnKeyType.Go;
-            if (secretsSection.Count == 0)
+            if (secretsSection.Count == 0) {
                 secretEntry.BecomeFirstResponder (true);
-            
+                root.RemoveAt (1);
+            }
             return root;
         }
         
@@ -547,6 +547,8 @@ namespace CrossCopy.iOSClient
                         
                 if (found != null) {
                     secretsSection.Remove (found);
+                    if (secretsSection.Count == 0)
+                        (secretsSection.Parent as RootElement).RemoveAt(1);
                 }
             }
             );
