@@ -11,6 +11,8 @@ namespace CrossCopy.iOSClient.UI
     {
         UIImage backgroundImage;
         UIColor backgroundColor;
+
+        public event EventHandler ViewLoaded;
         
         public StyledDialogViewController (RootElement root, UIImage image, UIColor color) 
             : base (root)
@@ -31,9 +33,15 @@ namespace CrossCopy.iOSClient.UI
             base.ViewWillAppear (animated);
             if (HidesBottomBarWhenPushed) {
                 if (this.NavigationController != null) {
-                    this.NavigationController.SetNavigationBarHidden (true, true);
+                    this.NavigationController.SetNavigationBarHidden (
+                        true,
+                        true
+                    );
                 } else {
-                    this.NavigationController.SetNavigationBarHidden (false, true);
+                    this.NavigationController.SetNavigationBarHidden (
+                        false,
+                        true
+                    );
                 }
             }
         }
@@ -62,10 +70,14 @@ namespace CrossCopy.iOSClient.UI
             
             UITapGestureRecognizer tapGesture = new UITapGestureRecognizer (
                 this,
-                new MonoTouch.ObjCRuntime.Selector("ViewTappedSelector:")
+                new MonoTouch.ObjCRuntime.Selector ("ViewTappedSelector:")
             );
             tapGesture.CancelsTouchesInView = false;
             this.TableView.AddGestureRecognizer (tapGesture);
+
+            if (ViewLoaded != null) {
+                ViewLoaded (this, new EventArgs ());
+            }
         }
         
         [Export( "ViewTappedSelector:" )]
@@ -105,6 +117,91 @@ namespace CrossCopy.iOSClient.UI
             }
         }
     }
+
+    public class ImageButtonStringElement : StringElement
+    {
+        static NSString skey = new NSString ("ImageButtonStringElement");
+
+        public event NSAction ButtonTapped;
+
+        string buttonImage;
+        UIButton button;
+        UIImage image;
+
+        public object Data { get; set; }
+        
+        public UITableViewCellAccessory Accessory { get; set; }
+        
+        public ImageButtonStringElement (string caption, object data, string btnImage, NSAction buttonTapped) 
+            : base (caption)
+        {
+            InitElement (data, btnImage, buttonTapped);
+        }
+
+        public ImageButtonStringElement (string caption, string value, object data, string btnImage, NSAction buttonTapped) 
+            : base (caption, value)
+        {
+            InitElement (data, btnImage, buttonTapped);
+        }
+        
+        public ImageButtonStringElement (string caption, object data, string btnImage, NSAction tapped, NSAction buttonTapped) 
+            : base (caption, tapped)
+        {
+            InitElement (data, btnImage, buttonTapped);
+        }
+        
+        private void InitElement (object data, string btnImage, NSAction buttonTapped)
+        {
+            Data = data;
+            image = UIImage.FromFile (btnImage);
+            buttonImage = btnImage;
+            ButtonTapped += buttonTapped;
+            button = UIHelper.CreateImageButton (buttonImage, 0f, 0f, 25f, 25f);
+            button.TouchDown += HandleTouchDown;
+            this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+        }
+        
+        protected override NSString CellKey {
+            get {
+                return skey;
+            }
+        }
+
+        public override UITableViewCell GetCell (UITableView tv)
+        {
+            var cell = tv.DequeueReusableCell (CellKey);
+            if (cell == null) {
+                cell = new UITableViewCell (
+                    Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle,
+                    CellKey
+                );
+                cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+            }
+            
+            cell.Accessory = Accessory;
+            cell.TextLabel.Text = Caption;
+            cell.TextLabel.TextAlignment = Alignment;
+            
+            cell.ImageView.Image = image;
+            cell.ImageView.UserInteractionEnabled = true;
+            cell.ImageView.AddSubview (button);
+            cell.ImageView.BringSubviewToFront (button);
+                                    
+            if (cell.DetailTextLabel != null) {
+                cell.DetailTextLabel.Text = Value == null ? "" : Value;
+            }
+            
+            return cell;
+        }
+        
+        void HandleTouchDown (object sender, EventArgs e)
+        {
+            if (ButtonTapped != null) {
+                ButtonTapped ();
+            }
+        }
+        
+    }
     
     public class AdvancedEntryElement : EntryElement
     {
@@ -117,12 +214,19 @@ namespace CrossCopy.iOSClient.UI
 
         public event NSAction TextChanged;
         
-        public AdvancedEntryElement (string caption, string placeholder, string value, NSAction textChanged) 
+        public AdvancedEntryElement (string caption, string placeholder, string value, NSAction textChanged = null) 
             : base(caption, placeholder, value)
         {
             TextChanged += textChanged;
         }
-        
+
+        public override UITableViewCell GetCell (UITableView tv)
+        {
+            UITableViewCell cell = base.GetCell (tv);
+            cell.BackgroundColor = UIColor.White; 
+            return cell;
+        }
+
         protected override UITextField CreateTextField (RectangleF frame)
         {
             UITextField tf = base.CreateTextField (frame);
@@ -254,7 +358,12 @@ namespace CrossCopy.iOSClient.UI
                 Title = title; 
             
                 activityView = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.WhiteLarge); 
-                activityView.Frame = new System.Drawing.RectangleF (122, 50, 40, 40); 
+                activityView.Frame = new System.Drawing.RectangleF (
+                    122,
+                    50,
+                    40,
+                    40
+                ); 
                 AddSubview (activityView); 
                 activityView.StartAnimating (); 
                 Show ();

@@ -36,6 +36,7 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var ce = require('cloneextend');
+var mime = require('mime');
 
 // using a fork of formidable be make octstream parsing possible
 var formidable = require('./scriby-node-formidable-19219c8');
@@ -170,7 +171,7 @@ server = http.createServer(function (req, res) {
           track("get-file-500");
           res.end();
         } else {
-          res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+          res.writeHead(200, { 'Content-Type': mime.lookup(pathname) });
           res.end(content, 'binary');
           track("get-file-200");
         }
