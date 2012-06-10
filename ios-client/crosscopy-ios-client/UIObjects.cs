@@ -214,12 +214,19 @@ namespace CrossCopy.iOSClient.UI
 
         public event NSAction TextChanged;
         
-        public AdvancedEntryElement (string caption, string placeholder, string value, NSAction textChanged) 
+        public AdvancedEntryElement (string caption, string placeholder, string value, NSAction textChanged = null) 
             : base(caption, placeholder, value)
         {
             TextChanged += textChanged;
         }
-        
+
+        public override UITableViewCell GetCell (UITableView tv)
+        {
+            UITableViewCell cell = base.GetCell (tv);
+            cell.BackgroundColor = UIColor.White; 
+            return cell;
+        }
+
         protected override UITextField CreateTextField (RectangleF frame)
         {
             UITextField tf = base.CreateTextField (frame);

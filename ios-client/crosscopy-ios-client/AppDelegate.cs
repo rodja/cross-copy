@@ -548,8 +548,7 @@ namespace CrossCopy.iOSClient
             {
                 new Section ("Share") {
                     (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
-                    (dataEntry = new AdvancedEntryElement (" ", "... or type a message", "", delegate {}))
-                },
+                    (dataEntry = new AdvancedEntryElement ("Text", "your message", null))},
                 (entriesSection = new Section ("History"))
             };
 
@@ -560,10 +559,12 @@ namespace CrossCopy.iOSClient
                 }
                 );
                 
-                ShareData (dataEntry.Value);
+                ShareData (dataEntry.Value.Trim());
                 
                 return true;
             };
+            dataEntry.ReturnKeyType = UIReturnKeyType.Send;
+
 
             entriesSection.Elements.AddRange (
                 from d in s.DataItems
