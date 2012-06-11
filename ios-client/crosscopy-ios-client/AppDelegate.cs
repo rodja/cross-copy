@@ -25,12 +25,6 @@ namespace CrossCopy.iOSClient
     public partial class AppDelegate : UIApplicationDelegate
     {
         #region Constants
-        const string SERVER = @"http://www.cross-copy.net";
-        const string API = @"/api/{0}";
-        static string DeviceID = string.Format (
-                "?device_id={0}",
-                Guid.NewGuid ()
-            );
         static string BaseDir = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
         static UIImage imgDownload = UIImage.FromFile ("Images/download.png");
         static UIImage imgUpload = UIImage.FromFile ("Images/upload.png");
@@ -189,10 +183,9 @@ namespace CrossCopy.iOSClient
         {
             Element element;
 
-            string apiUrl = string.Format (API, secretValue);
-            if (item.Data.IndexOf (apiUrl) != -1) {
+            if (item.Data.StartsWith (server.CurrentPath)) {
                 var dataElement = new DataImageStringElement (
-                    Path.GetFileName (item.Data.Substring (apiUrl.Length + 1)),
+                    Path.GetFileName (item.Data),
                     (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
                     item.Data
                 );
@@ -202,7 +195,7 @@ namespace CrossCopy.iOSClient
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
                 if (item.Direction == DataItemDirection.In) {
                     dataElement.Animating = true;
-                    Server.DownloadFileAsync (SERVER + dataElement.Data, Path.Combine (
+                    Server.DownloadFileAsync (dataElement.Data, Path.Combine (
                         BaseDir,
                         dataElement.Caption
                     ), delegate {

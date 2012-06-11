@@ -41,8 +41,12 @@ namespace CrossCopy.Api
                     Listen ();
                     return;
                 }
-                DataItem item = new DataItem(e.Result, DataItemDirection.In, DateTime.Now);
-                TransferEvent(this, new TransferEventArgs(item));
+                DataItem item = new DataItem (
+                    e.Result,
+                    DataItemDirection.In,
+                    DateTime.Now
+                );
+                TransferEvent (this, new TransferEventArgs (item));
                 Listen ();
             };
 
@@ -63,7 +67,8 @@ namespace CrossCopy.Api
                     JsonObject.Parse (e.Result) ["data"],
                     DataItemDirection.Out,
                     DateTime.Now
-                ))
+                )
+                )
                 );
             };
 
@@ -73,6 +78,8 @@ namespace CrossCopy.Api
         public event TransferEventHandler TransferEvent;
 
         public string secretValue{ get; set; }
+
+        public string CurrentPath { get { return "/api/" + secretValue; } }
 
         public void Listen ()
         {
@@ -152,7 +159,7 @@ namespace CrossCopy.Api
 
         public static void DownloadFileAsync (string remoteFilePath, string localFilePath, EventDelegate dwnldCompletedDelegate)
         {
-            var url = new Uri (remoteFilePath);
+            var url = new Uri (SERVER + remoteFilePath);
             var webClient = new WebClient ();
             webClient.DownloadDataCompleted += (s, e) => {
                 var bytes = e.Result; 
