@@ -3,20 +3,70 @@ using System.Net;
 using System.Net.Cache;
 using System.IO;
 using System.Text;
+using System.Json;
 
+
+using CrossCopy.iOSClient.BL;
 
 namespace CrossCopy.Api
 {
     public class Server
     {
+        public delegate void TransferEventHandler(object sender, EventArgs e);
         public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
         public delegate void StatusChanged ();
 
+        const string SERVER = @"http://www.cross-copy.net";
+        const string API = @"/api/{0}";
+        static string DeviceID = string.Format (
+                "?device_id={0}",
+                Guid.NewGuid ()
+            );
+
+        WebClient shareClient = new WebClient ();
+        
         public Server ()
         {
+            shareClient.UploadStringCompleted += (sender, e) => {
+                if (e.Cancelled || String.IsNullOrWhiteSpace (e.Result))
+                    return;
+                if (e.Error != null) {
+                    Console.Out.WriteLine (
+                        "Error sharing data: {0}",
+                        e.Error.Message
+                    );
+                    return;
+                }
+
+                TransferEvent(this, new TransferEventArgs(new DataItem(JsonObject.Parse (e.Result) ["data"], DataItemDirection.Out, DateTime.Now)));
+            };
+
+        
         }
 
+        public event TransferEventHandler TransferEvent;
+
         public string secretValue{get;set;}
+
+         public void ShareData (string dataToShare)
+        {
+            if (String.IsNullOrEmpty (secretValue))
+                return;
+
+            shareClient.UploadStringAsync (
+                new Uri (String.Format (
+                "{0}/api/{1}.json{2}",
+                SERVER,
+                secretValue,
+                DeviceID
+            )
+            ),
+                "PUT",
+                dataToShare
+            );
+    
+        }
+
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
         {
@@ -72,5 +122,12 @@ namespace CrossCopy.Api
         }
     }
 
+    public class TransferEventArgs : EventArgs {
+        public TransferEventArgs(DataItem data){
+            Data = data;
+        }
+
+        public DataItem Data{get; set; }
+    }
 }
 

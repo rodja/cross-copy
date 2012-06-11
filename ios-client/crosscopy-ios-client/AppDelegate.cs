@@ -64,7 +64,6 @@ namespace CrossCopy.iOSClient
         Section secretsSection, entriesSection;
         Secret currentSecret;
         string secretValue = string.Empty;
-        WebClient shareClient = new WebClient ();
         WebClient receiveClient = new WebClient ();
         Server server = new Server ();
         List<string> selectedFilePathArray;
@@ -122,22 +121,7 @@ namespace CrossCopy.iOSClient
                 Listen ();
             };
             
-            shareClient.UploadStringCompleted += (sender, e) => {
-                if (e.Cancelled || String.IsNullOrWhiteSpace (e.Result))
-                    return;
-                if (e.Error != null) {
-                    Console.Out.WriteLine (
-                        "Error sharing data: {0}",
-                        e.Error.Message
-                    );
-                    return;
-                }
 
-                PasteData (
-                    JsonObject.Parse (e.Result) ["data"],
-                    DataItemDirection.Out
-                );
-            };
 
             Listen ();
             
@@ -295,25 +279,7 @@ namespace CrossCopy.iOSClient
             );
         }
         
-        private void ShareData (string dataToShare)
-        {
-            if (String.IsNullOrEmpty (secretValue))
-                return;
-
-            shareClient.UploadStringAsync (
-                new Uri (String.Format (
-                "{0}/api/{1}.json{2}",
-                SERVER,
-                secretValue,
-                DeviceID
-            )
-            ),
-                "PUT",
-                dataToShare
-            );
-    
-        }
-
+       
         private void OpenFile (string fileName)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
@@ -481,7 +447,7 @@ namespace CrossCopy.iOSClient
                 }
                 );
                 
-                ShareData (dataEntry.Value.Trim ());
+                server.ShareData (dataEntry.Value.Trim ());
                 
                 return true;
             };
