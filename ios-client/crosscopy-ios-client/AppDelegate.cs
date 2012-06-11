@@ -480,6 +480,7 @@ namespace CrossCopy.iOSClient
             navigation.PushViewController (dvc, true);
 
             secretValue = s.Phrase;
+            server.secretValue = secretValue;
             currentSecret = s;
             Listen ();
         }
