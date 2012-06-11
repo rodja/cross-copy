@@ -12,7 +12,7 @@ namespace CrossCopy.Api
 {
     public class Server
     {
-        public delegate void TransferEventHandler(object sender, EventArgs e);
+        public delegate void TransferEventHandler(object sender, TransferEventArgs e);
         public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
         public delegate void StatusChanged ();
 

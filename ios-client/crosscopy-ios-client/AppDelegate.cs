@@ -121,7 +121,7 @@ namespace CrossCopy.iOSClient
                 Listen ();
             };
             
-
+            server.TransferEvent += (sender, e) => { Paste (e.Data); };
 
             Listen ();
             
@@ -271,12 +271,16 @@ namespace CrossCopy.iOSClient
 
         private void PasteData (string data, DataItemDirection direction)
         {
-            UIApplication.SharedApplication.InvokeOnMainThread (delegate { 
-                DataItem item = new DataItem (data, direction, DateTime.Now);
+            DataItem item = new DataItem (data, direction, DateTime.Now);
+            Paste(item);                
+        }
+
+        private void Paste(DataItem item){
+                 UIApplication.SharedApplication.InvokeOnMainThread (delegate { 
                 currentSecret.DataItems.Insert (0, item);
                 entriesSection.Insert (0, CreateDataItemElement (item));
-            }
-            );
+            });
+
         }
         
        
