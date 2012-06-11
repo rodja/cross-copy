@@ -46,12 +46,6 @@ namespace CrossCopy.iOSClient
                 115 / 255.0f,
                 1.0f
             );
-        static UIColor darkTextColor = new UIColor (
-                80 / 255.0f,
-                80 / 255.0f,
-                80 / 255.0f,
-                1.0f
-            );
         static UIImagePickerController imagePicker;
         static MPMoviePlayerController moviePlayer;
         #endregion
@@ -64,7 +58,6 @@ namespace CrossCopy.iOSClient
         Section secretsSection, entriesSection;
         Secret currentSecret;
         string secretValue = string.Empty;
-        WebClient receiveClient = new WebClient ();
         Server server = new Server ();
         List<string> selectedFilePathArray;
         #endregion
@@ -105,26 +98,10 @@ namespace CrossCopy.iOSClient
             
             window.RootViewController = navigation;
             
-            receiveClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
-            receiveClient.DownloadStringCompleted += (sender, e) => { 
-                if (e.Cancelled)
-                    return;
-                if (e.Error != null) {
-                    Console.Out.WriteLine (
-                        "Error fetching data: {0}",
-                        e.Error.Message
-                    );
-                    Listen ();
-                    return;
-                }
-                PasteData (e.Result, DataItemDirection.In);
-                Listen ();
-            };
-            
             server.TransferEvent += (sender, e) => {
                 Paste (e.Data); };
 
-            Listen ();
+            server.Listen ();
             
             return true;
         }
@@ -175,11 +152,7 @@ namespace CrossCopy.iOSClient
                 (secretsSection = new Section ("Secrets")),
                 new Section () 
                 {
-                    (secretEntry = new AdvancedEntryElement ("Secret", "enter new phrase", "", 
-                                                                       delegate { 
-                                                                        secretValue = secretEntry.Value;
-                                                                        server.secretValue = secretValue;
-                                                                        Listen(); }))
+                    (secretEntry = new AdvancedEntryElement ("Secret", "enter new phrase", "", null))
                 }
             };
             
@@ -210,22 +183,6 @@ namespace CrossCopy.iOSClient
                 root.RemoveAt (1);
             }
             return root;
-        }
-        
-        private void Listen ()
-        {
-            if (String.IsNullOrEmpty (secretValue))
-                return;
-            Console.Out.WriteLine ("Listen for secret: {0}", secretValue);
-            receiveClient.CancelAsync ();
-            receiveClient.DownloadStringAsync (new Uri (String.Format (
-                "{0}/api/{1}{2}",
-                SERVER,
-                secretValue,
-                DeviceID
-            )
-            )
-            );
         }
 
         private Element CreateDataItemElement (DataItem item)
@@ -482,7 +439,7 @@ namespace CrossCopy.iOSClient
             secretValue = s.Phrase;
             server.secretValue = secretValue;
             currentSecret = s;
-            Listen ();
+            server.Listen ();
         }
         #endregion
     }

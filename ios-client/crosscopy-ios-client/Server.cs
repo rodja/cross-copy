@@ -25,9 +25,27 @@ namespace CrossCopy.Api
                 Guid.NewGuid ()
             );
         WebClient shareClient = new WebClient ();
+        WebClient receiveClient = new WebClient ();
         
         public Server ()
         {
+            receiveClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
+            receiveClient.DownloadStringCompleted += (sender, e) => { 
+                if (e.Cancelled)
+                    return;
+                if (e.Error != null) {
+                    Console.Out.WriteLine (
+                        "Error fetching data: {0}",
+                        e.Error.Message
+                    );
+                    Listen ();
+                    return;
+                }
+                DataItem item = new DataItem(e.Result, DataItemDirection.In, DateTime.Now);
+                TransferEvent(this, new TransferEventArgs(item));
+                Listen ();
+            };
+
             shareClient.UploadStringCompleted += (sender, e) => {
                 if (e.Cancelled || String.IsNullOrWhiteSpace (e.Result))
                     return;
@@ -41,7 +59,11 @@ namespace CrossCopy.Api
 
                 TransferEvent (
                     this,
-                    new TransferEventArgs(new DataItem(JsonObject.Parse (e.Result) ["data"], DataItemDirection.Out, DateTime.Now))
+                    new TransferEventArgs (new DataItem (
+                    JsonObject.Parse (e.Result) ["data"],
+                    DataItemDirection.Out,
+                    DateTime.Now
+                ))
                 );
             };
 
@@ -51,6 +73,22 @@ namespace CrossCopy.Api
         public event TransferEventHandler TransferEvent;
 
         public string secretValue{ get; set; }
+
+        public void Listen ()
+        {
+            if (String.IsNullOrEmpty (secretValue))
+                return;
+            Console.Out.WriteLine ("Listen for secret: {0}", secretValue);
+            receiveClient.CancelAsync ();
+            receiveClient.DownloadStringAsync (new Uri (String.Format (
+                "{0}/api/{1}{2}",
+                SERVER,
+                secretValue,
+                DeviceID
+            )
+            )
+            );
+        }
 
         public void ShareData (string dataToShare)
         {
