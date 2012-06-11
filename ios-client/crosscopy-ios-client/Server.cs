@@ -12,8 +12,10 @@ namespace CrossCopy.Api
 {
     public class Server
     {
-        public delegate void TransferEventHandler(object sender, TransferEventArgs e);
+        public delegate void TransferEventHandler (object sender,TransferEventArgs e);
+
         public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
+
         public delegate void StatusChanged ();
 
         const string SERVER = @"http://www.cross-copy.net";
@@ -22,7 +24,6 @@ namespace CrossCopy.Api
                 "?device_id={0}",
                 Guid.NewGuid ()
             );
-
         WebClient shareClient = new WebClient ();
         
         public Server ()
@@ -38,7 +39,10 @@ namespace CrossCopy.Api
                     return;
                 }
 
-                TransferEvent(this, new TransferEventArgs(new DataItem(JsonObject.Parse (e.Result) ["data"], DataItemDirection.Out, DateTime.Now)));
+                TransferEvent (
+                    this,
+                    new TransferEventArgs(new DataItem(JsonObject.Parse (e.Result) ["data"], DataItemDirection.Out, DateTime.Now))
+                );
             };
 
         
@@ -46,9 +50,9 @@ namespace CrossCopy.Api
 
         public event TransferEventHandler TransferEvent;
 
-        public string secretValue{get;set;}
+        public string secretValue{ get; set; }
 
-         public void ShareData (string dataToShare)
+        public void ShareData (string dataToShare)
         {
             if (String.IsNullOrEmpty (secretValue))
                 return;
@@ -67,7 +71,6 @@ namespace CrossCopy.Api
     
         }
 
-
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
         {
             if (String.IsNullOrEmpty (secretValue))
@@ -83,7 +86,7 @@ namespace CrossCopy.Api
             client.Headers ["content-type"] = "application/octet-stream";
             client.Encoding = Encoding.UTF8;
             client.UploadDataCompleted += (sender, e) => {
-                downloadCompleted();
+                downloadCompleted ();
 
                 if (e.Cancelled) {
                     Console.Out.WriteLine ("Upload file cancelled.");
@@ -122,12 +125,14 @@ namespace CrossCopy.Api
         }
     }
 
-    public class TransferEventArgs : EventArgs {
-        public TransferEventArgs(DataItem data){
+    public class TransferEventArgs : EventArgs
+    {
+        public TransferEventArgs (DataItem data)
+        {
             Data = data;
         }
 
-        public DataItem Data{get; set; }
+        public DataItem Data{ get; set; }
     }
 }
 

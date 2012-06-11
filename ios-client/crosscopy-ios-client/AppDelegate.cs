@@ -121,7 +121,8 @@ namespace CrossCopy.iOSClient
                 Listen ();
             };
             
-            server.TransferEvent += (sender, e) => { Paste (e.Data); };
+            server.TransferEvent += (sender, e) => {
+                Paste (e.Data); };
 
             Listen ();
             
@@ -272,17 +273,18 @@ namespace CrossCopy.iOSClient
         private void PasteData (string data, DataItemDirection direction)
         {
             DataItem item = new DataItem (data, direction, DateTime.Now);
-            Paste(item);                
+            Paste (item);                
         }
 
-        private void Paste(DataItem item){
-                 UIApplication.SharedApplication.InvokeOnMainThread (delegate { 
+        private void Paste (DataItem item)
+        {
+            UIApplication.SharedApplication.InvokeOnMainThread (delegate { 
                 currentSecret.DataItems.Insert (0, item);
                 entriesSection.Insert (0, CreateDataItemElement (item));
-            });
+            }
+            );
 
         }
-        
        
         private void OpenFile (string fileName)
         {
@@ -399,13 +401,15 @@ namespace CrossCopy.iOSClient
                 return;
             }
 
-              LoadingView loading = new LoadingView ();
+            LoadingView loading = new LoadingView ();
             loading.Show ("Uploading file, please wait ...");
              
             server.UploadFileAsync (
                 referenceUrl.AbsoluteString,
                 mediaByteArray,
-                delegate { loading.Hide (); }
+                delegate {
+                loading.Hide ();
+            }
             );
         }
 
