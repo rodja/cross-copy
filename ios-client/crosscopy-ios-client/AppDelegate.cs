@@ -17,6 +17,8 @@ using CrossCopy.iOSClient.UI;
 using CrossCopy.iOSClient.Helpers;
 using MonoTouch.MediaPlayer;
 
+using CrossCopy.Api;
+
 namespace CrossCopy.iOSClient
 {
     [Register ("AppDelegate")]
@@ -64,12 +66,12 @@ namespace CrossCopy.iOSClient
         string secretValue = string.Empty;
         WebClient shareClient = new WebClient ();
         WebClient receiveClient = new WebClient ();
+        Server server = new Server ();
         List<string> selectedFilePathArray;
         #endregion
         
         #region Public props
         public static History HistoryData { get; set; }
-        public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
         #endregion
 
         #region Methods
@@ -190,7 +192,8 @@ namespace CrossCopy.iOSClient
                 {
                     (secretEntry = new AdvancedEntryElement ("Secret", "enter new phrase", "", 
                                                                        delegate { 
-                                                                        secretValue = secretEntry.Value; 
+                                                                        secretValue = secretEntry.Value;
+                                                                        server.secretValue = secretValue;
                                                                         Listen(); }))
                 }
             };
@@ -257,7 +260,7 @@ namespace CrossCopy.iOSClient
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
                 if (item.Direction == DataItemDirection.In) {
                     dataElement.Animating = true;
-                    DownloadFileAsync (SERVER + dataElement.Data, Path.Combine (
+                    Server.DownloadFileAsync (SERVER + dataElement.Data, Path.Combine (
                         BaseDir,
                         dataElement.Caption
                     ), delegate {
@@ -309,61 +312,6 @@ namespace CrossCopy.iOSClient
                 dataToShare
             );
     
-        }
-
-        public void UploadFileAsync (string filePath, byte[] fileByteArray)
-        {
-            if (String.IsNullOrEmpty (secretValue))
-                return;
-
-            LoadingView loading = new LoadingView ();
-            loading.Show ("Uploading file, please wait ...");
-
-            string destinationPath = String.Format (
-                "/api/{0}/{1}",
-                secretValue,
-                UrlHelper.GetFileName (filePath)
-            );
-            WebClient client = new WebClient ();
-            client.Headers ["content-type"] = "application/octet-stream";
-            client.Encoding = Encoding.UTF8;
-            client.UploadDataCompleted += (sender, e) => {
-                loading.Hide ();
-
-                if (e.Cancelled) {
-                    Console.Out.WriteLine ("Upload file cancelled.");
-                    return;
-                }
-
-                if (e.Error != null) {
-                    Console.Out.WriteLine (
-                        "Error uploading file: {0}",
-                        e.Error.Message
-                    );
-                    return;
-                }
-
-                string response = System.Text.Encoding.UTF8.GetString (e.Result);
-
-                if (!String.IsNullOrEmpty (response)) {
-                    ShareData (destinationPath);
-                }
-            };
-
-            Uri fileUri = new Uri (SERVER + destinationPath);
-            client.UploadDataAsync (fileUri, "POST", fileByteArray);
-        }
-
-        public static void DownloadFileAsync (string remoteFilePath, string localFilePath, EventDelegate dwnldCompletedDelegate)
-        {
-            var url = new Uri (remoteFilePath);
-            var webClient = new WebClient ();
-            webClient.DownloadDataCompleted += (s, e) => {
-                var bytes = e.Result; 
-                File.WriteAllBytes (localFilePath, bytes);  
-            };
-            webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler (dwnldCompletedDelegate);
-            webClient.DownloadDataAsync (url);
         }
 
         private void OpenFile (string fileName)
@@ -480,8 +428,15 @@ namespace CrossCopy.iOSClient
                 Console.Out.WriteLine ("No media to upload!");
                 return;
             }
-            
-            UploadFileAsync (referenceUrl.AbsoluteString, mediaByteArray);
+
+              LoadingView loading = new LoadingView ();
+            loading.Show ("Uploading file, please wait ...");
+             
+            server.UploadFileAsync (
+                referenceUrl.AbsoluteString,
+                mediaByteArray,
+                delegate { loading.Hide (); }
+            );
         }
 
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
@@ -503,7 +458,7 @@ namespace CrossCopy.iOSClient
                 if (found != null) {
                     secretsSection.Remove (found);
                     if (secretsSection.Count == 0)
-                        (secretsSection.Parent as RootElement).RemoveAt(1);
+                        (secretsSection.Parent as RootElement).RemoveAt (1);
                 }
             }
             );

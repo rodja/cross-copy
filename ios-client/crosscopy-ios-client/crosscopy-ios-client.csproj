@@ -88,6 +88,8 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="BusinessObjects.cs" />
     <Compile Include="UIObjects.cs" />
+    <Compile Include="Server.cs" />
+    <Compile Include="ApiHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
