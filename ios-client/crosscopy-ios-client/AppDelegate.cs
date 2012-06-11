@@ -51,7 +51,6 @@ namespace CrossCopy.iOSClient
         StyledStringElement pickPhoto;
         Section secretsSection, entriesSection;
         Secret currentSecret;
-        string secretValue = string.Empty;
         Server server = new Server ();
         List<string> selectedFilePathArray;
         #endregion
@@ -82,9 +81,6 @@ namespace CrossCopy.iOSClient
                 Autorotate = true, 
                 HidesBottomBarWhenPushed = true
             };
-            dvc.ViewLoaded += delegate {
-                secretValue = string.Empty;
-            };
 
             navigation = new UINavigationController ();
             navigation.PushViewController (dvc, false);
@@ -95,8 +91,6 @@ namespace CrossCopy.iOSClient
             server.TransferEvent += (sender, e) => {
                 Paste (e.Data); };
 
-            server.Listen ();
-            
             return true;
         }
         
@@ -429,8 +423,7 @@ namespace CrossCopy.iOSClient
             navigation.SetNavigationBarHidden (false, true);
             navigation.PushViewController (dvc, true);
 
-            secretValue = s.Phrase;
-            server.secretValue = secretValue;
+            server.secretValue = s.Phrase;
             currentSecret = s;
             server.Listen ();
         }
