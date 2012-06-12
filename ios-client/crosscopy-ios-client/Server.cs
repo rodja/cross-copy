@@ -61,15 +61,9 @@ namespace CrossCopy.Api
                     return;
                 }
 
-                TransferEvent (
-                    this,
-                    new TransferEventArgs (new DataItem (
-                    JsonObject.Parse (e.Result) ["data"],
-                    DataItemDirection.Out,
-                    DateTime.Now
-                )
-                )
-                );
+                DateTime item = new DataItem (JsonObject.Parse (e.Result) ["data"],
+                    DataItemDirection.Out, DateTime.Now);
+                TransferEvent (this, new TransferEventArgs (item));
             };
 
         
@@ -87,14 +81,8 @@ namespace CrossCopy.Api
                 return;
             Console.Out.WriteLine ("Listen for secret: {0}", Secret);
             receiveClient.CancelAsync ();
-            receiveClient.DownloadStringAsync (new Uri (String.Format (
-                "{0}/api/{1}{2}",
-                SERVER,
-                Secret,
-                DeviceID
-            )
-            )
-            );
+            Uri uri = new Uri (String.Format ("{0}/api/{1}{2}", SERVER, Secret, DeviceID));
+            receiveClient.DownloadStringAsync (uri);
         }
 
         public void Send (string message)
@@ -103,16 +91,10 @@ namespace CrossCopy.Api
                 return;
 
             shareClient.UploadStringAsync (
-                new Uri (String.Format (
-                "{0}/api/{1}.json{2}",
-                SERVER,
-                Secret,
-                DeviceID
-            )
+                new Uri (String.Format ("{0}/api/{1}.json{2}",
+                SERVER, Secret, DeviceID)
             ),
-                "PUT",
-                message
-            );
+                "PUT", message);
     
         }
 
@@ -123,9 +105,7 @@ namespace CrossCopy.Api
 
           
             string destinationPath = String.Format (
-                "/api/{0}/{1}",
-                Secret,
-                UrlHelper.GetFileName (filePath)
+                "/api/{0}/{1}", Secret, UrlHelper.GetFileName (filePath)
             );
             WebClient client = new WebClient ();
             client.Headers ["content-type"] = "application/octet-stream";
