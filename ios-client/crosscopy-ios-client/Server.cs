@@ -77,54 +77,54 @@ namespace CrossCopy.Api
 
         public event TransferEventHandler TransferEvent;
 
-        public string secretValue{ get; set; }
+        public string Secret{ get; set; }
 
-        public string CurrentPath { get { return "/api/" + secretValue; } }
+        public string CurrentPath { get { return "/api/" + Secret; } }
 
         public void Listen ()
         {
-            if (String.IsNullOrEmpty (secretValue))
+            if (String.IsNullOrEmpty (Secret))
                 return;
-            Console.Out.WriteLine ("Listen for secret: {0}", secretValue);
+            Console.Out.WriteLine ("Listen for secret: {0}", Secret);
             receiveClient.CancelAsync ();
             receiveClient.DownloadStringAsync (new Uri (String.Format (
                 "{0}/api/{1}{2}",
                 SERVER,
-                secretValue,
+                Secret,
                 DeviceID
             )
             )
             );
         }
 
-        public void ShareData (string dataToShare)
+        public void Send (string message)
         {
-            if (String.IsNullOrEmpty (secretValue))
+            if (String.IsNullOrEmpty (Secret))
                 return;
 
             shareClient.UploadStringAsync (
                 new Uri (String.Format (
                 "{0}/api/{1}.json{2}",
                 SERVER,
-                secretValue,
+                Secret,
                 DeviceID
             )
             ),
                 "PUT",
-                dataToShare
+                message
             );
     
         }
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
         {
-            if (String.IsNullOrEmpty (secretValue))
+            if (String.IsNullOrEmpty (Secret))
                 return;
 
           
             string destinationPath = String.Format (
                 "/api/{0}/{1}",
-                secretValue,
+                Secret,
                 UrlHelper.GetFileName (filePath)
             );
             WebClient client = new WebClient ();
@@ -149,7 +149,7 @@ namespace CrossCopy.Api
                 string response = System.Text.Encoding.UTF8.GetString (e.Result);
 
                 if (!String.IsNullOrEmpty (response)) {
-                    ShareData (destinationPath);
+                    Send (destinationPath);
                 }
             };
 

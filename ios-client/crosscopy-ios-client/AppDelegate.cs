@@ -399,7 +399,7 @@ namespace CrossCopy.iOSClient
                 }
                 );
                 
-                server.ShareData (dataEntry.Value.Trim ());
+                server.Send (dataEntry.Value.Trim ());
                 
                 return true;
             };
@@ -423,7 +423,7 @@ namespace CrossCopy.iOSClient
             navigation.SetNavigationBarHidden (false, true);
             navigation.PushViewController (dvc, true);
 
-            server.secretValue = s.Phrase;
+            server.Secret = s.Phrase;
             currentSecret = s;
             server.Listen ();
         }
