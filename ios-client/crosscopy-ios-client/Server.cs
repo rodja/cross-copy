@@ -29,6 +29,7 @@ namespace CrossCopy.Api
         
         public Server ()
         {
+            CurrentSecret = null;
             receiveClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
             receiveClient.DownloadStringCompleted += (sender, e) => { 
                 if (e.Cancelled)
@@ -41,12 +42,13 @@ namespace CrossCopy.Api
                     Listen ();
                     return;
                 }
-                DataItem item = new DataItem (
-                    e.Result,
-                    DataItemDirection.In,
-                    DateTime.Now
-                );
-                TransferEvent (this, new TransferEventArgs (item));
+
+                JsonValue items = JsonArray.Parse(e.Result);
+                foreach (JsonValue i in items){
+                    DataItem item = new DataItem (i,
+                        DataItemDirection.In, DateTime.Now);
+                    TransferEvent (this, new TransferEventArgs (item));
+                }
                 Listen ();
             };
 
@@ -71,41 +73,42 @@ namespace CrossCopy.Api
 
         public event TransferEventHandler TransferEvent;
 
-        public string Secret{ get; set; }
+        public Secret CurrentSecret{ get; set; }
 
-        public string CurrentPath { get { return "/api/" + Secret; } }
+        public string CurrentPath { get { return "/api/" + CurrentSecret; } }
 
         public void Listen ()
         {
-            if (String.IsNullOrEmpty (Secret))
+            if (CurrentSecret == null)
                 return;
-            Console.Out.WriteLine ("Listen for secret: {0}", Secret);
+            Console.Out.WriteLine ("Listen for secret: {0}", CurrentSecret);
             receiveClient.CancelAsync ();
-            Uri uri = new Uri (String.Format ("{0}/api/{1}{2}", SERVER, Secret, DeviceID));
+            Uri uri = new Uri (String.Format ("{0}/api/{1}.json{2}", 
+                                              SERVER, CurrentSecret, DeviceID, "")
+            );
             receiveClient.DownloadStringAsync (uri);
         }
 
         public void Send (string message)
         {
-            if (String.IsNullOrEmpty (Secret))
+            if (CurrentSecret == null)
                 return;
 
             shareClient.UploadStringAsync (
                 new Uri (String.Format ("{0}/api/{1}.json{2}",
-                SERVER, Secret, DeviceID)
-            ),
-                "PUT", message);
+                SERVER, CurrentSecret, DeviceID)
+            ), "PUT", message);
     
         }
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
         {
-            if (String.IsNullOrEmpty (Secret))
+            if (CurrentSecret == null)
                 return;
 
           
             string destinationPath = String.Format (
-                "/api/{0}/{1}", Secret, UrlHelper.GetFileName (filePath)
+                "/api/{0}/{1}", CurrentSecret, UrlHelper.GetFileName (filePath)
             );
             WebClient client = new WebClient ();
             client.Headers ["content-type"] = "application/octet-stream";

@@ -423,7 +423,7 @@ namespace CrossCopy.iOSClient
             navigation.SetNavigationBarHidden (false, true);
             navigation.PushViewController (dvc, true);
 
-            server.Secret = s.Phrase;
+            server.CurrentSecret = s;
             currentSecret = s;
             server.Listen ();
         }
