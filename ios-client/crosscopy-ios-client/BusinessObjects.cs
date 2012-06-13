@@ -40,6 +40,13 @@ namespace CrossCopy.iOSClient.BL
         [XmlElement("dataitem")]
         public List<DataItem> DataItems { get; set; }
 
+        [XmlIgnore]
+        public string LatestId {
+            get {
+                return (DataItems.Count == 0) ? "" : DataItems [0].Id;
+            }
+        }
+
         public override string ToString ()
         {
             return Phrase;

@@ -83,7 +83,7 @@ namespace CrossCopy.Api
                 return;
             receiveClient.CancelAsync ();
             Uri uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
-                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.DataItems[0].Id)
+                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId)
             );
             receiveClient.DownloadStringAsync (uri);
         }

@@ -148,6 +148,10 @@ namespace CrossCopy.iOSClient
 
             secretEntry.AutocapitalizationType = UITextAutocapitalizationType.None;
             secretEntry.ShouldReturn += delegate {
+
+                if (String.IsNullOrEmpty(secretEntry.Value))
+                    return false;
+
                 var newSecret = new Secret (secretEntry.Value);
                 AppDelegate.HistoryData.Secrets.Add (newSecret);
 
