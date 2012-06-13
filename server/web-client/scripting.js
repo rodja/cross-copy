@@ -200,9 +200,11 @@ $(document).ready(function() {
 
   if (storage){
     var secrets = JSON.parse(storage.getItem('secrets'));
-    if (secrets != null && secrets.length > 0){
-      $('#secret').val(secrets[0]); 
-      onNewSecret();
+    if (secrets != null){
+      $.each(secrets, function(i,e){
+        console.log(e);
+        $("#secrets").append($('<li><a href="javascript:void(0)" onclick=\'onNewSecret("' + e + '");\'>' + decodeURI(e) + '</a></li>'));
+      });
     }
   }
 
@@ -212,8 +214,7 @@ $(document).ready(function() {
   $('#step-2 p').hide();
 
   $('#secret').keyup(function (e){
-    if (secret != encodeURI($('#secret').val()))
-      onNewSecret();
+      onNewSecret(encodeURI($('#secret').val()));
   });
 
   $('#data').keyup(function (e){
@@ -230,8 +231,11 @@ $(document).ready(function() {
   
 });
 
-function onNewSecret(){
-  secret = encodeURI($('#secret').val());
+function onNewSecret(s){
+  if (s === secret) return;
+  
+  console.log("new secret " + s);
+  secret = s
   showlocalHistory();
   listen();
   watch();
