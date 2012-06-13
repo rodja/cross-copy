@@ -79,8 +79,8 @@
                   share(response.url);
                 },
                 template: '<div class="qq-uploader">' + 
-                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
-                  '<div class="qq-upload-button"><img src="fileuploader/upload.png"</img></div>' +
+                '<div class="qq-upload-drop-area"><span>Drop files here</span></div>' +
+                  '<div class="qq-upload-button"><a href="#">pick</a>/drop a file: &nbsp; <img src="fileuploader/upload.png"</img></div>' +
                   '' + 
                 '</div><div class="qq-upload-progress"></div>',
                 listElement: " "
@@ -121,20 +121,23 @@
         
       <div id="session">
         <div  id="share">
+          <h2>Share</h2>
           <div id="upload"></div>
-          <h2>select or drop files</h2>
           <textarea name="data" id="data" rows="1" placeholder="or type text and press return"></textarea>
         </div>
-    
+        <br>
+        <h2>History</h2>
         <ul id="current"></ul>
+        <hr/>
         <ul id="history"></ul>
 
       </div> <!-- session -->
       
       <div id="secrets">
-     
+       <h2>Secrets</h2>
+        
         <ul>
-          <li><input name="secret" placeholder="enter secret" id="new-secret" type="text" size="30" placeholder=""></li>
+          <li><input name="secret" placeholder="add a secret" id="new-secret" type="text" size="30" placeholder=""></li>
           <li>einz</li>
           <li>zweii</li>
         </ul>

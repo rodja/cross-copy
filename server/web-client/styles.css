@@ -18,6 +18,7 @@ html, body {
 
 #instructions{
   text-align:center;
+  color:#aaa;
 }
 
 #secrets {
@@ -37,6 +38,10 @@ html, body {
   float:right;
 }
 
+#session p{
+  margin:0px;
+}
+
 #history {
   margin-top:2em;
 }
@@ -47,11 +52,12 @@ h1{
 }
 
 h2{
-  margin-top:1.5em;
+  margin-top:0em;
   margin-bottom:0px;
   font-weight:normal;
   font-size:1em;
   color: #555;
+  font-style:italic;
 }
 
 #explenation{
@@ -103,14 +109,8 @@ textarea {
   font-family: 'Varela', sans-serif;
 }
 
-
-#step-3 textarea {
-  margin-top:0.3em;
-  width:80%;
-}
-
 #upload{
-  float:right;
+  float:left;
 }
 
 input:focus{
@@ -135,15 +135,8 @@ textarea:focus{
   clear:both;
 }
 
-#step-2 p {
-  margin-top:0.2em;
-  color:#999;
-  font-size:70%;
-  text-align: right;
-}
-
 #secrets ul{
-  margin-left:0em;
+  margin:0em;
   padding:0px;
 }
 
@@ -152,9 +145,9 @@ textarea:focus{
   margin-bottom:0.2em; 
 }
 
-
 #session ul{
   margin-top:1em;
+  padding:0px;
 }
 
 #session li {
