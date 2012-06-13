@@ -9,10 +9,36 @@ html, body {
   font-family: 'Varela', sans-serif;
 }
 
-#wrapper{
-  width:20em;
+#wrapper {
+  width:70%;
+  min-width:25em;
   margin-left:auto;
   margin-right:auto;
+}
+
+#instructions{
+  text-align:center;
+}
+
+#secrets {
+  min-width:5em;
+  max-width:15em;
+  width:30%;
+}
+
+#new-secret{
+  width: 100%;
+}
+
+#session {
+  min-width:15em;
+  max-width:25em;
+  width:65%;
+  float:right;
+}
+
+#history {
+  margin-top:2em;
 }
 
 h1{
@@ -29,7 +55,7 @@ h2{
 }
 
 #explenation{
-  margin-bottom:60px;
+  margin-bottom:20px;
   text-align:center;
   color:#aaa;
 }
@@ -85,7 +111,6 @@ textarea {
 
 #upload{
   float:right;
-  margin-top:10px;
 }
 
 input:focus{
@@ -117,17 +142,28 @@ textarea:focus{
   text-align: right;
 }
 
-ul{
+#secrets ul{
+  margin-left:0em;
+  padding:0px;
+}
+
+#secrets li {
+  list-style-type:none;
+  margin-bottom:0.2em; 
+}
+
+
+#session ul{
   margin-top:1em;
 }
 
-li {
+#session li {
   list-style-type:none;
   margin-bottom:0.5em;  
   margin-bottom:0.8em;  
 }
 
-li .countdown{
+#session li .countdown{
   font-size:65%;
   position:relative;
   top: 17px;

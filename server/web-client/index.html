@@ -108,39 +108,38 @@
                 <a href="javascript:void(0)" onclick="showWhy();">read "Why another tool?"</a>
         </p>
           <div id="why" style="display:none;">
-            <strong>Why another tool?</strong><br/><br/>
-
-            No need to login.</br />          
-            No need to install an application.</br />
-            No need to explain much.<br/>
-            Just agree on a code word!<br/>
+            <strong>Why another tool?</strong> Because there is no need to login, no need to install an application and no need to explain much.<br/>
+            Just browse to this page and agree on a code word!<br/>
 	    <a href="http://xkcd.com/949/">» see cartoon about sending files</a>
-          <br/>
-
+            <br/>
           </div>
       </div>
-
-      <div id="step-1" class="step">
-        <h2><span class="num">1</span> open this page on different devices</h2>
-     </div>
-
-      <div id="step-2" class="step">
-        <h2><span class="num">2</span> enter the same secret</h2>
-        <input name="secret" id="secret" type="text" size="30" placeholder="">
-        <p style="display:hidden"></p>     
-      </div>
-
-      <div  id="step-3" class="step">
-        <h2><span class="num">3</span> pick a file you want to share</h2>
-        <textarea name="data" id="data" rows="1" placeholder="or type text and press return"></textarea>
-        <div id="upload"></div>      
-      </div>
-
-      <div id="step-4" class="step">
-        <h2><span class="num">4</span> wait for appearing cross copies</h2>
+      
+         <p id="instructions">
+          Open this page on different devices and choose the same secret. You can then transfer messages and files between them without any further setup.
+        </p>
+        
+      <div id="session">
+        <div  id="share">
+          <div id="upload"></div>
+          <h2>select or drop files</h2>
+          <textarea name="data" id="data" rows="1" placeholder="or type text and press return"></textarea>
+        </div>
+    
         <ul id="current"></ul>
         <ul id="history"></ul>
+
+      </div> <!-- session -->
+      
+      <div id="secrets">
+     
+        <ul>
+          <li><input name="secret" placeholder="enter secret" id="new-secret" type="text" size="30" placeholder=""></li>
+          <li>einz</li>
+          <li>zweii</li>
+        </ul>
       </div>
+
     </div>
   </div>
 </body>
