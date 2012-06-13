@@ -127,8 +127,7 @@ namespace CrossCopy.iOSClient
                 UITextAlignment.Center,
                 lightTextColor
             );
-
-
+         
             captionLabel.Frame = new Rectangle (0, 10, 320, 40);
             subcaptionLabel.Frame = new Rectangle (20, 55, 280, 100);
             UIView header = new UIView (new Rectangle (0, 0, 300, 145));
@@ -149,7 +148,7 @@ namespace CrossCopy.iOSClient
             secretEntry.AutocapitalizationType = UITextAutocapitalizationType.None;
             secretEntry.ShouldReturn += delegate {
 
-                if (String.IsNullOrEmpty(secretEntry.Value))
+                if (String.IsNullOrEmpty (secretEntry.Value))
                     return false;
 
                 var newSecret = new Secret (secretEntry.Value);
@@ -430,6 +429,12 @@ namespace CrossCopy.iOSClient
             server.CurrentSecret = s;
             currentSecret = s;
             server.Listen ();
+
+            dvc.ViewDisappearing += (sender, e) => {
+                server.Abort (); 
+                server.CurrentSecret = null;
+                currentSecret = null;
+            };
         }
         #endregion
     }

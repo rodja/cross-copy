@@ -88,6 +88,11 @@ namespace CrossCopy.Api
             receiveClient.DownloadStringAsync (uri);
         }
 
+        public void Abort ()
+        {
+            receiveClient.CancelAsync();
+        }
+
         public void Send (string message)
         {
             if (CurrentSecret == null)
