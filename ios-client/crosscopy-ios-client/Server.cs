@@ -61,7 +61,7 @@ namespace CrossCopy.Api
                     return;
                 }
 
-                DateTime item = new DataItem (JsonObject.Parse (e.Result) ["data"],
+                DataItem item = new DataItem (JsonObject.Parse (e.Result) ["data"],
                     DataItemDirection.Out, DateTime.Now);
                 TransferEvent (this, new TransferEventArgs (item));
             };
