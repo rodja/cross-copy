@@ -43,8 +43,8 @@ namespace CrossCopy.Api
                     return;
                 }
 
-                JsonValue items = JsonArray.Parse(e.Result);
-                foreach (JsonValue i in items){
+                JsonValue items = JsonArray.Parse (e.Result);
+                foreach (JsonValue i in items) {
                     DataItem item = new DataItem (i,
                         DataItemDirection.In, DateTime.Now);
                     TransferEvent (this, new TransferEventArgs (item));
@@ -81,10 +81,9 @@ namespace CrossCopy.Api
         {
             if (CurrentSecret == null)
                 return;
-            Console.Out.WriteLine ("Listen for secret: {0}", CurrentSecret);
             receiveClient.CancelAsync ();
-            Uri uri = new Uri (String.Format ("{0}/api/{1}.json{2}", 
-                                              SERVER, CurrentSecret, DeviceID, "")
+            Uri uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
+                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.DataItems[0].Id)
             );
             receiveClient.DownloadStringAsync (uri);
         }
