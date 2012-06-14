@@ -59,8 +59,6 @@ function listen () {
   if (secret === undefined || secret.length == 0)
     return;
 
-  $('#step-2 h2').css({color: ''}); 
-  
   if (uploader != undefined){
     uploader._options.action = "api/" + secret + "/";
     uploader._handler._options.action = uploader._options.action;
@@ -130,7 +128,7 @@ function watch(){
 
 function paste(msg, direction){
   msg.direction = direction;
-
+  
   // convert relative file ref into hyperlink
   if (msg.data.indexOf('/api/' + secret) != -1)
     msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
@@ -157,11 +155,7 @@ function paste(msg, direction){
 
 function share(text){
 
-  if (secret.length == 0){
-    $('#step-2 h2').css({color: '#f00'});
-    $('#step-1 h2').css({color: ''});
-    return;
-  }
+  if (secret.length == 0) return;
 
   trackEvent('data', 'submitted');
 
@@ -261,7 +255,7 @@ function showlocalHistory(){
       $('#history').append($li);
     });
     if (oldPastes.length > 0)
-      $('#history').prepend($('<li class="new-session">locally stored history for this secret</li>'));
+      $('#history').prepend($('<li class="new-session">old messages (stored locally)</li>'));
     $('#history').fadeIn();
   });
 }

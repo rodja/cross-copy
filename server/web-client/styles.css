@@ -43,7 +43,7 @@ html, body {
 }
 
 #history {
-  margin-top:2em;
+  margin-top:1em;
 }
 
 h1{
@@ -135,7 +135,7 @@ textarea:focus{
   clear:both;
 }
 
-#secrets ul{
+ul{
   margin:0em;
   padding:0px;
 }
@@ -146,7 +146,6 @@ textarea:focus{
 }
 
 #session ul{
-  margin-top:1em;
   padding:0px;
 }
 
