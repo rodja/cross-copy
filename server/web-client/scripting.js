@@ -119,7 +119,7 @@ function watch(){
 }
 
 function updateListenerCount(count){
-  if (count === undefined) count = 0;
+  if (undefined === count || count < 0) count = 0;
   listenerCount = count;
 
   if (listenerCount == 0)
@@ -193,8 +193,8 @@ function rememberSecret(s){
   
   var secrets = JSON.parse(storage.getItem('secrets'));
   var index = secrets.indexOf(s);
-  if (index != -1) secrets.splice(s,1);
-  secrets.push(s);
+  if (index != -1) secrets.splice(index,1);
+  secrets.unshift(s);
   storage.setItem('secrets', JSON.stringify(secrets, null, 2));
 }
 
@@ -215,6 +215,9 @@ $(document).ready(function() {
         console.log(e);
         $("#secrets").append($('<li><a href="javascript:void(0)" onclick=\'onNewSecret("' + e + '");\'>' + decodeURI(e) + '</a></li>'));
       });
+    } else { 
+      secrets = [];
+      storage.setItem('secrets', JSON.stringify(secrets, null, 2));
     }
   }
 
