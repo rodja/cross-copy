@@ -73,6 +73,7 @@ function listen () {
       cache: false,
       dataType: "json",
       success: function(res){
+        rememberSecret(secret);
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
         $.each(res, function(i, msg){
@@ -96,20 +97,15 @@ function watch(){
   if (watchRequest != undefined)
     watchRequest.abort();
 
+  updateListenerCount(listenerCount);
+  
   watchRequest = $.ajax({
       url: server + '/' + secret + '?watch=listeners&count=' + (listenerCount + 1),
       cache: false,
       success: function(response){
         trackEvent('watch_listeners', 'changed');
-        listenerCount = response - 1;
 
-        // wait for reconnecting myself
-        if (listenerCount == -1){
-          return;
-        }
-
-        var msg = "Share with " + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s" : "");
-        $('#share h2').text(msg);    
+        updateListenerCount(response -1);    
       },
       error: function(xhr, status){
         trackEvent('error', 'GET listeners count');
@@ -120,6 +116,18 @@ function watch(){
         }
       }
   });
+}
+
+function updateListenerCount(count){
+  if (count === undefined) count = 0;
+  listenerCount = count;
+
+  if (listenerCount == 0)
+    var msg = "Share (nobody else uses this secret)";
+  else
+    var msg = "Share with " + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s" : "");
+  
+  $('#share h2').text(msg);
 }
 
 
@@ -168,7 +176,7 @@ function share(text){
         trackEvent('succsess', 'GET');
         $('#step-1 h2').css({color: ''});       
         paste(response, "out");
-        storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
+        rememberSecret(secret);
       },
       error: function(xhr, status){
         $('#step-1 h2').css({color: '#f00'});
@@ -177,6 +185,17 @@ function share(text){
       complete: function(xhr, status){
       }
   });
+}
+
+function rememberSecret(s){
+  if (!storage)
+    return;
+  
+  var secrets = JSON.parse(storage.getItem('secrets'));
+  var index = secrets.indexOf(s);
+  if (index != -1) secrets.splice(s,1);
+  secrets.push(s);
+  storage.setItem('secrets', JSON.stringify(secrets, null, 2));
 }
 
 $(document).ready(function() {
@@ -199,13 +218,10 @@ $(document).ready(function() {
     }
   }
 
-  $('#secret').focus();
-  $('#secret').select();
+  $('#new-secret').focus();
 
-  $('#step-2 p').hide();
-
-  $('#secret').keyup(function (e){
-      onNewSecret(encodeURI($('#secret').val()));
+  $('#new-secret').keyup(function (e){
+      onNewSecret(encodeURI($('#new-secret').val()));
   });
 
   $('#data').keyup(function (e){
