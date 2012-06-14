@@ -54,8 +54,8 @@
    <title>cross copy</title>
    
             <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-            <link rel='stylesheet' href='styles.css' type='text/css' />
             <link rel='stylesheet' href='fileuploader/fileuploader.css' type='text/css' />
+            <link rel='stylesheet' href='styles.css' type='text/css' />
             <script src='jquery-1.7.1.min.js' type='text/javascript'></script>
             <script src='jquery.autosize-min.js' type='text/javascript'></script>
             <script src='jquery.autolink.js' type='text/javascript'></script>
@@ -80,7 +80,7 @@
                 },
                 template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area"><span>Drop files here</span></div>' +
-                  '<div class="qq-upload-button"><a href="#">pick</a>/drop a file: &nbsp; <img src="fileuploader/upload.png"</img></div>' +
+                  '<div class="qq-upload-button">or pick a file: &nbsp; <img src="fileuploader/upload.png"</img></div>' +
                   '' + 
                 '</div><div class="qq-upload-progress"></div>',
                 listElement: " "
@@ -122,8 +122,8 @@
       <div id="session">
         <div  id="share">
           <h2>Share</h2>
+          <textarea name="data" id="data" rows="1" placeholder="type text and press return"></textarea>
           <div id="upload"></div>
-          <textarea name="data" id="data" rows="1" placeholder="or type text and press return"></textarea>
         </div>
         <br>
         <h2>History</h2>

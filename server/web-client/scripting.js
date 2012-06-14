@@ -108,11 +108,8 @@ function watch(){
           return;
         }
 
-        var msg = "(" + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s use" : " uses") + " this secret)";
-        if ($('#step-2 p').is(":visible"))
-          $('#step-2 p').text(msg);
-        else
-          $('#step-2 p').text(msg).hide().slideDown(400);    
+        var msg = "Share with " + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s" : "");
+        $('#share h2').text(msg);    
       },
       error: function(xhr, status){
         trackEvent('error', 'GET listeners count');
