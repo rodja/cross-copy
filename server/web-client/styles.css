@@ -24,20 +24,35 @@ html, body {
 }
 
 #secrets {
-  min-width:5em;
-  max-width:15em;
-  width:30%;
+  width:31%;
+}
+
+#secrets li {
+  width: 100%;
+  padding-left: 0.2em;
+}
+
+#secrets .active {
+  position:relative;
+  width:200%;
+  z-index:2;
+	background: #eee url(noise.png);
+  box-shadow:3px 1px 5px gray;
 }
 
 #new-secret{
-  width: 100%;
+  width: 95%;
 }
 
 #session {
-  min-width:15em;
-  max-width:25em;
-  width:65%;
-  float:right;
+  position:relative;
+  width:60%;
+  z-index:10;
+	float:right;
+  margin-top:1.2em;
+  padding:1em;
+	background: #eee url(noise.png);
+  box-shadow:3px 1px 5px gray;
 }
 
 #session p{

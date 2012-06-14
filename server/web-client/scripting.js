@@ -213,7 +213,7 @@ $(document).ready(function() {
     if (secrets != null){
       $.each(secrets, function(i,e){
         console.log(e);
-        $("#secrets").append($('<li><a href="javascript:void(0)" onclick=\'onNewSecret("' + e + '");\'>' + decodeURI(e) + '</a></li>'));
+        $("#secrets ul").append($('<li><a href="javascript:void(0)" onclick=\'onNewSecret("' + e + '", $(this).parent());\'>' + decodeURI(e) + '</a></li>'));
       });
     } else { 
       secrets = [];
@@ -241,9 +241,11 @@ $(document).ready(function() {
   
 });
 
-function onNewSecret(s){
+function onNewSecret(s, $li){
   if (s === secret) return;
   
+  $("#secrets li").removeClass('active');
+  if ($li) $li.addClass('active');
   console.log("new secret " + s);
   secret = s
   showlocalHistory();
