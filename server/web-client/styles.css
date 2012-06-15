@@ -41,7 +41,7 @@ html, body {
 }
 
 #new-secret{
-  width: 95%;
+  width: 7em;
 }
 
 #session {
@@ -49,7 +49,7 @@ html, body {
   width:60%;
   z-index:10;
 	float:right;
-  margin-top:1.2em;
+  margin-top:1.12em;
   padding:1em;
 	background: #eee url(noise.png);
   box-shadow:3px 1px 5px gray;

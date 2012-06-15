@@ -224,7 +224,7 @@ $(document).ready(function() {
   $('#new-secret').focus();
 
   $('#new-secret').keyup(function (e){
-      onNewSecret(encodeURI($('#new-secret').val()));
+      onNewSecret(encodeURI($('#new-secret').val()), $('#new-secret').parent());
   });
 
   $('#data').keyup(function (e){
