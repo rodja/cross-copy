@@ -51,10 +51,12 @@ namespace CrossCopy.iOSClient
         UINavigationController navigation;
         EntryElement secretEntry, dataEntry;
         StyledStringElement pickPhoto;
-        Section secretsSection, entriesSection;
+        Section secretsSection, entriesSection, shareSection;
         Secret currentSecret;
         Server server = new Server ();
         List<string> selectedFilePathArray;
+        StyledDialogViewController rootDVC, sectionDVC;
+        int listenersCount = 0;
         #endregion
         
         #region Public props
@@ -74,7 +76,7 @@ namespace CrossCopy.iOSClient
             }
             
             var root = CreateRootElement ();
-            var dvc = new StyledDialogViewController (
+            rootDVC = new StyledDialogViewController (
                 root,
                 null,
                 backgroundColor
@@ -85,7 +87,7 @@ namespace CrossCopy.iOSClient
             };
 
             navigation = new UINavigationController ();
-            navigation.PushViewController (dvc, false);
+            navigation.PushViewController (rootDVC, false);
             navigation.SetNavigationBarHidden (true, false);
             
             window.RootViewController = navigation;
@@ -386,9 +388,25 @@ namespace CrossCopy.iOSClient
             );
         }
 
+        private void UpdateListenersCount (string secret, StringElement element)
+        {
+            server.Watch(secret, 0);
+            server.WatchEvent += (sender, e) => {
+                if (e.ListenersCount > 0) {
+                    string pattern = (e.ListenersCount) > 1 ? "{0} devices" : "{0} device";
+                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                        element.Value = string.Format(pattern, e.ListenersCount); 
+                        if (rootDVC != null) {
+                            rootDVC.ReloadData();
+                        }
+                    });
+                }
+            };
+        }
+
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
-            return new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
+            var secretElement = new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
                       delegate {
                 DisplaySecretDetail (secret);
             }, 
@@ -409,16 +427,41 @@ namespace CrossCopy.iOSClient
                 }
             }
             );
+            secretElement.Value = " ";
+
+            UpdateListenersCount(secret.Phrase, secretElement);
+
+            return secretElement;
         }
 
         private void DisplaySecretDetail (Secret s)
         {
             var subRoot = new RootElement (s.Phrase) 
             {
-                new Section ("Share") {
+                (shareSection = new Section ("Share with no device") {
                     (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
-                    (dataEntry = new AdvancedEntryElement ("Text", "your message", null))},
+                    (dataEntry = new AdvancedEntryElement ("Text", "your message", null))}),
                 (entriesSection = new Section ("History"))
+            };
+
+            server.Watch(s.Phrase, listenersCount);
+            server.WatchEvent += (sender, e) => {
+                int count = e.ListenersCount - 1;
+                if (count != listenersCount) {
+                    listenersCount = count;
+                    string pattern = "Share with no device";
+                    if (listenersCount > 0) {
+                        pattern = (listenersCount) > 1 ? "Share with {0} devices" : "Share with {0} device";
+                    }
+                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                        shareSection.Caption = string.Format(pattern, listenersCount); 
+                        if (sectionDVC != null) {
+                            sectionDVC.ReloadData();
+                        }
+                    }
+                    );
+                }
+                server.Watch(s.Phrase, listenersCount);
             };
 
             pickPhoto.Accessory = UITableViewCellAccessory.DisclosureIndicator;
@@ -442,21 +485,21 @@ namespace CrossCopy.iOSClient
 
             subRoot.UnevenRows = true;
 
-            var dvc = new StyledDialogViewController (
+            sectionDVC = new StyledDialogViewController (
                 subRoot,
                 true,
                 null,
                 backgroundColor
             );
-            dvc.HidesBottomBarWhenPushed = false;
+            sectionDVC.HidesBottomBarWhenPushed = false;
             navigation.SetNavigationBarHidden (false, true);
-            navigation.PushViewController (dvc, true);
+            navigation.PushViewController (sectionDVC, true);
 
             server.CurrentSecret = s;
             currentSecret = s;
             server.Listen ();
 
-            dvc.ViewDisappearing += (sender, e) => {
+            sectionDVC.ViewDisappearing += (sender, e) => {
                 server.Abort (); 
                 server.CurrentSecret = null;
                 currentSecret = null;

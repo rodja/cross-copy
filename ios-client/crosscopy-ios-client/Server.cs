@@ -14,6 +14,8 @@ namespace CrossCopy.Api
     {
         public delegate void TransferEventHandler (object sender,TransferEventArgs e);
 
+        public delegate void WatchEventHandler (object sender,WatchEventArgs e);
+
         public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
 
         public delegate void StatusChanged ();
@@ -26,6 +28,7 @@ namespace CrossCopy.Api
             );
         WebClient shareClient = new WebClient ();
         WebClient receiveClient = new WebClient ();
+        WebClient watchClient = new WebClient ();
         
         public Server ()
         {
@@ -68,10 +71,27 @@ namespace CrossCopy.Api
                 TransferEvent (this, new TransferEventArgs (item));
             };
 
-        
+            watchClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
+            watchClient.DownloadStringCompleted += (sender, e) => { 
+                if (e.Cancelled)
+                    return;
+                if (e.Error != null) {
+                    Console.Out.WriteLine (
+                        "Error watching listeners: {0}",
+                        e.Error.Message
+                    );
+                    return;
+                }
+                int listenersCount = Convert.ToInt32(e.Result);
+                if (WatchEvent != null) {
+                    WatchEvent (this, new WatchEventArgs (listenersCount));
+                }
+            };
         }
 
         public event TransferEventHandler TransferEvent;
+
+        public event WatchEventHandler WatchEvent;
 
         public Secret CurrentSecret{ get; set; }
 
@@ -103,6 +123,15 @@ namespace CrossCopy.Api
                 SERVER, CurrentSecret, DeviceID)
             ), "PUT", message);
     
+        }
+
+        public void Watch (string secret, int listenersCount)
+        {
+            watchClient.CancelAsync ();
+            Uri uri = new Uri (String.Format ("{0}/api/{1}?watch=listeners&count={2}", 
+                                              SERVER, secret, listenersCount + 1)
+            );
+            watchClient.DownloadStringAsync (uri);    
         }
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
@@ -173,6 +202,16 @@ namespace CrossCopy.Api
         }
 
         public DataItem Data{ get; set; }
+    }
+
+    public class WatchEventArgs : EventArgs
+    {
+        public WatchEventArgs (int listenersCount)
+        {
+            ListenersCount = listenersCount;
+        }
+
+        public int ListenersCount { get; set; }
     }
 }
 

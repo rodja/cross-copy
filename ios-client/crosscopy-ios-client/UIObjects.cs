@@ -172,7 +172,7 @@ namespace CrossCopy.iOSClient.UI
             var cell = tv.DequeueReusableCell (CellKey);
             if (cell == null) {
                 cell = new UITableViewCell (
-                    Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle,
+                    Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1,
                     CellKey
                 );
                 cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
@@ -189,6 +189,9 @@ namespace CrossCopy.iOSClient.UI
                                     
             if (cell.DetailTextLabel != null) {
                 cell.DetailTextLabel.Text = Value == null ? "" : Value;
+                cell.DetailTextLabel.TextColor = UIColor.Gray;
+                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize (13);
+                cell.DetailTextLabel.TextAlignment = UITextAlignment.Right;
             }
             
             return cell;
