@@ -18,6 +18,7 @@ using CrossCopy.iOSClient.Helpers;
 using MonoTouch.MediaPlayer;
 
 using CrossCopy.Api;
+using MonoTouch.AssetsLibrary;
 
 namespace CrossCopy.iOSClient
 {
@@ -42,6 +43,7 @@ namespace CrossCopy.iOSClient
             );
         static UIImagePickerController imagePicker;
         static MPMoviePlayerController moviePlayer;
+        const string ASSETS_LIBRARY = "assets-library://";
         #endregion
         
         #region Private members
@@ -180,23 +182,34 @@ namespace CrossCopy.iOSClient
         {
             Element element;
 
-            if (item.Data.StartsWith (server.CurrentPath)) {
+            if ((item.Data.StartsWith (server.CurrentPath)) ||
+                (item.Data.StartsWith (ASSETS_LIBRARY)) ||
+                (item.Data.StartsWith (BaseDir))) {
                 var dataElement = new DataImageStringElement (
                     Path.GetFileName (item.Data),
                     (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
                     item.Data
                 );
                 dataElement.Tapped += delegate {
-                    OpenFile (dataElement.Caption);
+                    OpenFile (dataElement.Data);
                 };
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
-                if (item.Direction == DataItemDirection.In) {
+                if ((item.Direction == DataItemDirection.In) && 
+                    (item.Data.StartsWith(server.CurrentPath))) {
                     dataElement.Animating = true;
-                    Server.DownloadFileAsync (dataElement.Data, Path.Combine (
+                    var localFilePath = Path.Combine (
                         BaseDir,
-                        dataElement.Caption
-                    ), delegate {
-                        dataElement.Animating = false;
+                        dataElement.Caption);
+                    Server.DownloadFileAsync (dataElement.Data, 
+                        (s, e) => {
+                        var bytes = e.Result;
+                        var mediaHelper = new MediaHelper();
+                        mediaHelper.FileSavedToPhotosAlbum += (sender, args) => {
+                            dataElement.Data = args.ReferenceUrl;
+                            item.Data = dataElement.Data;
+                            dataElement.Animating = false;
+                        };
+                        mediaHelper.SaveFileToPhotosAlbum(localFilePath, bytes);
                     }
                     );
                 } else {
@@ -233,12 +246,11 @@ namespace CrossCopy.iOSClient
 
         }
        
-        private void OpenFile (string fileName)
+        private void OpenFile (string filePath)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
-            string filePath = Path.Combine (BaseDir, fileName);
-            string ext = Path.GetExtension (fileName);
-            
+            string ext = Path.GetExtension (filePath);                   
+                  
             if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
                 var movieController = new AdvancedUIViewController ();
                 moviePlayer = new MPMoviePlayerController (NSUrl.FromFilename (filePath));
@@ -265,44 +277,58 @@ namespace CrossCopy.iOSClient
                 movieController.View.AddSubview (moviePlayer.View);
                 movieController.View.AddSubview (btnClose);
                 navigation.PresentModalViewController (movieController, true);
-            } else if (ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
-                var imageController = new AdvancedUIViewController (); 
-                
-                var imageView = new UIImageView (UIImage.FromFile (filePath));
-                imageView.Frame = sbounds;
-                imageView.UserInteractionEnabled = true;
-                imageView.ClipsToBounds = true;
-                imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
-                
-                var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
-                btnClose.Frame = new RectangleF (
-                    (sbounds.Width / 2) - 50,
-                    20,
-                    100,
-                    30
-                );
-                btnClose.SetTitle ("Close", UIControlState.Normal);
-                btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
-                btnClose.TouchDown += delegate {
-                    imageController.DismissModalViewControllerAnimated (true);
-                };
-                
-                var scrollView = new UIScrollView (sbounds);
-                scrollView.ClipsToBounds = true;
-                scrollView.ContentSize = sbounds.Size;
-                scrollView.BackgroundColor = UIColor.Gray;
-                scrollView.MinimumZoomScale = 1.0f;
-                scrollView.MaximumZoomScale = 3.0f; 
-                scrollView.MultipleTouchEnabled = true;
-                scrollView.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
-                scrollView.ViewForZoomingInScrollView = delegate(UIScrollView sv) {
-                    return imageView;
-                };
-                 
-                scrollView.AddSubview (imageView);
-                imageController.View.AddSubview (scrollView);
-                imageController.View.AddSubview (btnClose);
-                navigation.PresentModalViewController (imageController, true);
+            } else {
+                ALAssetsLibrary library = new ALAssetsLibrary();
+                library.AssetForUrl (new NSUrl (filePath), 
+                    (asset) => {
+                        if (asset != null)
+                        {
+                            var imageController = new AdvancedUIViewController (); 
+                            var image = UIImage.FromImage(asset.DefaultRepresentation.GetFullScreenImage());
+                            var imageView = new UIImageView (image);
+                            imageView.Frame = sbounds;
+                            imageView.UserInteractionEnabled = true;
+                            imageView.ClipsToBounds = true;
+                            imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
+                            
+                            var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
+                            btnClose.Frame = new RectangleF (
+                                (sbounds.Width / 2) - 50,
+                                20,
+                                100,
+                                30
+                            );
+                            btnClose.SetTitle ("Close", UIControlState.Normal);
+                            btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
+                            btnClose.TouchDown += delegate {
+                                imageController.DismissModalViewControllerAnimated (true);
+                            };
+                            
+                            var scrollView = new UIScrollView (sbounds);
+                            scrollView.ClipsToBounds = true;
+                            scrollView.ContentSize = sbounds.Size;
+                            scrollView.BackgroundColor = UIColor.Gray;
+                            scrollView.MinimumZoomScale = 1.0f;
+                            scrollView.MaximumZoomScale = 3.0f; 
+                            scrollView.MultipleTouchEnabled = true;
+                            scrollView.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
+                            scrollView.ViewForZoomingInScrollView = delegate(UIScrollView sv) {
+                                return imageView;
+                            };
+                             
+                            scrollView.AddSubview (imageView);
+                            imageController.View.AddSubview (scrollView);
+                            imageController.View.AddSubview (btnClose);
+                            navigation.PresentModalViewController (imageController, true);
+                        } else {
+                            Console.Out.WriteLine("Asset is null.");
+                        }
+                    }, 
+                    (error) => {
+                        if (error != null) {
+                            Console.Out.WriteLine ("Error: " + error.LocalizedDescription);
+                        }
+                });
             }
         }
         

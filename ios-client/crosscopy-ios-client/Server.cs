@@ -155,6 +155,14 @@ namespace CrossCopy.Api
             webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler (dwnldCompletedDelegate);
             webClient.DownloadDataAsync (url);
         }
+
+        public static void DownloadFileAsync (string remoteFilePath, EventDelegate dwnldCompletedDelegate)
+        {
+            var url = new Uri (SERVER + remoteFilePath);
+            var webClient = new WebClient ();
+            webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler (dwnldCompletedDelegate);
+            webClient.DownloadDataAsync (url);
+        }
     }
 
     public class TransferEventArgs : EventArgs
