@@ -249,7 +249,17 @@ function onNewSecret(s, $li){
   if (secret === "") return;
   
   $("#secrets li").removeClass('active');
-  if ($li) $li.addClass('active');
+
+  var $session = $("#session");
+  if ($session.is(":hidden")) {
+     $("#secrets").animate({'margin-left' : "0px"}, 300, function(){
+       $session.fadeIn(); 
+       if ($li) $li.addClass('active');
+     });
+  } else 
+    if ($li) $li.addClass('active');
+  
+  
   console.log("new secret " + s);
   showlocalHistory();
   listen();
