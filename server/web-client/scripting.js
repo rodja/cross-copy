@@ -136,10 +136,10 @@ function paste(msg, direction){
   
   // convert relative file ref into hyperlink
   if (msg.data.indexOf('/api/' + secret) != -1)
-    msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
+    msg.data = '<a href="' + msg.data + '" target="_blank">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
   
   var $li = $('<li>' + msg.data +'</li>\n');
-  $li.autolink();
+  $li.autolink({target: "_blank"});
   $li.addClass(direction);
   if (msg.keep_for){
     var $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
@@ -282,7 +282,7 @@ function showlocalHistory(){
     $.each(oldPastes, function(i,e){
        if (e.data === undefined) return true; // continue
        var $li = $('<li class="' + (e.direction || 'in') + '">' + e.data +'</li>\n');
-      $li.autolink();
+      $li.autolink({target: "_blank"});
       $('#history').append($li);
     });
     if (oldPastes.length > 0)
