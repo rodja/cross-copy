@@ -47,6 +47,9 @@ namespace CrossCopy.iOSClient.BL
             }
         }
 
+        [XmlIgnore]
+        public int ListenersCount { get; set; }
+
         public override string ToString ()
         {
             return Phrase;

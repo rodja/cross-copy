@@ -80,11 +80,15 @@ namespace CrossCopy.Api
                         "Error watching listeners: {0}",
                         e.Error.Message
                     );
-                    return;
                 }
-                int listenersCount = Convert.ToInt32(e.Result);
-                if (WatchEvent != null) {
-                    WatchEvent (this, new WatchEventArgs (listenersCount));
+                try {
+                    string secretPhrase = Convert.ToString(e.UserState);
+                    int listenersCount = Convert.ToInt32(e.Result);
+                    if (WatchEvent != null) {
+                        WatchEvent (this, new WatchEventArgs (secretPhrase, listenersCount));
+                    }
+                } catch (Exception ex) {
+                    Console.Out.WriteLine("Error downloding watching listeners: {0}", ex.Message);
                 }
             };
         }
@@ -132,7 +136,7 @@ namespace CrossCopy.Api
             Uri uri = new Uri (String.Format ("{0}/api/{1}?watch=listeners&count={2}", 
                                               SERVER, secret, listenersCount + 1)
             );
-            watchClient.DownloadStringAsync (uri);    
+            watchClient.DownloadStringAsync (uri, secret);   
         }
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
@@ -207,11 +211,13 @@ namespace CrossCopy.Api
 
     public class WatchEventArgs : EventArgs
     {
-        public WatchEventArgs (int listenersCount)
+        public WatchEventArgs (string secretPhrase, int listenersCount)
         {
+            SecretPhrase = secretPhrase;
             ListenersCount = listenersCount;
         }
 
+        public string SecretPhrase { get; set; }
         public int ListenersCount { get; set; }
     }
 }
