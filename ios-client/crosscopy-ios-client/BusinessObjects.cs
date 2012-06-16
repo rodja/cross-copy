@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MonoTouch.Foundation;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Json;
 
 namespace CrossCopy.iOSClient.BL
 {
@@ -39,6 +40,18 @@ namespace CrossCopy.iOSClient.BL
         [XmlElement("dataitem")]
         public List<DataItem> DataItems { get; set; }
 
+        [XmlIgnore]
+        public string LatestId {
+            get {
+                return (DataItems.Count == 0) ? "" : DataItems [0].Id;
+            }
+        }
+
+        public override string ToString ()
+        {
+            return Phrase;
+        }
+
     }
 
     [System.Diagnostics.DebuggerDisplay("DataItem - {Data}")]
@@ -47,16 +60,31 @@ namespace CrossCopy.iOSClient.BL
         public DataItem ()
         {
         }
-        
-        public DataItem (string data, DataItemDirection direction, DateTime date)
+
+        private DataItem (DataItemDirection direction, DateTime date)
         {
-            Data = data;
             Direction = direction;
             Date = date;
         }
 
+        public DataItem (string data, DataItemDirection direction, DateTime date)
+        : this(direction, date)
+        {
+            Data = data;
+        }
+
+        public DataItem (JsonValue data, DataItemDirection direction, DateTime date)
+        : this(direction, date)
+        {
+            Data = data ["data"];
+            Id = data ["id"];
+        }
+
         [XmlAttribute("data")]
         public string Data { get; set; }
+
+        [XmlAttribute("id")]
+        public string Id { get; set; }
 
         [XmlIgnore]
         public DataItemDirection Direction { get; set; }

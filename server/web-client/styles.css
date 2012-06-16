@@ -9,33 +9,91 @@ html, body {
   font-family: 'Varela', sans-serif;
 }
 
-#wrapper{
-  width:20em;
+#wrapper {
+  width:70%;
+  min-width:25em;
+  max-width: 35em;
   margin-left:auto;
   margin-right:auto;
 }
 
+#instructions{
+  text-align:center;
+  color:#aaa;
+  font-size:0.75em;
+  margin-bottom:2em;
+}
+
+#secrets {
+  width:31%;
+  margin-left:auto;
+  margin-right:auto;
+  text-align: center;
+}
+
+#secrets li {
+  width: 100%;
+  padding-left: 0.2em;
+}
+
+#secrets .active {
+  position:relative;
+  width:200%;
+  z-index:2;
+	background: #eee url(noise.png);
+  box-shadow:3px 1px 5px gray;
+}
+
+#new-secret{
+  width: 7em;
+  text-align: center;
+}
+
+#session {
+  position:relative;
+  width:60%;
+  z-index:10;
+	float:right;
+  margin-top:1.12em;
+  padding:1em;
+	background: #eee url(noise.png);
+  box-shadow:3px 1px 5px gray;
+  text-align: center;
+}
+
+#session p{
+  margin:0px;
+}
+
+#history {
+  margin-top:1em;
+}
+
 h1{
   text-align:center;
-  margin-bottom:10px;
+  margin-bottom:-20px;
+  text-shadow: 1px 1px 0px white;
 }
 
 h2{
-  margin-top:1.5em;
-  margin-bottom:0px;
+  margin-top:0em;
+  margin-bottom:0.2em;
   font-weight:normal;
-  font-size:1em;
+  font-size:0.8em;
   color: #555;
+  font-style:italic;
+  text-shadow: 1px 1px 0px white;
 }
 
 #explenation{
-  margin-bottom:60px;
+  margin-bottom:20px;
   text-align:center;
   color:#aaa;
 }
 
 #explenation #why{
-  margin-top:30px;
+  margin-top:1em;
+  font-size:0.8em;
 }
 
 #explenation a{
@@ -77,15 +135,7 @@ textarea {
   font-family: 'Varela', sans-serif;
 }
 
-
-#step-3 textarea {
-  margin-top:0.3em;
-  width:80%;
-}
-
-#upload{
-  float:right;
-  margin-top:10px;
+.qq-upload-button {
 }
 
 input:focus{
@@ -110,24 +160,27 @@ textarea:focus{
   clear:both;
 }
 
-#step-2 p {
-  margin-top:0.2em;
-  color:#999;
-  font-size:70%;
-  text-align: right;
-}
-
 ul{
-  margin-top:1em;
+  margin:0em;
+  padding:0px;
 }
 
-li {
+#secrets li {
+  list-style-type:none;
+  margin-bottom:0.2em; 
+}
+
+#session ul{
+  padding:0px;
+}
+
+#session li {
   list-style-type:none;
   margin-bottom:0.5em;  
   margin-bottom:0.8em;  
 }
 
-li .countdown{
+#session li .countdown{
   font-size:65%;
   position:relative;
   top: 17px;
@@ -137,6 +190,10 @@ li .countdown{
 
 .in {
   text-align:right;
+}
+
+.out {
+  text-align:left;
 }
 
 .new-session{

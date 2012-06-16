@@ -59,8 +59,6 @@ function listen () {
   if (secret === undefined || secret.length == 0)
     return;
 
-  $('#step-2 h2').css({color: ''}); 
-  
   if (uploader != undefined){
     uploader._options.action = "api/" + secret + "/";
     uploader._handler._options.action = uploader._options.action;
@@ -75,6 +73,7 @@ function listen () {
       cache: false,
       dataType: "json",
       success: function(res){
+        rememberSecret(secret);
         trackEvent('succsess', 'GET');
         trackEvent('data', 'received');
         $.each(res, function(i, msg){
@@ -98,23 +97,15 @@ function watch(){
   if (watchRequest != undefined)
     watchRequest.abort();
 
+  updateListenerCount(listenerCount);
+  
   watchRequest = $.ajax({
       url: server + '/' + secret + '?watch=listeners&count=' + (listenerCount + 1),
       cache: false,
       success: function(response){
         trackEvent('watch_listeners', 'changed');
-        listenerCount = response - 1;
 
-        // wait for reconnecting myself
-        if (listenerCount == -1){
-          return;
-        }
-
-        var msg = "(" + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s use" : " uses") + " this secret)";
-        if ($('#step-2 p').is(":visible"))
-          $('#step-2 p').text(msg);
-        else
-          $('#step-2 p').text(msg).hide().slideDown(400);    
+        updateListenerCount(response -1);    
       },
       error: function(xhr, status){
         trackEvent('error', 'GET listeners count');
@@ -127,16 +118,28 @@ function watch(){
   });
 }
 
+function updateListenerCount(count){
+  if (undefined === count || count < 0) count = 0;
+  listenerCount = count;
+
+  if (listenerCount == 0)
+    var msg = "Share (nobody else uses this secret)";
+  else
+    var msg = "Share with " + (listenerCount < 13 ? numbersAsWords[listenerCount] : listenerCount) + " other device" + (listenerCount > 1 ? "s" : "");
+  
+  $('#share h2').text(msg);
+}
+
 
 function paste(msg, direction){
   msg.direction = direction;
-
+  
   // convert relative file ref into hyperlink
   if (msg.data.indexOf('/api/' + secret) != -1)
-    msg.data = '<a href="' + msg.data + '">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
+    msg.data = '<a href="' + msg.data + '" target="_blank">' + msg.data.substring(('/api/' + secret).length + 1) + '</a>';
   
   var $li = $('<li>' + msg.data +'</li>\n');
-  $li.autolink();
+  $li.autolink({target: "_blank"});
   $li.addClass(direction);
   if (msg.keep_for){
     var $countdown = $("<div class='countdown' title='seconds until message will be deleted from server'>" + msg.keep_for + "</div>");
@@ -157,11 +160,7 @@ function paste(msg, direction){
 
 function share(text){
 
-  if (secret.length == 0){
-    $('#step-2 h2').css({color: '#f00'});
-    $('#step-1 h2').css({color: ''});
-    return;
-  }
+  if (secret.length == 0) return;
 
   trackEvent('data', 'submitted');
 
@@ -177,7 +176,7 @@ function share(text){
         trackEvent('succsess', 'GET');
         $('#step-1 h2').css({color: ''});       
         paste(response, "out");
-        storage && storage.setItem('secrets', JSON.stringify([secret], null, 2));
+        rememberSecret(secret);
       },
       error: function(xhr, status){
         $('#step-1 h2').css({color: '#f00'});
@@ -186,6 +185,17 @@ function share(text){
       complete: function(xhr, status){
       }
   });
+}
+
+function rememberSecret(s){
+  if (!storage)
+    return;
+  
+  var secrets = JSON.parse(storage.getItem('secrets'));
+  var index = secrets.indexOf(s);
+  if (index != -1) secrets.splice(index,1);
+  secrets.unshift(s);
+  storage.setItem('secrets', JSON.stringify(secrets, null, 2));
 }
 
 $(document).ready(function() {
@@ -200,21 +210,24 @@ $(document).ready(function() {
 
   if (storage){
     var secrets = JSON.parse(storage.getItem('secrets'));
-    if (secrets != null && secrets.length > 0){
-      $('#secret').val(secrets[0]); 
-      onNewSecret();
+    if (secrets != null){
+      $.each(secrets, function(i,e){
+        console.log(e);
+        $("#secrets ul").append($('<li><a href="javascript:void(0)" onclick=\'onNewSecret("' + e + '", $(this).parent());\'>' + decodeURI(e) + '</a></li>'));
+      });
+    } else { 
+      secrets = [];
+      storage.setItem('secrets', JSON.stringify(secrets, null, 2));
     }
   }
 
-  $('#secret').focus();
-  $('#secret').select();
+  $('#new-secret').focus();
 
-  $('#step-2 p').hide();
-
-  $('#secret').keyup(function (e){
-    if (secret != encodeURI($('#secret').val()))
-      onNewSecret();
+  $('#new-secret').keyup(function (e){
+      onNewSecret(encodeURI($('#new-secret').val()), $('#new-secret').parent());
   });
+
+  $('#session').hide();
 
   $('#data').keyup(function (e){
     
@@ -230,8 +243,24 @@ $(document).ready(function() {
   
 });
 
-function onNewSecret(){
-  secret = encodeURI($('#secret').val());
+function onNewSecret(s, $li){
+  if (s === secret) return;
+  secret = s
+  if (secret === "") return;
+  
+  $("#secrets li").removeClass('active');
+
+  var $session = $("#session");
+  if ($session.is(":hidden")) {
+     $("#secrets").animate({'margin-left' : "0px"}, 300, function(){
+       $session.fadeIn(); 
+       if ($li) $li.addClass('active');
+     });
+  } else 
+    if ($li) $li.addClass('active');
+  
+  
+  console.log("new secret " + s);
   showlocalHistory();
   listen();
   watch();
@@ -253,11 +282,11 @@ function showlocalHistory(){
     $.each(oldPastes, function(i,e){
        if (e.data === undefined) return true; // continue
        var $li = $('<li class="' + (e.direction || 'in') + '">' + e.data +'</li>\n');
-      $li.autolink();
+      $li.autolink({target: "_blank"});
       $('#history').append($li);
     });
     if (oldPastes.length > 0)
-      $('#history').prepend($('<li class="new-session">locally stored history for this secret</li>'));
+      $('#history').prepend($('<li class="new-session">old messages (stored locally)</li>'));
     $('#history').fadeIn();
   });
 }
