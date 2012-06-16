@@ -18,6 +18,7 @@ using CrossCopy.iOSClient.Helpers;
 using MonoTouch.MediaPlayer;
 
 using CrossCopy.Api;
+using MonoTouch.AssetsLibrary;
 
 namespace CrossCopy.iOSClient
 {
@@ -42,6 +43,7 @@ namespace CrossCopy.iOSClient
             );
         static UIImagePickerController imagePicker;
         static MPMoviePlayerController moviePlayer;
+        const string ASSETS_LIBRARY = "assets-library://";
         #endregion
         
         #region Private members
@@ -49,10 +51,12 @@ namespace CrossCopy.iOSClient
         UINavigationController navigation;
         EntryElement secretEntry, dataEntry;
         StyledStringElement pickPhoto;
-        Section secretsSection, entriesSection;
+        Section secretsSection, entriesSection, shareSection;
         Secret currentSecret;
         Server server = new Server ();
         List<string> selectedFilePathArray;
+        StyledDialogViewController rootDVC, sectionDVC;
+        int listenersCount = 0;
         #endregion
         
         #region Public props
@@ -71,21 +75,20 @@ namespace CrossCopy.iOSClient
                 selectedFilePathArray = new List<string> ();
             }
             
-            var root = CreateRootElement ();
-            var dvc = new StyledDialogViewController (
-                root,
-                null,
-                backgroundColor
-            )
+            RootElement root = CreateRootElement ();
+            rootDVC = new StyledDialogViewController (root, null, backgroundColor)
             {
                 Autorotate = true, 
                 HidesBottomBarWhenPushed = true
             };
+            rootDVC.ViewAppearing += (sender, e) => {
+                server.Abort (); 
+                currentSecret = null;
+            };
 
             navigation = new UINavigationController ();
-            navigation.PushViewController (dvc, false);
+            navigation.PushViewController (rootDVC, false);
             navigation.SetNavigationBarHidden (true, false);
-            
             window.RootViewController = navigation;
             
             server.TransferEvent += (sender, e) => {
@@ -180,23 +183,34 @@ namespace CrossCopy.iOSClient
         {
             Element element;
 
-            if (item.Data.StartsWith (server.CurrentPath)) {
+            if ((item.Data.StartsWith (server.CurrentPath)) ||
+                (item.Data.StartsWith (ASSETS_LIBRARY)) ||
+                (item.Data.StartsWith (BaseDir))) {
                 var dataElement = new DataImageStringElement (
                     Path.GetFileName (item.Data),
                     (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
                     item.Data
                 );
                 dataElement.Tapped += delegate {
-                    OpenFile (dataElement.Caption);
+                    OpenFile (dataElement.Data);
                 };
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
-                if (item.Direction == DataItemDirection.In) {
+                if ((item.Direction == DataItemDirection.In) && 
+                    (item.Data.StartsWith (server.CurrentPath))) {
                     dataElement.Animating = true;
-                    Server.DownloadFileAsync (dataElement.Data, Path.Combine (
+                    var localFilePath = Path.Combine (
                         BaseDir,
-                        dataElement.Caption
-                    ), delegate {
-                        dataElement.Animating = false;
+                        dataElement.Caption);
+                    Server.DownloadFileAsync (dataElement.Data, 
+                        (s, e) => {
+                        var bytes = e.Result;
+                        var mediaHelper = new MediaHelper ();
+                        mediaHelper.FileSavedToPhotosAlbum += (sender, args) => {
+                            dataElement.Data = args.ReferenceUrl;
+                            item.Data = dataElement.Data;
+                            dataElement.Animating = false;
+                        };
+                        mediaHelper.SaveFileToPhotosAlbum (localFilePath, bytes);
                     }
                     );
                 } else {
@@ -233,12 +247,11 @@ namespace CrossCopy.iOSClient
 
         }
        
-        private void OpenFile (string fileName)
+        private void OpenFile (string filePath)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
-            string filePath = Path.Combine (BaseDir, fileName);
-            string ext = Path.GetExtension (fileName);
-            
+            string ext = Path.GetExtension (filePath);                   
+                  
             if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
                 var movieController = new AdvancedUIViewController ();
                 moviePlayer = new MPMoviePlayerController (NSUrl.FromFilename (filePath));
@@ -265,44 +278,58 @@ namespace CrossCopy.iOSClient
                 movieController.View.AddSubview (moviePlayer.View);
                 movieController.View.AddSubview (btnClose);
                 navigation.PresentModalViewController (movieController, true);
-            } else if (ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
-                var imageController = new AdvancedUIViewController (); 
-                
-                var imageView = new UIImageView (UIImage.FromFile (filePath));
-                imageView.Frame = sbounds;
-                imageView.UserInteractionEnabled = true;
-                imageView.ClipsToBounds = true;
-                imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
-                
-                var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
-                btnClose.Frame = new RectangleF (
-                    (sbounds.Width / 2) - 50,
-                    20,
-                    100,
-                    30
+            } else {
+                ALAssetsLibrary library = new ALAssetsLibrary ();
+                library.AssetForUrl (new NSUrl (filePath), 
+                    (asset) => {
+                    if (asset != null) {
+                        var imageController = new AdvancedUIViewController (); 
+                        var image = UIImage.FromImage (asset.DefaultRepresentation.GetFullScreenImage ());
+                        var imageView = new UIImageView (image);
+                        imageView.Frame = sbounds;
+                        imageView.UserInteractionEnabled = true;
+                        imageView.ClipsToBounds = true;
+                        imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
+                            
+                        var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
+                        btnClose.Frame = new RectangleF (
+                                (sbounds.Width / 2) - 50,
+                                20,
+                                100,
+                                30
+                        );
+                        btnClose.SetTitle ("Close", UIControlState.Normal);
+                        btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
+                        btnClose.TouchDown += delegate {
+                            imageController.DismissModalViewControllerAnimated (true);
+                        };
+                            
+                        var scrollView = new UIScrollView (sbounds);
+                        scrollView.ClipsToBounds = true;
+                        scrollView.ContentSize = sbounds.Size;
+                        scrollView.BackgroundColor = UIColor.Gray;
+                        scrollView.MinimumZoomScale = 1.0f;
+                        scrollView.MaximumZoomScale = 3.0f; 
+                        scrollView.MultipleTouchEnabled = true;
+                        scrollView.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
+                        scrollView.ViewForZoomingInScrollView = delegate(UIScrollView sv) {
+                            return imageView;
+                        };
+                             
+                        scrollView.AddSubview (imageView);
+                        imageController.View.AddSubview (scrollView);
+                        imageController.View.AddSubview (btnClose);
+                        navigation.PresentModalViewController (imageController, true);
+                    } else {
+                        Console.Out.WriteLine ("Asset is null.");
+                    }
+                }, 
+                    (error) => {
+                    if (error != null) {
+                        Console.Out.WriteLine ("Error: " + error.LocalizedDescription);
+                    }
+                }
                 );
-                btnClose.SetTitle ("Close", UIControlState.Normal);
-                btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
-                btnClose.TouchDown += delegate {
-                    imageController.DismissModalViewControllerAnimated (true);
-                };
-                
-                var scrollView = new UIScrollView (sbounds);
-                scrollView.ClipsToBounds = true;
-                scrollView.ContentSize = sbounds.Size;
-                scrollView.BackgroundColor = UIColor.Gray;
-                scrollView.MinimumZoomScale = 1.0f;
-                scrollView.MaximumZoomScale = 3.0f; 
-                scrollView.MultipleTouchEnabled = true;
-                scrollView.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
-                scrollView.ViewForZoomingInScrollView = delegate(UIScrollView sv) {
-                    return imageView;
-                };
-                 
-                scrollView.AddSubview (imageView);
-                imageController.View.AddSubview (scrollView);
-                imageController.View.AddSubview (btnClose);
-                navigation.PresentModalViewController (imageController, true);
             }
         }
         
@@ -360,9 +387,26 @@ namespace CrossCopy.iOSClient
             );
         }
 
+        private void UpdateListenersCount (string secret, StringElement element)
+        {
+            server.Watch (secret, 0);
+            server.WatchEvent += (sender, e) => {
+                if (e.ListenersCount > 0) {
+                    string pattern = (e.ListenersCount) > 1 ? "{0} devices" : "{0} device";
+                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                        element.Value = string.Format (pattern, e.ListenersCount); 
+                        if (rootDVC != null) {
+                            rootDVC.ReloadData ();
+                        }
+                    }
+                    );
+                }
+            };
+        }
+
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
-            return new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
+            var secretElement = new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
                       delegate {
                 DisplaySecretDetail (secret);
             }, 
@@ -383,16 +427,41 @@ namespace CrossCopy.iOSClient
                 }
             }
             );
+            secretElement.Value = " ";
+
+            UpdateListenersCount (secret.Phrase, secretElement);
+
+            return secretElement;
         }
 
         private void DisplaySecretDetail (Secret s)
         {
             var subRoot = new RootElement (s.Phrase) 
             {
-                new Section ("Share") {
+                (shareSection = new Section ("Share with no device") {
                     (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
-                    (dataEntry = new AdvancedEntryElement ("Text", "your message", null))},
+                    (dataEntry = new AdvancedEntryElement ("Text", "your message", null))}),
                 (entriesSection = new Section ("History"))
+            };
+
+            server.Watch (s.Phrase, listenersCount);
+            server.WatchEvent += (sender, e) => {
+                int count = e.ListenersCount - 1;
+                if (count != listenersCount) {
+                    listenersCount = count;
+                    string pattern = "Share with no device";
+                    if (listenersCount > 0) {
+                        pattern = (listenersCount) > 1 ? "Share with {0} devices" : "Share with {0} device";
+                    }
+                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                        shareSection.Caption = string.Format (pattern, listenersCount); 
+                        if (sectionDVC != null) {
+                            sectionDVC.ReloadData ();
+                        }
+                    }
+                    );
+                }
+                server.Watch (s.Phrase, listenersCount);
             };
 
             pickPhoto.Accessory = UITableViewCellAccessory.DisclosureIndicator;
@@ -416,25 +485,19 @@ namespace CrossCopy.iOSClient
 
             subRoot.UnevenRows = true;
 
-            var dvc = new StyledDialogViewController (
+            sectionDVC = new StyledDialogViewController (
                 subRoot,
                 true,
                 null,
                 backgroundColor
             );
-            dvc.HidesBottomBarWhenPushed = false;
+            sectionDVC.HidesBottomBarWhenPushed = false;
             navigation.SetNavigationBarHidden (false, true);
-            navigation.PushViewController (dvc, true);
+            navigation.PushViewController (sectionDVC, true);
 
             server.CurrentSecret = s;
             currentSecret = s;
             server.Listen ();
-
-            dvc.ViewDisappearing += (sender, e) => {
-                server.Abort (); 
-                server.CurrentSecret = null;
-                currentSecret = null;
-            };
         }
         #endregion
     }

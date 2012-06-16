@@ -9,6 +9,7 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using CrossCopy.iOSClient.BL;
 using CrossCopy.iOSClient.UI;
+using MonoTouch.AssetsLibrary;
 
 namespace CrossCopy.iOSClient.Helpers
 {
@@ -235,6 +236,62 @@ namespace CrossCopy.iOSClient.Helpers
             string serialized = SerializeHelper<History>.ToXmlString(AppDelegate.HistoryData);
             NSUserDefaults.StandardUserDefaults[historyKey] = NSObject.FromObject(serialized);
             NSUserDefaults.StandardUserDefaults.Synchronize();
+        }
+    }
+
+    public class FilesSavedToPhotosAlbumArgs : System.EventArgs
+    {
+        public FilesSavedToPhotosAlbumArgs(string referenceUrl) { 
+            ReferenceUrl = referenceUrl; 
+        } 
+    
+        public string ReferenceUrl { 
+            get; 
+            set; 
+        }
+    }
+
+    public class MediaHelper
+    {
+        public delegate void FileSavedToPhotosAlbumHandler (object sender, FilesSavedToPhotosAlbumArgs args); 
+        public event FileSavedToPhotosAlbumHandler FileSavedToPhotosAlbum;
+
+        public void SaveFileToPhotosAlbum (string filePath, byte[] fileData)
+        {
+            string ext = Path.GetExtension (filePath);
+
+            if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
+                File.WriteAllBytes (filePath, fileData);
+                if (UIVideo.IsCompatibleWithSavedPhotosAlbum(filePath)) {
+                    UIVideo.SaveToPhotosAlbum(filePath, (path, error) => {
+                        if (error == null) {
+                            if (FileSavedToPhotosAlbum != null) {
+                                FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (path));
+                            }
+                        } else {
+                            Console.Out.WriteLine ("Video {0} cannot be saved to photos album!", filePath);
+                        }
+                    });
+                }
+            } else if (ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
+                NSData imgData = NSData.FromArray(fileData);
+                var img = UIImage.LoadFromData(imgData);
+                var meta = new NSDictionary(); 
+
+                ALAssetsLibrary library = new ALAssetsLibrary();
+                library.WriteImageToSavedPhotosAlbum (img.CGImage, 
+                    meta, 
+                    (assetUrl, error) => {
+                        if (error == null) {
+                            if (FileSavedToPhotosAlbum != null) {
+                                FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (assetUrl.ToString()));
+                        } else {
+                            Console.Out.WriteLine ("Image {0} cannot be saved to photos album!", filePath);
+                        }
+                    }
+                });
+                img.Dispose();
+            }
         }
     }
 }

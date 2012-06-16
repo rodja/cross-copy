@@ -13,6 +13,7 @@ namespace CrossCopy.iOSClient.UI
         UIColor backgroundColor;
 
         public event EventHandler ViewLoaded;
+        public event EventHandler ViewAppearing;
         
         public StyledDialogViewController (RootElement root, UIImage image, UIColor color) 
             : base (root)
@@ -43,6 +44,9 @@ namespace CrossCopy.iOSClient.UI
                         true
                     );
                 }
+            }
+            if (ViewAppearing != null) {
+                ViewAppearing (this, new EventArgs ());
             }
         }
         
@@ -172,7 +176,7 @@ namespace CrossCopy.iOSClient.UI
             var cell = tv.DequeueReusableCell (CellKey);
             if (cell == null) {
                 cell = new UITableViewCell (
-                    Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle,
+                    Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1,
                     CellKey
                 );
                 cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
@@ -189,6 +193,9 @@ namespace CrossCopy.iOSClient.UI
                                     
             if (cell.DetailTextLabel != null) {
                 cell.DetailTextLabel.Text = Value == null ? "" : Value;
+                cell.DetailTextLabel.TextColor = UIColor.Gray;
+                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize (13);
+                cell.DetailTextLabel.TextAlignment = UITextAlignment.Right;
             }
             
             return cell;
