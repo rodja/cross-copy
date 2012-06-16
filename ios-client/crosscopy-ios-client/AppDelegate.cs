@@ -386,20 +386,6 @@ namespace CrossCopy.iOSClient
             );
         }
 
-        private void UpdateListenersCountLabel (Secret secret, StringElement element)
-        {
-            UIApplication.SharedApplication.InvokeOnMainThread (delegate {
-                if (secret.ListenersCount > 0) {
-                    string pattern = (secret.ListenersCount) > 1 ? "{0} devices" : "{0} device";
-                    element.Value = string.Format (pattern, secret.ListenersCount);
-                } else {
-                    element.Value = " ";
-                }
-                rootDVC.ReloadData ();
-            }
-            );
-        }
-
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
             var secretElement = new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
@@ -423,8 +409,15 @@ namespace CrossCopy.iOSClient
                 }
             }
             );
-            int count = secret.ListenersCount - 1;
-            secretElement.Value = count > 0 ? count + " device" + (count > 1 ? "s" : "") : " ";
+            secretElement.Value = " ";
+            secret.WatchEvent += (s) => { 
+                InvokeOnMainThread (() => {
+                    int peers = s.ListenersCount;
+                    secretElement.Value = peers > 0 ? peers + " device" + (peers > 1 ? "s" : "") : " ";
+                    rootDVC.ReloadData ();
+                }
+                );
+            };
 
             return secretElement;
         }
@@ -475,7 +468,7 @@ namespace CrossCopy.iOSClient
             server.Listen ();
 
             currentSecret.WatchEvent += (secret) => {
-                int count = secret.ListenersCount -1;
+                int count = secret.ListenersCount - 1;
                 string pattern = "Keep on server (1 min)";
                 if (count > 0) {
                     pattern = (count) > 1 ? "Share with {0} devices" : "Share with {0} device";
