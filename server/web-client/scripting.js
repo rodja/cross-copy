@@ -227,6 +227,8 @@ $(document).ready(function() {
       onNewSecret(encodeURI($('#new-secret').val()), $('#new-secret').parent());
   });
 
+  $('#session').hide();
+
   $('#data').keyup(function (e){
     
     if (e.which != 13)
@@ -243,11 +245,12 @@ $(document).ready(function() {
 
 function onNewSecret(s, $li){
   if (s === secret) return;
+  secret = s
+  if (secret === "") return;
   
   $("#secrets li").removeClass('active');
   if ($li) $li.addClass('active');
   console.log("new secret " + s);
-  secret = s
   showlocalHistory();
   listen();
   watch();
