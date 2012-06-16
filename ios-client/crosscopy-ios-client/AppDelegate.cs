@@ -100,11 +100,12 @@ namespace CrossCopy.iOSClient
                 Secret s = null;
                 StringElement el = null;
                 for (int i=0; i < secretsSection.Elements.Count; i++) {
-                    el = secretsSection.Elements[i] as StringElement;
+                    el = secretsSection.Elements [i] as StringElement;
                     if (el != null) {
-                        s = HistoryData.Secrets.Find(delegate(Secret sObj) {
+                        s = HistoryData.Secrets.Find (delegate(Secret sObj) {
                             return sObj.Phrase == el.Caption;
-                        }); 
+                        }
+                        ); 
     
                         if (s != null) {
                             UpdateListenersCount (s, el);
@@ -416,25 +417,25 @@ namespace CrossCopy.iOSClient
                 if (secret.ListenersCount > 0) {
                     string pattern = (secret.ListenersCount) > 1 ? "{0} devices" : "{0} device";
                     element.Value = string.Format (pattern, secret.ListenersCount);
-                }
-                else {
+                } else {
                     element.Value = " ";
                 }
                 rootDVC.ReloadData ();
-            });
+            }
+            );
         }
 
         private void UpdateListenersCount (Secret secret, StringElement element)
         {
             UpdateListenersCountLabel (secret, element);
 
-            server.Watch(secret.Phrase, secret.ListenersCount);
+            server.Watch (secret.Phrase, secret.ListenersCount);
             server.WatchEvent += (sender, e) => {
                 if (watchList &&
                     ((secret != null) && (element != null)) && 
                     secret.Phrase == e.SecretPhrase) {
-                        secret.ListenersCount = e.ListenersCount;
-                        UpdateListenersCountLabel (secret, element);
+                    secret.ListenersCount = e.ListenersCount;
+                    UpdateListenersCountLabel (secret, element);
                 }
             };
         }
@@ -512,24 +513,24 @@ namespace CrossCopy.iOSClient
             currentSecret = s;
             server.Listen ();
 
-            server.Watch(server.CurrentSecret.Phrase, server.CurrentSecret.ListenersCount);
+            server.Watch (server.CurrentSecret.Phrase, server.CurrentSecret.ListenersCount);
             server.WatchEvent += (sender, e) => {
                 if (!watchList &&
                     (server.CurrentSecret != null) && 
                     (server.CurrentSecret.Phrase == e.SecretPhrase)) {
-                        server.CurrentSecret.ListenersCount = e.ListenersCount - 1;
-                        string pattern = "Share with no device";
-                        if (server.CurrentSecret.ListenersCount > 0) {
-                            pattern = (server.CurrentSecret.ListenersCount) > 1 ? "Share with {0} devices" : "Share with {0} device";
+                    server.CurrentSecret.ListenersCount = e.ListenersCount - 1;
+                    string pattern = "Share with no device";
+                    if (server.CurrentSecret.ListenersCount > 0) {
+                        pattern = (server.CurrentSecret.ListenersCount) > 1 ? "Share with {0} devices" : "Share with {0} device";
+                    }
+                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                        shareSection.Caption = string.Format (pattern, server.CurrentSecret.ListenersCount); 
+                        if (sectionDVC != null) {
+                            sectionDVC.ReloadData ();
                         }
-                        UIApplication.SharedApplication.InvokeOnMainThread (delegate {
-                            shareSection.Caption = string.Format(pattern, server.CurrentSecret.ListenersCount); 
-                            if (sectionDVC != null) {
-                                sectionDVC.ReloadData();
-                            }
-                        }
-                        );
-                        server.Watch(server.CurrentSecret.Phrase, server.CurrentSecret.ListenersCount);
+                    }
+                    );
+                    server.Watch (server.CurrentSecret.Phrase, server.CurrentSecret.ListenersCount);
                 }
             };
         }
