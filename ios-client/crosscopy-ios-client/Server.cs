@@ -111,6 +111,7 @@ namespace CrossCopy.Api
         public void Abort ()
         {
             receiveClient.CancelAsync();
+            CurrentSecret = null;
         }
 
         public void Send (string message)

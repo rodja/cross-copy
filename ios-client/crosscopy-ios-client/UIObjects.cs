@@ -13,6 +13,7 @@ namespace CrossCopy.iOSClient.UI
         UIColor backgroundColor;
 
         public event EventHandler ViewLoaded;
+        public event EventHandler ViewAppearing;
         
         public StyledDialogViewController (RootElement root, UIImage image, UIColor color) 
             : base (root)
@@ -43,6 +44,9 @@ namespace CrossCopy.iOSClient.UI
                         true
                     );
                 }
+            }
+            if (ViewAppearing != null) {
+                ViewAppearing (this, new EventArgs ());
             }
         }
         
