@@ -14,13 +14,11 @@ namespace CrossCopy.Api
     {
         public delegate void TransferEventHandler (object sender,TransferEventArgs e);
 
-        public delegate void WatchEventHandler (object sender,WatchEventArgs e);
-
         public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
 
         public delegate void StatusChanged ();
 
-        const string SERVER = @"http://www.cross-copy.net";
+        public static string SERVER = @"http://www.cross-copy.net";
         const string API = @"/api/{0}";
         static string DeviceID = string.Format (
                 "?device_id={0}",
@@ -28,8 +26,7 @@ namespace CrossCopy.Api
             );
         WebClient shareClient = new WebClient ();
         WebClient receiveClient = new WebClient ();
-        WebClient watchClient = new WebClient ();
-        
+
         public Server ()
         {
             CurrentSecret = null;
@@ -70,33 +67,10 @@ namespace CrossCopy.Api
                     DataItemDirection.Out, DateTime.Now);
                 TransferEvent (this, new TransferEventArgs (item));
             };
-
-            watchClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
-            watchClient.DownloadStringCompleted += (sender, e) => { 
-                if (e.Cancelled)
-                    return;
-                if (e.Error != null) {
-                    Console.Out.WriteLine (
-                        "Error watching listeners: {0}",
-                        e.Error.Message
-                    );
-                }
-                try {
-                    string secretPhrase = Convert.ToString(e.UserState);
-                    int listenersCount = Convert.ToInt32(e.Result);
-                    if (WatchEvent != null) {
-                        WatchEvent (this, new WatchEventArgs (secretPhrase, listenersCount));
-                    }
-                } catch (Exception ex) {
-                    Console.Out.WriteLine("Error downloding watching listeners: {0}", ex.Message);
-                }
-            };
         }
 
         public event TransferEventHandler TransferEvent;
-
-        public event WatchEventHandler WatchEvent;
-
+       
         public Secret CurrentSecret{ get; set; }
 
         public string CurrentPath { get { return "/api/" + CurrentSecret; } }
@@ -114,7 +88,7 @@ namespace CrossCopy.Api
 
         public void Abort ()
         {
-            receiveClient.CancelAsync();
+            receiveClient.CancelAsync ();
             CurrentSecret = null;
         }
 
@@ -128,15 +102,6 @@ namespace CrossCopy.Api
                 SERVER, CurrentSecret, DeviceID)
             ), "PUT", message);
     
-        }
-
-        public void Watch (string secret, int listenersCount)
-        {
-            watchClient.CancelAsync ();
-            Uri uri = new Uri (String.Format ("{0}/api/{1}?watch=listeners&count={2}", 
-                                              SERVER, secret, listenersCount + 1)
-            );
-            watchClient.DownloadStringAsync (uri, secret);   
         }
 
         public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged downloadCompleted)
@@ -207,18 +172,6 @@ namespace CrossCopy.Api
         }
 
         public DataItem Data{ get; set; }
-    }
-
-    public class WatchEventArgs : EventArgs
-    {
-        public WatchEventArgs (string secretPhrase, int listenersCount)
-        {
-            SecretPhrase = secretPhrase;
-            ListenersCount = listenersCount;
-        }
-
-        public string SecretPhrase { get; set; }
-        public int ListenersCount { get; set; }
     }
 }
 

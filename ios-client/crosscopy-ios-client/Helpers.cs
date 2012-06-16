@@ -224,6 +224,9 @@ namespace CrossCopy.iOSClient.Helpers
             if (!string.IsNullOrEmpty(serialized))
             {
                 AppDelegate.HistoryData = SerializeHelper<History>.FromXmlString(serialized);
+                foreach (Secret s in AppDelegate.HistoryData.Secrets){
+                    s.StartWatching();
+                }
             }
             else 
             {

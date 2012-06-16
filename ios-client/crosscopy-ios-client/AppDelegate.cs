@@ -56,7 +56,6 @@ namespace CrossCopy.iOSClient
         Server server = new Server ();
         List<string> selectedFilePathArray;
         StyledDialogViewController rootDVC, sectionDVC;
-        bool watchList = false;
         #endregion
         
         #region Public props
@@ -93,30 +92,6 @@ namespace CrossCopy.iOSClient
             
             server.TransferEvent += (sender, e) => {
                 Paste (e.Data); };
-
-            rootDVC.ViewAppearing += delegate {
-                watchList = true;
-
-                Secret s = null;
-                StringElement el = null;
-                for (int i=0; i < secretsSection.Elements.Count; i++) {
-                    el = secretsSection.Elements [i] as StringElement;
-                    if (el != null) {
-                        s = HistoryData.Secrets.Find (delegate(Secret sObj) {
-                            return sObj.Phrase == el.Caption;
-                        }
-                        ); 
-    
-                        if (s != null) {
-                            UpdateListenersCount (s, el);
-                        }
-                    }
-                }
-            };
-
-            rootDVC.ViewDisappearing += delegate {
-                watchList = false;
-            };
 
             return true;
         }
@@ -425,21 +400,6 @@ namespace CrossCopy.iOSClient
             );
         }
 
-        private void UpdateListenersCount (Secret secret, StringElement element)
-        {
-            UpdateListenersCountLabel (secret, element);
-
-            server.Watch (secret.Phrase, secret.ListenersCount);
-            server.WatchEvent += (sender, e) => {
-                if (watchList &&
-                    ((secret != null) && (element != null)) && 
-                    secret.Phrase == e.SecretPhrase) {
-                    secret.ListenersCount = e.ListenersCount;
-                    UpdateListenersCountLabel (secret, element);
-                }
-            };
-        }
-
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
             var secretElement = new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
@@ -463,7 +423,8 @@ namespace CrossCopy.iOSClient
                 }
             }
             );
-            secretElement.Value = " ";
+            int count = secret.ListenersCount - 1;
+            secretElement.Value = count > 0 ? count + " device" + (count > 1 ? "s" : "") : " ";
 
             return secretElement;
         }
@@ -472,7 +433,7 @@ namespace CrossCopy.iOSClient
         {
             var subRoot = new RootElement (s.Phrase) 
             {
-                (shareSection = new Section ("Share with no device") {
+                (shareSection = new Section ("Share (no other devices connected)") {
                     (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
                     (dataEntry = new AdvancedEntryElement ("Text", "your message", null))}),
                 (entriesSection = new Section ("History"))
@@ -513,25 +474,19 @@ namespace CrossCopy.iOSClient
             currentSecret = s;
             server.Listen ();
 
-            server.Watch (server.CurrentSecret.Phrase, server.CurrentSecret.ListenersCount);
-            server.WatchEvent += (sender, e) => {
-                if (!watchList &&
-                    (server.CurrentSecret != null) && 
-                    (server.CurrentSecret.Phrase == e.SecretPhrase)) {
-                    server.CurrentSecret.ListenersCount = e.ListenersCount - 1;
-                    string pattern = "Share with no device";
-                    if (server.CurrentSecret.ListenersCount > 0) {
-                        pattern = (server.CurrentSecret.ListenersCount) > 1 ? "Share with {0} devices" : "Share with {0} device";
-                    }
-                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
-                        shareSection.Caption = string.Format (pattern, server.CurrentSecret.ListenersCount); 
-                        if (sectionDVC != null) {
-                            sectionDVC.ReloadData ();
-                        }
-                    }
-                    );
-                    server.Watch (server.CurrentSecret.Phrase, server.CurrentSecret.ListenersCount);
+            currentSecret.WatchEvent += (secret) => {
+                int count = secret.ListenersCount -1;
+                string pattern = "Keep on server (1 min)";
+                if (count > 0) {
+                    pattern = (count) > 1 ? "Share with {0} devices" : "Share with {0} device";
                 }
+                UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                    shareSection.Caption = string.Format (pattern, count); 
+                    if (sectionDVC != null) {
+                        sectionDVC.ReloadData ();
+                    }
+                }
+                );
             };
         }
         #endregion

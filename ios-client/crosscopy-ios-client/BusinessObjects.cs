@@ -4,6 +4,9 @@ using MonoTouch.Foundation;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Json;
+using System.Net;
+using System.Net.Cache;
+using CrossCopy.Api;
 
 namespace CrossCopy.iOSClient.BL
 {
@@ -20,22 +23,30 @@ namespace CrossCopy.iOSClient.BL
         public List<Secret> Secrets { get; set; }
     }
 
+    public delegate void WatchEventHandler (Secret secret);
+
     [System.Diagnostics.DebuggerDisplay("Secret - {Phrase} {DataItems.Count}")]
     public class Secret
     {
+
+        WebClient watchClient = new WebClient ();
+        
         public Secret ()
         {
             DataItems = new List<DataItem> ();
         }
         
-        public Secret (string phrase)
+        public Secret (string phrase) : this()
         {
             Phrase = phrase;
-            DataItems = new List<DataItem> ();
+
+            StartWatching ();
         }
 
+        public event WatchEventHandler WatchEvent;
+
         [XmlAttribute("phrase")]
-        public string Phrase { get; set; }
+        public string Phrase { get; private set; }
 
         [XmlElement("dataitem")]
         public List<DataItem> DataItems { get; set; }
@@ -49,6 +60,39 @@ namespace CrossCopy.iOSClient.BL
 
         [XmlIgnore]
         public int ListenersCount { get; set; }
+
+        public void StartWatching ()
+        {
+            watchClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
+            watchClient.DownloadStringCompleted += (sender, e) => { 
+                if (e.Cancelled) {
+
+                } else if (e.Error != null) {
+                    Console.Out.WriteLine ("Error watching listeners: {0}", e.Error.Message);
+                } else
+                    try {
+                        ListenersCount = Convert.ToInt32 (e.Result);
+                        if (WatchEvent != null) {
+                            WatchEvent (this);
+                        }
+                    } catch (Exception ex) {
+                        Console.Out.WriteLine ("Error downloding listener count: {0}", ex.Message);
+                    }
+                 
+                Watch ();
+            };
+
+            Watch ();
+        }
+
+        private void Watch ()
+        {
+            watchClient.CancelAsync ();
+            Uri uri = new Uri (String.Format ("{0}/api/{1}?watch=listeners&count={2}", 
+                                              Server.SERVER, Phrase, ListenersCount)
+            );
+            watchClient.DownloadStringAsync (uri);   
+        }
 
         public override string ToString ()
         {
