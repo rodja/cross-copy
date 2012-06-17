@@ -16,6 +16,7 @@ using CrossCopy.iOSClient.BL;
 using CrossCopy.iOSClient.UI;
 using CrossCopy.iOSClient.Helpers;
 using MonoTouch.MediaPlayer;
+using Analytics = GoogleAnalytics.GANTracker;
 
 using CrossCopy.Api;
 using MonoTouch.AssetsLibrary;
@@ -65,6 +66,11 @@ namespace CrossCopy.iOSClient
         #region Methods
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
+            // only activated in release version
+            //Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
+            NSError error;
+            Analytics.SharedTracker.TrackPageView("/launched", out error);
+
             StoreHelper.Load ();
 
             window = new UIWindow (UIScreen.MainScreen.Bounds);
@@ -83,6 +89,8 @@ namespace CrossCopy.iOSClient
             rootDVC.ViewAppearing += (sender, e) => {
                 server.Abort (); 
                 currentSecret = null;
+                NSError err;
+                Analytics.SharedTracker.TrackPageView("/secrets", out err);
             };
 
             navigation = new UINavigationController ();
@@ -102,12 +110,14 @@ namespace CrossCopy.iOSClient
 
         public override void DidEnterBackground (UIApplication application)
         {
+            Analytics.SharedTracker.Dispatch();
             StoreHelper.Save ();
         }
         
         public override void WillTerminate (UIApplication application)
         {
             StoreHelper.Save ();
+            Analytics.SharedTracker.StopTracker();
         }
         
         private RootElement CreateRootElement ()
@@ -424,6 +434,9 @@ namespace CrossCopy.iOSClient
 
         private void DisplaySecretDetail (Secret s)
         {
+            NSError error;
+            Analytics.SharedTracker.TrackPageView("/session", out error);
+
             var subRoot = new RootElement (s.Phrase) 
             {
                 (shareSection = new Section ("Share (no other devices connected)") {
