@@ -112,7 +112,7 @@ namespace CrossCopy.iOSClient.Helpers
         public static UIViewElement CreateHtmlViewElement(string caption, string value, UITextAlignment alignment)
         {
             var html = Regex.Replace(value, @"((http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?)", "<a href='$1'>$1</a>", RegexOptions.Compiled);
-            var style = @"<style type='text/css'>body { color: #000; background-color:#fafafa; font-family: Helvetica, Arial, sans-serif; font-size:16px; float:" + ((alignment == UITextAlignment.Left) ? "left" : "right") + "; }</style>";
+            var style = @"<style type='text/css'>body { color: #000; background-color:#e0e0e0; font-family: Helvetica, Arial, sans-serif; font-size:16px; float:" + ((alignment == UITextAlignment.Left) ? "left" : "right") + "; }</style>";
             html = "<html><head>" + style + "</head><body>" + html + "</body>";
             Console.Out.WriteLine("Parsed html: {0}", html);
             

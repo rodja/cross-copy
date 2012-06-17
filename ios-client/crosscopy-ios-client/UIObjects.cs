@@ -89,6 +89,29 @@ namespace CrossCopy.iOSClient.UI
         {
             this.TableView.EndEditing (true);
         }
+
+        public override Source CreateSizingSource (bool unevenRows)
+        {
+            return new AdvancedSource (this);
+        }
+
+        public class AdvancedSource : Source
+        {
+            public AdvancedSource (DialogViewController container) : base(container)
+            {
+
+            }
+
+            public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+            {
+                base.WillDisplay(tableView, cell, indexPath);
+                var section = Root[indexPath.Section];
+                if (section.Caption == "History") {
+                    cell.BackgroundColor = UIColor.Clear;
+                    cell.BackgroundView = null;
+                }
+            }
+        }
     }
     
     public class ImageButtonEntryElement : EntryElement
@@ -337,6 +360,7 @@ namespace CrossCopy.iOSClient.UI
             var sbounds = UIScreen.MainScreen.Bounds;
             activity.Frame = new RectangleF ((sbounds.Width - 30), 4, 20, 20);
             cell.AccessoryView = activity;
+            cell.BackgroundColor = UIColor.Clear;
             return cell;
         }
         
@@ -437,6 +461,7 @@ namespace CrossCopy.iOSClient.UI
         public AdvancedWebView () : base()
         {
             ShouldStartLoad += OpenInSafari;
+            BackgroundColor = UIColor.Clear;
         }
         
         bool OpenInSafari (UIWebView sender, NSUrlRequest request, UIWebViewNavigationType navType)
@@ -466,6 +491,13 @@ namespace CrossCopy.iOSClient.UI
         float IElementSizing.GetHeight (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
         {
             return base.GetHeight (tableView, indexPath) + 10;
+        }
+
+        public override UITableViewCell GetCell (UITableView tv)
+        {
+            var cell = base.GetCell (tv);
+            cell.BackgroundColor = UIColor.Clear;
+            return cell;
         }
     }
     
