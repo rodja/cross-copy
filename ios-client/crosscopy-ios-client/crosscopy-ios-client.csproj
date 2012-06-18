@@ -73,19 +73,31 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TestFlight|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\iPhone\Distribution</OutputPath>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Distribution</CodesignKey>
     <BuildIpa>true</BuildIpa>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchArch>ARMv6_ARMv7</MtouchArch>
+    <MtouchUseSGen>true</MtouchUseSGen>
+    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchI18n />
+    <DefineConstants>TESTFLIGHT</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\iPhone\AppStore</OutputPath>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Distribution: Rodja Trappe</CodesignKey>
     <CodesignProvision>BB279395-B117-477E-A28B-B1917F033B3E</CodesignProvision>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchArch>ARMv6_ARMv7</MtouchArch>
+    <MtouchUseSGen>true</MtouchUseSGen>
+    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchI18n />
+    <DefineConstants>APPSTORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -96,6 +108,9 @@
     <Reference Include="System.Json" />
     <Reference Include="GoogleAnalytics">
       <HintPath>GoogleAnalytics.dll</HintPath>
+    </Reference>
+    <Reference Include="TestFlight">
+      <HintPath>TestFlight.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
