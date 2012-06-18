@@ -16,7 +16,7 @@
 		<string>Images/crosscopy-icon-144.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>net.crosscopy.app</string>
+	<string>net.cross-copy.free</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -33,9 +33,9 @@
 		<string>Images/crosscopy-icon-144.png</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.2</string>
+	<string>0.8.0</string>
 	<key>MinimumOSVersion</key>
-	<string>3.1.3</string>
+	<string>4.3</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>

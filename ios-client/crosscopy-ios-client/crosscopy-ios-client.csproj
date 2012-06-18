@@ -71,6 +71,22 @@
     <IpaPackageName />
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TestFlight|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Distribution</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Distribution</CodesignKey>
+    <BuildIpa>true</BuildIpa>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\AppStore</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Distribution: Rodja Trappe</CodesignKey>
+    <CodesignProvision>BB279395-B117-477E-A28B-B1917F033B3E</CodesignProvision>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />

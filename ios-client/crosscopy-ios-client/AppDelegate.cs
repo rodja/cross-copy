@@ -66,10 +66,12 @@ namespace CrossCopy.iOSClient
         #region Methods
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
+#if !DEBUG
             // only activated in release version
-            //Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
+            Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
             NSError error;
             Analytics.SharedTracker.TrackPageView("/launched", out error);
+#endif
 
             StoreHelper.Load ();
 

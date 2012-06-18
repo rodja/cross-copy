@@ -9,8 +9,12 @@ Global
 		Release|iPhoneSimulator = Release|iPhoneSimulator
 		Debug|iPhone = Debug|iPhone
 		Release|iPhone = Release|iPhone
+		TestFlight|iPhone = TestFlight|iPhone
+		AppStore|iPhone = AppStore|iPhone
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7579F03A-83E6-49C3-BAB3-559515796B21}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{7579F03A-83E6-49C3-BAB3-559515796B21}.AppStore|iPhone.Build.0 = AppStore|iPhone
 		{7579F03A-83E6-49C3-BAB3-559515796B21}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{7579F03A-83E6-49C3-BAB3-559515796B21}.Debug|iPhone.Build.0 = Debug|iPhone
 		{7579F03A-83E6-49C3-BAB3-559515796B21}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -19,6 +23,8 @@ Global
 		{7579F03A-83E6-49C3-BAB3-559515796B21}.Release|iPhone.Build.0 = Release|iPhone
 		{7579F03A-83E6-49C3-BAB3-559515796B21}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{7579F03A-83E6-49C3-BAB3-559515796B21}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{7579F03A-83E6-49C3-BAB3-559515796B21}.TestFlight|iPhone.ActiveCfg = TestFlight|iPhone
+		{7579F03A-83E6-49C3-BAB3-559515796B21}.TestFlight|iPhone.Build.0 = TestFlight|iPhone
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = crosscopy-ios-client\crosscopy-ios-client.csproj
