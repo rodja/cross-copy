@@ -68,7 +68,7 @@ namespace CrossCopy.iOSClient.Helpers
         
         public static UIButton CreateImageButton(string image, float x, float y, float width, float height)
         {
-            var button = CreateTextButton("", x, y, width, height, UIColor.Black, UIColor.White);
+            var button = CreateTextButton("", x, y, width, height, UIColor.Black, UIColor.Clear);
             button.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
             button.SetImage(UIImage.FromFile(image), UIControlState.Normal);
             return button;
