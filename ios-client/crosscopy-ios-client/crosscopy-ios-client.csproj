@@ -139,6 +139,7 @@
     <Content Include="Images\upload.png" />
     <Content Include="Images\browse.png" />
     <Content Include="Images\remove.png" />
+    <Content Include="About.html" />
   </ItemGroup>
   <ItemGroup>
     <ITunesArtwork Include="iTunesArtwork" />

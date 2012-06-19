@@ -73,6 +73,15 @@ namespace CrossCopy.iOSClient.Helpers
             button.SetImage(UIImage.FromFile(image), UIControlState.Normal);
             return button;
         }
+
+        public static UIButton CreateInfoButton(float xOffset, float yOffset)
+        {
+            var button = UIButton.FromType (UIButtonType.InfoDark);
+            var bounds = UIScreen.MainScreen.Bounds;
+            button.Frame = new RectangleF (bounds.Width-xOffset, bounds.Height-yOffset, 30f, 30f);
+            button.SetTitle ("Info", UIControlState.Normal);
+            return button;
+        }
         
         public static void ShowAlert(string title, string message, string buttonText)
         {
@@ -130,6 +139,22 @@ namespace CrossCopy.iOSClient.Helpers
             web.Center = new PointF(width/2+5, height/2+5);
 
             return new AdvancedUIViewElement(caption, web, false);
+        }
+
+        public static UIViewElement CreateHtmlViewElement(string webFilePath, float width, float height)
+        {
+            NSUrl webFile = NSUrl.FromFilename (webFilePath);
+            NSUrlRequest request = new NSUrlRequest (webFile);
+            
+            var web = new AdvancedWebView();
+            web.LoadRequest (request);
+            web.ScalesPageToFit = false;
+            web.SizeToFit ();
+            web.Bounds = new RectangleF (0, 0, width, height);
+            web.AutoresizingMask = UIViewAutoresizing.FlexibleRightMargin | UIViewAutoresizing.FlexibleBottomMargin;
+            web.Center = new PointF(width/2+5, height/2+5);
+
+            return new AdvancedUIViewElement(null, web, false);
         }
     }
     

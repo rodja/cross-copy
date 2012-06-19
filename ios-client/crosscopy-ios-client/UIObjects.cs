@@ -92,12 +92,34 @@ namespace CrossCopy.iOSClient.UI
 
         public override Source CreateSizingSource (bool unevenRows)
         {
-            return new AdvancedSource (this);
+            if (unevenRows) {
+                return new AdvancedSizingSource (this);
+            } else {
+                return new AdvancedSource (this);
+            } 
         }
 
         public class AdvancedSource : Source
         {
             public AdvancedSource (DialogViewController container) : base(container)
+            {
+
+            }
+
+            public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+            {
+                base.WillDisplay(tableView, cell, indexPath);
+                var section = Root[indexPath.Section];
+                if (section.Caption == "History") {
+                    cell.BackgroundColor = UIColor.Clear;
+                    cell.BackgroundView = null;
+                }
+            }
+        }
+
+        public class AdvancedSizingSource : SizingSource
+        {
+            public AdvancedSizingSource (DialogViewController container) : base(container)
             {
 
             }

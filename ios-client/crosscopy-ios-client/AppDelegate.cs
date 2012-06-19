@@ -102,6 +102,12 @@ namespace CrossCopy.iOSClient
                 Analytics.SharedTracker.TrackPageView ("/secrets", out err);
             };
 
+            var aboutButton = UIHelper.CreateInfoButton(40f, 60f);
+            aboutButton.TouchDown += (sender, e) => {
+                ShowAboutView();
+            };
+            rootDVC.View.AddSubview(aboutButton);
+
             navigation = new UINavigationController ();
             navigation.PushViewController (rootDVC, false);
             navigation.SetNavigationBarHidden (true, false);
@@ -503,6 +509,47 @@ namespace CrossCopy.iOSClient
                 }
                 );
             };
+        }
+
+        private void ShowAboutView ()
+        {
+            var captionLabel = UIHelper.CreateLabel (
+                "about",
+                true,
+                32,
+                32,
+                UITextAlignment.Center,
+                UIColor.Black
+            );
+            captionLabel.Frame = new Rectangle (0, 10, 320, 40);
+            UIView header = new UIView (new Rectangle (0, 0, 300, 40));
+            header.AddSubviews (captionLabel);
+
+            var closeButton = new StyledStringElement ("Close");
+            closeButton.BackgroundColor = UIColor.LightGray;
+            closeButton.Alignment = UITextAlignment.Center;
+            closeButton.Tapped += delegate { 
+                navigation.DismissModalViewControllerAnimated(true); 
+            };
+
+            var root = new RootElement ("About") 
+            {
+                new Section (header),
+                new Section()
+                {
+                    UIHelper.CreateHtmlViewElement("About.html", 290f, 300f)
+                },
+                new Section() 
+                {
+                    closeButton
+                }
+            };
+            root.UnevenRows = true;
+            var dvc = new StyledDialogViewController (root, null, backgroundColor)
+            {
+                Autorotate = true,
+            };
+            navigation.PresentModalViewController(dvc, true);
         }
         #endregion
     }
