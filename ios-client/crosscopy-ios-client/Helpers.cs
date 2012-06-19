@@ -141,20 +141,23 @@ namespace CrossCopy.iOSClient.Helpers
             return new AdvancedUIViewElement(caption, web, false);
         }
 
-        public static UIViewElement CreateHtmlViewElement(string webFilePath, float width, float height)
-        {
+        public static AdvancedWebView CreateHtmlView(string webFilePath, float width, float height){
             NSUrl webFile = NSUrl.FromFilename (webFilePath);
             NSUrlRequest request = new NSUrlRequest (webFile);
             
-            var web = new AdvancedWebView();
+            AdvancedWebView web = new AdvancedWebView();
             web.LoadRequest (request);
             web.ScalesPageToFit = false;
             web.SizeToFit ();
             web.Bounds = new RectangleF (0, 0, width, height);
             web.AutoresizingMask = UIViewAutoresizing.FlexibleRightMargin | UIViewAutoresizing.FlexibleBottomMargin;
             web.Center = new PointF(width/2+5, height/2+5);
+            return web;
+        }
 
-            return new AdvancedUIViewElement(null, web, false);
+        public static UIViewElement CreateHtmlViewElement(string webFilePath, float width, float height)
+        {
+            return new AdvancedUIViewElement(null, CreateHtmlView(webFilePath, width, height), false);
         }
     }
     

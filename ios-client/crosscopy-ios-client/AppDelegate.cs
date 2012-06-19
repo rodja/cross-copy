@@ -535,10 +535,7 @@ namespace CrossCopy.iOSClient
             var root = new RootElement ("About") 
             {
                 new Section (header),
-                new Section()
-                {
-                    UIHelper.CreateHtmlViewElement("About.html", 290f, 300f)
-                },
+                new Section(UIHelper.CreateHtmlView("About.html", 290f, 300f)),
                 new Section() 
                 {
                     closeButton
