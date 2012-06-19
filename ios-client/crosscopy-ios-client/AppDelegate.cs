@@ -448,7 +448,7 @@ namespace CrossCopy.iOSClient
 
             var subRoot = new RootElement (s.Phrase) 
             {
-                (shareSection = new Section ("Share (no other devices connected)") {
+                (shareSection = new Section ("Keep on server (1 min)") {
                     (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
                     (dataEntry = new AdvancedEntryElement ("Text", "your message", null))}),
                 (entriesSection = new Section ("History"))
