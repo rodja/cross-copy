@@ -70,7 +70,7 @@ namespace CrossCopy.iOSClient
             NSError error;
 #if TESTFLIGHT
             Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
-            Analytics.SharedTracker.SetReferrer("TestFlight", error);
+            Analytics.SharedTracker.SetReferrer("TestFlight", out error);
 
             TestFlight.TakeOff("88e03730ca852e81d199baba95b9fc61_MTAxMDc3MjAxMi0wNi0xNyAyMzo0OToxNy44NzEzOTI");
 #endif
