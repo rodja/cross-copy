@@ -59,6 +59,13 @@ namespace CrossCopy.iOSClient.BL
         }
 
         [XmlIgnore]
+        public DateTime LastModified {
+            get {
+                return (DataItems.Count == 0) ? DateTime.MinValue : DataItems [0].Date;
+            }
+        }
+
+        [XmlIgnore]
         public int ListenersCount { get; set; }
 
         public void StartWatching ()

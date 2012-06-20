@@ -100,6 +100,7 @@ namespace CrossCopy.iOSClient
                 currentSecret = null;
                 NSError err;
                 Analytics.SharedTracker.TrackPageView ("/secrets", out err);
+                ReOrderSecrets();
             };
 
             var aboutButton = UIHelper.CreateInfoButton(40f, 60f);
@@ -547,6 +548,23 @@ namespace CrossCopy.iOSClient
                 Autorotate = true,
             };
             navigation.PresentModalViewController(dvc, true);
+        }
+
+        private void ReOrderSecrets ()
+        {
+            secretsSection.Elements.Sort (delegate(Element e1, Element e2) {
+                ImageButtonStringElement se1 = e1 as ImageButtonStringElement;
+                ImageButtonStringElement se2 = e2 as ImageButtonStringElement;
+                if ((se1 != null) && (se2 != null)) {
+                    Secret s1 = se1.Data as Secret;
+                    Secret s2 = se2.Data as Secret;
+                    if ((s1 != null) && (s2 != null)) {
+                        return (s1.LastModified.CompareTo (s2.LastModified)) * -1;
+                    }
+                }
+                return -1;
+            });
+            rootDVC.ReloadComplete();
         }
         #endregion
     }
