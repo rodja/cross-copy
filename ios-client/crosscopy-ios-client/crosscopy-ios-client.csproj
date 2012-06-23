@@ -142,6 +142,8 @@
     <Content Include="Images\remove.png" />
     <Content Include="About.html" />
     <Content Include="Images\remove%402x.png" />
+    <Content Include="Default%402x.png" />
+    <Content Include="Default.png" />
   </ItemGroup>
   <ItemGroup>
     <ITunesArtwork Include="iTunesArtwork" />
