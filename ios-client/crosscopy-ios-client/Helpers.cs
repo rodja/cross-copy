@@ -128,15 +128,14 @@ namespace CrossCopy.iOSClient.Helpers
             var web = new AdvancedWebView();
             web.LoadHtmlString(html, null);
                     
-            var size = new UITextView().StringSize(html, 
-                                                   UIFont.SystemFontOfSize(10), 
-                                                   new SizeF(300, 2000), 
-                                                   UILineBreakMode.WordWrap);
-    
+            var size = web.StringSize(html, 
+                                      UIFont.SystemFontOfSize(10), 
+                                      new SizeF(UIScreen.MainScreen.Bounds.Width - 20, 2000), 
+                                      UILineBreakMode.WordWrap);
             float width = size.Width;
             float height = size.Height;
             web.Bounds = new RectangleF(0, 0, width, height); 
-            web.Center = new PointF(width/2+5, height/2+5);
+            web.Center = new PointF(width/2, height/2);
 
             return new AdvancedUIViewElement(caption, web, false);
         }
