@@ -37,6 +37,7 @@ var fs = require('fs');
 var path = require('path');
 var ce = require('cloneextend');
 var mime = require('mime');
+var growingfile = require('growing-file');
 
 // using a fork of formidable be make octstream parsing possible
 var formidable = require('./scriby-node-formidable-19219c8');
@@ -165,7 +166,9 @@ server = http.createServer(function (req, res) {
       return;
 
     } else if (filecache[pathname] != undefined){
-      var file = filecache[pathname];
+      var file = growingfile.open(filecache[pathname].path);
+      file.pipe(res);
+      /*var file = filecache[pathname];
       fs.readFile(file.path, function(error, content) {
         if (error) {
           res.writeHead(500);
@@ -176,7 +179,7 @@ server = http.createServer(function (req, res) {
           res.end(content, 'binary');
           track("get-file-200");
         }
-      });
+      });*/
     } else {
       res.writeHead(404);
       track("get-file-404");
@@ -236,7 +239,7 @@ server = http.createServer(function (req, res) {
       res.end();
       return;
     }
-
+    
     var form = new formidable.IncomingForm();
       form.parse(req, function(err, fields, files) {
         if (err) {
@@ -245,8 +248,7 @@ server = http.createServer(function (req, res) {
           return;
         }
         var file = files.file || files.data;
-        filecache[pathname] = file;
-
+       
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "'+ pathname + '"}');
         track("post-200");
@@ -255,6 +257,12 @@ server = http.createServer(function (req, res) {
           fs.unlink(file.path);
         }, 10 * 60 * 1000);
       });
+      
+      form.on('fileBegin', function(name, file){
+        filecache[pathname] = file;
+          console.log("begin " + util.inspect(filecache[pathname]));
+      });
+
   }
 
   if (pathname.indexOf('/api') == 0) return;
