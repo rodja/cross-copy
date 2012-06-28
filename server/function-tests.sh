@@ -107,13 +107,21 @@ function testFetchingOnlyUnknownRecentPastes(){
   SECRET=`uuidgen`
 }
 
+function testDownloadingWhileUploading(){
+  echo $FUNCNAME
+  URI="http://localhost:8080/api/test/icon.jpg"
+  curl -s -q -F "file=@../artwork/ios-icon-512.png" "$URI" --limit-rate 100k > /dev/null &
+  sleep 2s
+  wget -S $URI && rm icon.jpg
+}
 
-testSimpleTransfer
-testFetchingRecentPaste
-testFetchingTwoRecentPastes
-testFetchingRecentPasteInJsonFormatWithDeviceId
-testWaitingForPasteAsJsonWithDeviceId
-testNotReceivingOwnPastesWhenRequestingJson
-testFetchingOnlyUnknownRecentPastes
+#testSimpleTransfer
+#testFetchingRecentPaste
+#testFetchingTwoRecentPastes
+#testFetchingRecentPasteInJsonFormatWithDeviceId
+#testWaitingForPasteAsJsonWithDeviceId
+#testNotReceivingOwnPastesWhenRequestingJson
+#testFetchingOnlyUnknownRecentPastes
+testDownloadingWhileUploading
 
 wait && echo "SUCSESS"

@@ -36,7 +36,7 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var ce = require('cloneextend');
-var mime = require('mime');
+var mime = require('mime-magic');
 var growingfile = require('growing-file');
 
 // using a fork of formidable be make octstream parsing possible
@@ -167,19 +167,9 @@ server = http.createServer(function (req, res) {
 
     } else if (filecache[pathname] != undefined){
       var file = growingfile.open(filecache[pathname].path);
-      file.pipe(res);
-      /*var file = filecache[pathname];
-      fs.readFile(file.path, function(error, content) {
-        if (error) {
-          res.writeHead(500);
-          track("get-file-500");
-          res.end();
-        } else {
-          res.writeHead(200, { 'Content-Type': mime.lookup(pathname) });
-          res.end(content, 'binary');
-          track("get-file-200");
-        }
-      });*/
+      res.writeHead(200, { 'Content-Type': (filecache[pathname].mimetype || filecache[pathname].mime) });
+      file.pipe(res);
+      console.log(filecache[pathname].mimetype);
     } else {
       res.writeHead(404);
       track("get-file-404");
@@ -260,7 +250,19 @@ server = http.createServer(function (req, res) {
       
       form.on('fileBegin', function(name, file){
         filecache[pathname] = file;
-          console.log("begin " + util.inspect(filecache[pathname]));
+        console.log("begin " + util.inspect(filecache[pathname]));
+      });
+
+
+      form.on('progress', function(received, expected){
+        if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype)
+          mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
+            if (err)
+                filecache[pathname].mimetype = require('mime').lookup(pathname);
+            else
+              filecache[pathname].mimetype = type;
+          });
+      
       });
 
   }

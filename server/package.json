@@ -1,1 +1,1 @@
-{"name":"cross-copy","version":"0.7.0","dependencies":{"cloneextend":"", "mime":"", "cloneextend":""}}
+{"name":"cross-copy","version":"0.7.0","dependencies":{"cloneextend":"", "mime":"", "mime-magic":"", "growing-file":""}}
