@@ -167,10 +167,12 @@ server = http.createServer(function (req, res) {
 
     } else if (filecache[pathname] != undefined){
       var file = growingfile.open(filecache[pathname].path);
-      res.writeHead(200, { 'Content-Type': (filecache[pathname].mimetype || filecache[pathname].mime) });
+      res.writeHead(200, { 
+        'Content-Type': (filecache[pathname].mimetype || filecache[pathname].mime),
+        //'Content-Length': filecache[pathname].size
+      });
       file.pipe(res);
-      console.log(filecache[pathname].mimetype);
-    } else {
+    } else {
       res.writeHead(404);
       track("get-file-404");
       res.end();
@@ -242,7 +244,7 @@ server = http.createServer(function (req, res) {
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "'+ pathname + '"}');
         track("post-200");
-        
+        //filecache[pathname].size = file.length;
         setTimeout(function(){ 
           fs.unlink(file.path);
         }, 10 * 60 * 1000);
@@ -250,7 +252,6 @@ server = http.createServer(function (req, res) {
       
       form.on('fileBegin', function(name, file){
         filecache[pathname] = file;
-        console.log("begin " + util.inspect(filecache[pathname]));
       });
 
 
@@ -261,8 +262,8 @@ server = http.createServer(function (req, res) {
                 filecache[pathname].mimetype = require('mime').lookup(pathname);
             else
               filecache[pathname].mimetype = type;
+          //filecache[pathname].size = expected  - 300;
           });
-      
       });
 
   }
