@@ -23,7 +23,7 @@
     along with cross copy.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var port = 8080;
+var port = 80;
 
 var waitingReceivers = {};
 var watchers = {};
