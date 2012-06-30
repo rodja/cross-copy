@@ -36,7 +36,8 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var ce = require('cloneextend');
-var mime = require('mime');
+var mime = require('mime-magic');
+var growingfile = require('growing-file');
 
 // using a fork of formidable be make octstream parsing possible
 var formidable = require('./scriby-node-formidable-19219c8');
@@ -164,19 +165,13 @@ server = http.createServer(function (req, res) {
       return;
 
     } else if (filecache[pathname] != undefined){
-      var file = filecache[pathname];
-      fs.readFile(file.path, function(error, content) {
-        if (error) {
-          res.writeHead(500);
-          track("get-file-500");
-          res.end();
-        } else {
-          res.writeHead(200, { 'Content-Type': mime.lookup(pathname) });
-          res.end(content, 'binary');
-          track("get-file-200");
-        }
-      });
-    } else {
+      var file = growingfile.open(filecache[pathname].path);
+      res.writeHead(200, { 
+        'Content-Type': (filecache[pathname].mimetype || filecache[pathname].mime),
+        //'Content-Length': filecache[pathname].size
+      });
+      file.pipe(res);
+    } else {
       res.writeHead(404);
       track("get-file-404");
       res.end();
@@ -235,7 +230,7 @@ server = http.createServer(function (req, res) {
       res.end();
       return;
     }
-
+    
     var form = new formidable.IncomingForm();
       form.parse(req, function(err, fields, files) {
         if (err) {
@@ -244,16 +239,32 @@ server = http.createServer(function (req, res) {
           return;
         }
         var file = files.file || files.data;
-        filecache[pathname] = file;
-
+       
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "'+ pathname + '"}');
         track("post-200");
-        
+        //filecache[pathname].size = file.length;
         setTimeout(function(){ 
           fs.unlink(file.path);
         }, 10 * 60 * 1000);
       });
+      
+      form.on('fileBegin', function(name, file){
+        filecache[pathname] = file;
+      });
+
+
+      form.on('progress', function(received, expected){
+        if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype)
+          mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
+            if (err)
+                filecache[pathname].mimetype = require('mime').lookup(pathname);
+            else
+              filecache[pathname].mimetype = type;
+          //filecache[pathname].size = expected  - 300;
+          });
+      });
+
   }
 
   if (pathname.indexOf('/api') == 0) return;

@@ -11,6 +11,7 @@ namespace crosscopyiosclient
     {
         static void Main (string[] args)
         {
+            System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
             UIApplication.Main (args, null, "AppDelegate");
         }
     }

@@ -71,6 +71,35 @@
     <IpaPackageName />
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TestFlight|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Distribution</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer: Rodja Trappe (SFFWUYR4JW)</CodesignKey>
+    <BuildIpa>true</BuildIpa>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchArch>ARMv6_ARMv7</MtouchArch>
+    <MtouchUseSGen>true</MtouchUseSGen>
+    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchI18n />
+    <DefineConstants>TESTFLIGHT</DefineConstants>
+    <CodesignProvision>96BAA92E-C17B-459A-94FE-311961810DA7</CodesignProvision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\AppStore</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Distribution: Rodja Trappe</CodesignKey>
+    <CodesignProvision>BB279395-B117-477E-A28B-B1917F033B3E</CodesignProvision>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchArch>ARMv6_ARMv7</MtouchArch>
+    <MtouchUseSGen>true</MtouchUseSGen>
+    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchI18n />
+    <DefineConstants>APPSTORE</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -78,6 +107,12 @@
     <Reference Include="monotouch" />
     <Reference Include="MonoTouch.Dialog-1" />
     <Reference Include="System.Json" />
+    <Reference Include="GoogleAnalytics">
+      <HintPath>GoogleAnalytics.dll</HintPath>
+    </Reference>
+    <Reference Include="TestFlight">
+      <HintPath>TestFlight.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -105,6 +140,10 @@
     <Content Include="Images\upload.png" />
     <Content Include="Images\browse.png" />
     <Content Include="Images\remove.png" />
+    <Content Include="About.html" />
+    <Content Include="Images\remove%402x.png" />
+    <Content Include="Default%402x.png" />
+    <Content Include="Default.png" />
   </ItemGroup>
   <ItemGroup>
     <ITunesArtwork Include="iTunesArtwork" />

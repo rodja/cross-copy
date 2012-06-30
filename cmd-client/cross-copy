@@ -79,7 +79,6 @@ elif [ $# == 2 ]; then
   PASTE=$2
   FILE=$(basename "$2")
   [ -f "$2" ] && curl -q -F "file=@$2" "$SERVER/api/$1/$FILE" > /dev/null && PASTE="/api/$1/$FILE"
-  echo $PASTE
   
   DELIVERIES=`curl -X PUT -s -d "$PASTE" "$SERVER/api/$1$JSON$PARAMETERS"`
   echo "$DELIVERIES direct deliveries"

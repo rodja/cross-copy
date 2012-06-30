@@ -16,6 +16,8 @@ using CrossCopy.iOSClient.BL;
 using CrossCopy.iOSClient.UI;
 using CrossCopy.iOSClient.Helpers;
 using MonoTouch.MediaPlayer;
+using Analytics = GoogleAnalytics.GANTracker;
+using MonoTouch.TestFlight;
 
 using CrossCopy.Api;
 using MonoTouch.AssetsLibrary;
@@ -56,7 +58,6 @@ namespace CrossCopy.iOSClient
         Server server = new Server ();
         List<string> selectedFilePathArray;
         StyledDialogViewController rootDVC, sectionDVC;
-        int listenersCount = 0;
         #endregion
         
         #region Public props
@@ -66,6 +67,19 @@ namespace CrossCopy.iOSClient
         #region Methods
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
+            NSError error;
+#if TESTFLIGHT
+            Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
+            Analytics.SharedTracker.SetReferrer("TestFlight", out error);
+
+            TestFlight.TakeOff("88e03730ca852e81d199baba95b9fc61_MTAxMDc3MjAxMi0wNi0xNyAyMzo0OToxNy44NzEzOTI");
+#endif
+#if APPSTORE
+            Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
+#endif
+
+            Analytics.SharedTracker.TrackPageView ("/launched", out error);
+
             StoreHelper.Load ();
 
             window = new UIWindow (UIScreen.MainScreen.Bounds);
@@ -84,7 +98,16 @@ namespace CrossCopy.iOSClient
             rootDVC.ViewAppearing += (sender, e) => {
                 server.Abort (); 
                 currentSecret = null;
+                NSError err;
+                Analytics.SharedTracker.TrackPageView ("/secrets", out err);
+                ReOrderSecrets();
             };
+
+            var aboutButton = UIHelper.CreateInfoButton(40f, 60f);
+            aboutButton.TouchDown += (sender, e) => {
+                ShowAboutView();
+            };
+            rootDVC.View.AddSubview(aboutButton);
 
             navigation = new UINavigationController ();
             navigation.PushViewController (rootDVC, false);
@@ -103,12 +126,14 @@ namespace CrossCopy.iOSClient
 
         public override void DidEnterBackground (UIApplication application)
         {
+            Analytics.SharedTracker.Dispatch ();
             StoreHelper.Save ();
         }
         
         public override void WillTerminate (UIApplication application)
         {
             StoreHelper.Save ();
+            Analytics.SharedTracker.StopTracker ();
         }
         
         private RootElement CreateRootElement ()
@@ -387,23 +412,6 @@ namespace CrossCopy.iOSClient
             );
         }
 
-        private void UpdateListenersCount (string secret, StringElement element)
-        {
-            server.Watch (secret, 0);
-            server.WatchEvent += (sender, e) => {
-                if (e.ListenersCount > 0) {
-                    string pattern = (e.ListenersCount) > 1 ? "{0} devices" : "{0} device";
-                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
-                        element.Value = string.Format (pattern, e.ListenersCount); 
-                        if (rootDVC != null) {
-                            rootDVC.ReloadData ();
-                        }
-                    }
-                    );
-                }
-            };
-        }
-
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
             var secretElement = new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
@@ -428,40 +436,29 @@ namespace CrossCopy.iOSClient
             }
             );
             secretElement.Value = " ";
-
-            UpdateListenersCount (secret.Phrase, secretElement);
+            secret.WatchEvent += (s) => { 
+                InvokeOnMainThread (() => {
+                    int peers = s.ListenersCount;
+                    secretElement.Value = peers > 0 ? peers + " device" + (peers > 1 ? "s" : "") : " ";
+                    rootDVC.ReloadData ();
+                }
+                );
+            };
 
             return secretElement;
         }
 
         private void DisplaySecretDetail (Secret s)
         {
+            NSError error;
+            Analytics.SharedTracker.TrackPageView ("/session", out error);
+
             var subRoot = new RootElement (s.Phrase) 
             {
-                (shareSection = new Section ("Share with no device") {
+                (shareSection = new Section ("Keep on server (1 min)") {
                     (pickPhoto = new StyledStringElement ("Photo", delegate { ShowImagePicker(); })),
                     (dataEntry = new AdvancedEntryElement ("Text", "your message", null))}),
                 (entriesSection = new Section ("History"))
-            };
-
-            server.Watch (s.Phrase, listenersCount);
-            server.WatchEvent += (sender, e) => {
-                int count = e.ListenersCount - 1;
-                if (count != listenersCount) {
-                    listenersCount = count;
-                    string pattern = "Share with no device";
-                    if (listenersCount > 0) {
-                        pattern = (listenersCount) > 1 ? "Share with {0} devices" : "Share with {0} device";
-                    }
-                    UIApplication.SharedApplication.InvokeOnMainThread (delegate {
-                        shareSection.Caption = string.Format (pattern, listenersCount); 
-                        if (sectionDVC != null) {
-                            sectionDVC.ReloadData ();
-                        }
-                    }
-                    );
-                }
-                server.Watch (s.Phrase, listenersCount);
             };
 
             pickPhoto.Accessory = UITableViewCellAccessory.DisclosureIndicator;
@@ -498,6 +495,76 @@ namespace CrossCopy.iOSClient
             server.CurrentSecret = s;
             currentSecret = s;
             server.Listen ();
+
+            currentSecret.WatchEvent += (secret) => {
+                int count = secret.ListenersCount - 1;
+                string pattern = "Keep on server (1 min)";
+                if (count > 0) {
+                    pattern = (count) > 1 ? "Share with {0} devices" : "Share with {0} device";
+                }
+                UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                    shareSection.Caption = string.Format (pattern, count); 
+                    if (sectionDVC != null) {
+                        sectionDVC.ReloadData ();
+                    }
+                }
+                );
+            };
+        }
+
+        private void ShowAboutView ()
+        {
+            var captionLabel = UIHelper.CreateLabel (
+                "about",
+                true,
+                32,
+                32,
+                UITextAlignment.Center,
+                UIColor.Black
+            );
+            captionLabel.Frame = new Rectangle (0, 10, 320, 40);
+            UIView header = new UIView (new Rectangle (0, 0, 300, 40));
+            header.AddSubviews (captionLabel);
+
+            var closeButton = new StyledStringElement ("Close");
+            closeButton.BackgroundColor = UIColor.LightGray;
+            closeButton.Alignment = UITextAlignment.Center;
+            closeButton.Tapped += delegate { 
+                navigation.DismissModalViewControllerAnimated(true); 
+            };
+
+            var root = new RootElement ("About") 
+            {
+                new Section (header),
+                new Section(UIHelper.CreateHtmlView("About.html", 290f, 300f)),
+                new Section() 
+                {
+                    closeButton
+                }
+            };
+            root.UnevenRows = true;
+            var dvc = new StyledDialogViewController (root, null, backgroundColor)
+            {
+                Autorotate = true,
+            };
+            navigation.PresentModalViewController(dvc, true);
+        }
+
+        private void ReOrderSecrets ()
+        {
+            secretsSection.Elements.Sort (delegate(Element e1, Element e2) {
+                ImageButtonStringElement se1 = e1 as ImageButtonStringElement;
+                ImageButtonStringElement se2 = e2 as ImageButtonStringElement;
+                if ((se1 != null) && (se2 != null)) {
+                    Secret s1 = se1.Data as Secret;
+                    Secret s2 = se2.Data as Secret;
+                    if ((s1 != null) && (s2 != null)) {
+                        return (s1.LastModified.CompareTo (s2.LastModified)) * -1;
+                    }
+                }
+                return -1;
+            });
+            rootDVC.ReloadComplete();
         }
         #endregion
     }

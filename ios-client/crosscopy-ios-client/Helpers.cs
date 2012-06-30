@@ -68,9 +68,18 @@ namespace CrossCopy.iOSClient.Helpers
         
         public static UIButton CreateImageButton(string image, float x, float y, float width, float height)
         {
-            var button = CreateTextButton("", x, y, width, height, UIColor.Black, UIColor.White);
+            var button = CreateTextButton("", x, y, width, height, UIColor.Black, UIColor.Clear);
             button.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
             button.SetImage(UIImage.FromFile(image), UIControlState.Normal);
+            return button;
+        }
+
+        public static UIButton CreateInfoButton(float xOffset, float yOffset)
+        {
+            var button = UIButton.FromType (UIButtonType.InfoDark);
+            var bounds = UIScreen.MainScreen.Bounds;
+            button.Frame = new RectangleF (bounds.Width-xOffset, bounds.Height-yOffset, 30f, 30f);
+            button.SetTitle ("Info", UIControlState.Normal);
             return button;
         }
         
@@ -112,24 +121,42 @@ namespace CrossCopy.iOSClient.Helpers
         public static UIViewElement CreateHtmlViewElement(string caption, string value, UITextAlignment alignment)
         {
             var html = Regex.Replace(value, @"((http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?)", "<a href='$1'>$1</a>", RegexOptions.Compiled);
-            var style = @"<style type='text/css'>body { color: #000; background-color:#fafafa; font-family: Helvetica, Arial, sans-serif; font-size:16px; float:" + ((alignment == UITextAlignment.Left) ? "left" : "right") + "; }</style>";
+            var style = @"<style type='text/css'>body { color: #000; background-color:#e0e0e0; font-family: Helvetica, Arial, sans-serif; font-size:16px; float:" + ((alignment == UITextAlignment.Left) ? "left" : "right") + "; }</style>";
             html = "<html><head>" + style + "</head><body>" + html + "</body>";
             Console.Out.WriteLine("Parsed html: {0}", html);
             
             var web = new AdvancedWebView();
             web.LoadHtmlString(html, null);
                     
-            var size = new UITextView().StringSize(html, 
-                                                   UIFont.SystemFontOfSize(10), 
-                                                   new SizeF(300, 2000), 
-                                                   UILineBreakMode.WordWrap);
-    
+            var size = web.StringSize(html, 
+                                      UIFont.SystemFontOfSize(10), 
+                                      new SizeF(UIScreen.MainScreen.Bounds.Width - 20, 2000), 
+                                      UILineBreakMode.WordWrap);
             float width = size.Width;
             float height = size.Height;
             web.Bounds = new RectangleF(0, 0, width, height); 
-            web.Center = new PointF(width/2+5, height/2+5);
+            web.Center = new PointF(width/2, height/2);
 
             return new AdvancedUIViewElement(caption, web, false);
+        }
+
+        public static AdvancedWebView CreateHtmlView(string webFilePath, float width, float height){
+            NSUrl webFile = NSUrl.FromFilename (webFilePath);
+            NSUrlRequest request = new NSUrlRequest (webFile);
+            
+            AdvancedWebView web = new AdvancedWebView();
+            web.LoadRequest (request);
+            web.ScalesPageToFit = false;
+            web.SizeToFit ();
+            web.Bounds = new RectangleF (0, 0, width, height);
+            web.AutoresizingMask = UIViewAutoresizing.FlexibleRightMargin | UIViewAutoresizing.FlexibleBottomMargin;
+            web.Center = new PointF(width/2+5, height/2+5);
+            return web;
+        }
+
+        public static UIViewElement CreateHtmlViewElement(string webFilePath, float width, float height)
+        {
+            return new AdvancedUIViewElement(null, CreateHtmlView(webFilePath, width, height), false);
         }
     }
     
@@ -224,6 +251,9 @@ namespace CrossCopy.iOSClient.Helpers
             if (!string.IsNullOrEmpty(serialized))
             {
                 AppDelegate.HistoryData = SerializeHelper<History>.FromXmlString(serialized);
+                foreach (Secret s in AppDelegate.HistoryData.Secrets){
+                    s.StartWatching();
+                }
             }
             else 
             {
