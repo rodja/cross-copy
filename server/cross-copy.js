@@ -240,10 +240,19 @@ server = http.createServer(function (req, res) {
           return;
         }
         var file = files.file || files.data;
-       
+        if (!filecache[pathname]) {
+          filecache[pathname] = file;
+          mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
+            if (err)
+                filecache[pathname].mimetype = require('mime').lookup(pathname);
+            else
+              filecache[pathname].mimetype = type;
+          });
+        }      
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "'+ pathname + '"}');
         track("post-200");
+        console.log("parse: " + util.inspect(filecache[pathname]));
         filecache[pathname].size = file.length;
         setTimeout(function(){ 
           fs.unlink(file.path);
@@ -252,11 +261,13 @@ server = http.createServer(function (req, res) {
       
       form.on('fileBegin', function(name, file){
         filecache[pathname] = file;
+        console.log("begin: " + util.inspect(filecache[pathname]));
       });
 
 
       form.on('progress', function(received, expected){
-        if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype)
+        if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype){
+          console.log("prog: " + util.inspect(filecache[pathname]));
           mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
             if (err)
                 filecache[pathname].mimetype = require('mime').lookup(pathname);
@@ -264,6 +275,7 @@ server = http.createServer(function (req, res) {
               filecache[pathname].mimetype = type;
           //filecache[pathname].size = expected  - 300;
           });
+        }
       });
 
   }
