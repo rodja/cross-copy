@@ -1,0 +1,3 @@
+/Users/marek/Dropbox/Projects/CrossCopy/android-client/crosscopy-android-client/bin/Debug/crosscopyandroidclient.dll
+/Users/marek/Dropbox/Projects/CrossCopy/android-client/crosscopy-android-client/bin/Debug/CrossCopyLib.dll
+/Users/marek/Dropbox/Projects/CrossCopy/android-client/crosscopy-android-client/bin/Debug/MonoDroid.Dialog.dll

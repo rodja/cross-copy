@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="crosscopyandroidclient.crosscopyandroidclient">
+  <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8" />
+  <application android:name="mono.android.app.Application">
+    <activity android:label="cross copy" android:windowSoftInputMode="stateUnspecified|adjustPan" android:name="crosscopy.androidclient.Activity1">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity android:name="monodroid.dialog.HtmlActivity" />
+    <provider android:name="mono.MonoRuntimeProvider" android:exported="false" android:initOrder="2147483647" android:authorities="crosscopyandroidclient.crosscopyandroidclient.__mono_init__" />
+  </application>
+</manifest>
