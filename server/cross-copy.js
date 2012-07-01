@@ -244,7 +244,7 @@ server = http.createServer(function (req, res) {
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "'+ pathname + '"}');
         track("post-200");
-        //filecache[pathname].size = file.length;
+        filecache[pathname].size = file.length;
         setTimeout(function(){ 
           fs.unlink(file.path);
         }, 10 * 60 * 1000);
@@ -292,7 +292,7 @@ server = http.createServer(function (req, res) {
             break;
     }
      
-    path.exists(filePath, function(exists) {
+    fs.exists(filePath, function(exists) {
      
         if (exists) {
             fs.readFile(filePath, function(error, content) {
