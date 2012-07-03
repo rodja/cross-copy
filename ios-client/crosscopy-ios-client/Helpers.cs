@@ -303,7 +303,7 @@ namespace CrossCopy.iOSClient.Helpers
                         }
                     });
                 }
-            } else if (ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
+            } else if (ext.ToUpper () == ".JPEG" || ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
                 NSData imgData = NSData.FromArray(fileData);
                 var img = UIImage.LoadFromData(imgData);
                 var meta = new NSDictionary(); 
@@ -321,6 +321,8 @@ namespace CrossCopy.iOSClient.Helpers
                     }
                 });
                 img.Dispose();
+            } else {
+                // TODO save other files in the App and make them accessable through itunes; also they should still be opend with iOS build in preview
             }
         }
     }

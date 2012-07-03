@@ -78,11 +78,11 @@ if [ $# == 1 ]; then
 elif [ $# == 2 ]; then
   PASTE=$2
   FILE=$(basename "$2")
-  [ -f "$2" ] && curl -q -F "file=@$2" "$SERVER/api/$1/$FILE" > /dev/null && PASTE="/api/$1/$FILE"
-  
+  [ -f "$2" ] && curl -q -F "file=@$2" "$SERVER/api/$1/$FILE" --limit-rate 10k  > /dev/null &
+  [ -f "$2" ] && PASTE="/api/$1/$FILE"
   DELIVERIES=`curl -X PUT -s -d "$PASTE" "$SERVER/api/$1$JSON$PARAMETERS"`
   echo "$DELIVERIES direct deliveries"
-  [[ $DELIVERIES == 0 ]] && echo "(you should wait for data on the other device while sending somthing)"
+  [[ $DELIVERIES == 0 ]] && echo "(you should wait for data on the other device while sending somthing)"  
 else
   echo "wrong number of arguments."
   usage
