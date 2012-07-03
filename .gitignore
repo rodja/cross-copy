@@ -1,1 +1,4 @@
+obj/
+bin/
 .DS_Store
+*.userprefs

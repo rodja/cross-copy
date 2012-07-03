@@ -30,7 +30,7 @@ namespace CrossCopy.AndroidClient
 			SetContentView (lv);
 
 			server.TransferEvent += (sender, e) => {
-                Paste (e.Data); 
+				Paste (e.Data); 
 			};
 		}
 
@@ -41,8 +41,8 @@ namespace CrossCopy.AndroidClient
                	 	(secretEntry = new EntryElement("Secret", "")),
 					new ButtonElement("Listen", delegate {
 						server.Send (dataEntry.Value.ToString().Trim ());
-							server.CurrentSecret = new Secret(secretEntry.Value.Trim());
-							server.Listen ();
+						server.CurrentSecret = new Secret(secretEntry.Value.Trim());
+						server.Listen ();
 					})
                 },
                 new Section() {
@@ -59,17 +59,18 @@ namespace CrossCopy.AndroidClient
 		}
 
 		private void Paste (DataItem item)
-        {
-			RunOnUiThread(() => {
+		{
+			RunOnUiThread (() => {
 				StringElement element;
 				if (item.Direction == DataItemDirection.Out) {
-					element = new StringElement(item.Data);	
+					element = new StringElement (item.Data);	
 				} else {
-					element = new StringElement("", item.Data);
+					element = new StringElement ("", item.Data);
 				}
 				entriesSection.Insert (0, element);
-			});
-        }
+			}
+			);
+		}
 		#endregion
 	}
 }
