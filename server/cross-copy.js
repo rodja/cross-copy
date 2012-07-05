@@ -167,10 +167,11 @@ server = http.createServer(function (req, res) {
 
     } else if (filecache[pathname] != undefined){
       var file = growingfile.open(filecache[pathname].path);
-      res.writeHead(200, { 
-        'Content-Type': (filecache[pathname].mimetype || filecache[pathname].mime),
-        //'Content-Length': filecache[pathname].size
-      });
+      var header = { 
+          'Content-Type': (filecache[pathname].mimetype || filecache[pathname].mime),
+      } 
+      if (filecache[pathname].contentLength) header['Content-Length'] = filecache[pathname].contentLength;
+      res.writeHead(200, header);
       file.pipe(res);
     } else {
       res.writeHead(404);
@@ -252,8 +253,7 @@ server = http.createServer(function (req, res) {
         res.writeHead(200, {'content-type': 'text/plain'});
         res.end('{"url": "'+ pathname + '"}');
         track("post-200");
-        console.log("parse: " + util.inspect(filecache[pathname]));
-        filecache[pathname].size = file.length;
+        filecache[pathname].contentLength = file.length;
         setTimeout(function(){ 
           fs.unlink(file.path);
         }, 10 * 60 * 1000);
@@ -261,19 +261,17 @@ server = http.createServer(function (req, res) {
       
       form.on('fileBegin', function(name, file){
         filecache[pathname] = file;
-        console.log("begin: " + util.inspect(filecache[pathname]));
       });
 
 
       form.on('progress', function(received, expected){
         if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype){
-          console.log("prog: " + util.inspect(filecache[pathname]));
           mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
             if (err)
                 filecache[pathname].mimetype = require('mime').lookup(pathname);
             else
               filecache[pathname].mimetype = type;
-          //filecache[pathname].size = expected  - 300;
+          //filecache[pathname].contentLength = expected  - 300;
           });
         }
       });

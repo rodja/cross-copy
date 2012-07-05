@@ -70,13 +70,14 @@
                 element: document.getElementById('upload'),
                 action: 'api/' + secret + '/',
                 debug: false,
-                onSubmit: function(id, fileName){},
+                onSubmit: function(id, fileName){
+                    share("/" + uploader._options.action + fileName);
+                },
                 onProgress: function(id, filename, loaded, total){
                   $('.qq-upload-progress').width((loaded/total * 100).toString() +"%");
                 },
                 onComplete: function(id, filename, response){
                   trackEvent('succsess', 'POST');
-                  share(response.url);
                 },
                 template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area"><span>Drop files here</span></div>' +
