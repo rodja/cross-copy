@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "crosscopy-android-client", "crosscopy-android-client\crosscopy-android-client.csproj", "{1371A456-6A51-4D70-A0BB-E9F1B92BE411}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1371A456-6A51-4D70-A0BB-E9F1B92BE411}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1371A456-6A51-4D70-A0BB-E9F1B92BE411}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1371A456-6A51-4D70-A0BB-E9F1B92BE411}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1371A456-6A51-4D70-A0BB-E9F1B92BE411}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = crosscopy-android-client\crosscopy-android-client.csproj
+	EndGlobalSection
+EndGlobal

@@ -84,7 +84,6 @@
     <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchI18n />
     <DefineConstants>TESTFLIGHT</DefineConstants>
-    <CodesignProvision>96BAA92E-C17B-459A-94FE-311961810DA7</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
     <DebugType>none</DebugType>
