@@ -135,10 +135,9 @@ namespace CrossCopy.Api
                 string response = System.Text.Encoding.UTF8.GetString (e.Result);
 
                 if (!String.IsNullOrEmpty (response)) {
-                    Send (destinationPath);
                 }
             };
-
+            Send (destinationPath);
             Uri fileUri = new Uri (SERVER + destinationPath);
             client.UploadDataAsync (fileUri, "POST", fileByteArray);
         }
