@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using MonoTouch.Dialog;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using CrossCopy.iOSClient.BL;
+using CrossCopy.BL;
 using CrossCopy.iOSClient.UI;
 using CrossCopy.iOSClient.Helpers;
 using MonoTouch.MediaPlayer;

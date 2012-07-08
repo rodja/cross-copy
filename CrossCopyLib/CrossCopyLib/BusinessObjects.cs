@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Json;
 using System.Net;
 using System.Net.Cache;
-using CrossCopy.Lib.Api;
+using CrossCopy.Api;
 
-namespace CrossCopy.Lib.BL
+namespace CrossCopy.BL
 {
     [System.Diagnostics.DebuggerDisplay("History - Secrets {Secrets.Count}")]
     [XmlRoot("history")]

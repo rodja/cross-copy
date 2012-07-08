@@ -1,11 +1,10 @@
 using System;
 using System.IO;
 using System.Net.NetworkInformation;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using CrossCopy.Lib.BL;
+using CrossCopy.BL;
 
-namespace CrossCopy.Lib.Helpers
+namespace CrossCopy.Helpers
 {
     public class DeviceHelper
     {
@@ -63,17 +62,5 @@ namespace CrossCopy.Lib.Helpers
             return (T)@object;
         }
     }
- 
-    public class FilesSavedToPhotosAlbumArgs : System.EventArgs
-    {
-        public FilesSavedToPhotosAlbumArgs(string referenceUrl) { 
-            ReferenceUrl = referenceUrl; 
-        } 
-    
-        public string ReferenceUrl { 
-            get; 
-            set; 
-        }
-    }
-}
+ }
 

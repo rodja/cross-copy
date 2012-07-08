@@ -4,11 +4,9 @@ using System.Net.Cache;
 using System.IO;
 using System.Text;
 using System.Json;
+using CrossCopy.BL;
 
-
-using CrossCopy.Lib.BL;
-
-namespace CrossCopy.Lib.Api
+namespace CrossCopy.Api
 {
     public class Server
     {
@@ -108,7 +106,8 @@ namespace CrossCopy.Lib.Api
         {
             if (CurrentSecret == null)
                 return;
-   
+
+          
             string destinationPath = String.Format (
                 "/api/{0}/{1}", CurrentSecret, UrlHelper.GetFileName (filePath)
             );
@@ -134,10 +133,9 @@ namespace CrossCopy.Lib.Api
                 string response = System.Text.Encoding.UTF8.GetString (e.Result);
 
                 if (!String.IsNullOrEmpty (response)) {
-                    Send (destinationPath);
                 }
             };
-
+            Send (destinationPath);
             Uri fileUri = new Uri (SERVER + destinationPath);
             client.UploadDataAsync (fileUri, "POST", fileByteArray);
         }

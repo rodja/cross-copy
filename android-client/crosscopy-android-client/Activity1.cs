@@ -5,8 +5,8 @@ using Android.OS;
 using Android.Views;
 using Android.Widget;
 using MonoDroid.Dialog;
-using CrossCopy.Lib.Api;
-using CrossCopy.Lib.BL;
+using CrossCopy.Api;
+using CrossCopy.BL;
 
 namespace CrossCopy.AndroidClient
 {

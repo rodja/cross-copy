@@ -119,14 +119,24 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="Helpers.cs" />
-    <Compile Include="BusinessObjects.cs" />
     <Compile Include="UIObjects.cs" />
-    <Compile Include="Server.cs" />
-    <Compile Include="ApiHelpers.cs" />
+    <Compile Include="..\..\CrossCopyLib\ApiHelpers.cs">
+      <Link>CrossCopyLib\ApiHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\..\CrossCopyLib\BusinessObjects.cs">
+      <Link>CrossCopyLib\BusinessObjects.cs</Link>
+    </Compile>
+    <Compile Include="iOSHelpers.cs" />
+    <Compile Include="..\..\CrossCopyLib\Helpers.cs">
+      <Link>CrossCopyLib\Helpers.cs</Link>
+    </Compile>
+    <Compile Include="..\..\CrossCopyLib\Server.cs">
+      <Link>CrossCopyLib\Server.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="CrossCopyLib\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\crosscopy-icon-114.png" />

@@ -7,9 +7,10 @@ using System.Xml.Serialization;
 using MonoTouch.Dialog;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using CrossCopy.iOSClient.BL;
+using CrossCopy.BL;
 using CrossCopy.iOSClient.UI;
 using MonoTouch.AssetsLibrary;
+using CrossCopy.Helpers;
 
 namespace CrossCopy.iOSClient.Helpers
 {
@@ -159,26 +160,7 @@ namespace CrossCopy.iOSClient.Helpers
             return new AdvancedUIViewElement(null, CreateHtmlView(webFilePath, width, height), false);
         }
     }
-    
-    public class DeviceHelper
-    {
-        public static string GetMacAddress()
-        {
-            string macAddresses = "";
-    
-            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                if (nic.OperationalStatus == OperationalStatus.Up)
-                {
-                    macAddresses += nic.GetPhysicalAddress().ToString();
-                    break;
-                }
-            }
-            
-            return macAddresses;
-        }
-    }
-    
+
     public class ByteHelper
     {
         public static void ImageToByteArray (UIImage image, out byte[] mediaByteArray)
@@ -198,45 +180,6 @@ namespace CrossCopy.iOSClient.Helpers
                 mediaByteArray = new byte[videoData.Length];
                 System.Runtime.InteropServices.Marshal.Copy (videoData.Bytes, mediaByteArray, 0, Convert.ToInt32 (videoData.Length));
             }
-        }
-    }
-
-
-    public static class SerializeHelper<T>
-    {
-        public static string ToXmlString(T obj)
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            System.IO.TextWriter writer = new System.IO.StringWriter();
-            try
-            {
-                serializer.Serialize(writer, obj);
-            }
-            finally
-            {
-                writer.Flush();
-                writer.Close();
-            }
-
-            return writer.ToString();
-        }
-        
-        public static T FromXmlString(string serialized)
-        {
-            if (serialized.Length <= 0) throw new ArgumentOutOfRangeException("serialized", "Cannot thaw a zero-length string");
-
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            System.IO.TextReader reader = new System.IO.StringReader(serialized);
-            object @object = default(T); 
-            try
-            {
-                @object = serializer.Deserialize(reader);
-            }
-            finally
-            {
-                reader.Close();
-            }
-            return (T)@object;
         }
     }
 

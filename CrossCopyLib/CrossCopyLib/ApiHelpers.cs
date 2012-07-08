@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace CrossCopy.Lib.Api
+namespace CrossCopy.Api
 {
     public class UrlHelper
     {
