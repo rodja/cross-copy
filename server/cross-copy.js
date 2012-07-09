@@ -171,10 +171,11 @@ server = http.createServer(function (req, res) {
       } 
       if (filecache[pathname].contentLength) header['Content-Length'] = filecache[pathname].contentLength;
       res.writeHead(200, header);
+      track("get-file-200");
       file.pipe(res);
     } else {
       res.writeHead(404);
-      track("get-file-404");
+      track("get-file-404");
       res.end();
     }
  
@@ -233,6 +234,24 @@ server = http.createServer(function (req, res) {
     }
     
     var form = new formidable.IncomingForm();
+
+      form.on('fileBegin', function(name, file){
+        filecache[pathname] = file;
+      });
+
+
+      form.on('progress', function(received, expected){
+        if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype){
+          mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
+            if (err)
+                filecache[pathname].mimetype = require('mime').lookup(pathname);
+            else
+              filecache[pathname].mimetype = type;
+          //filecache[pathname].contentLength = expected  - 300;
+          });
+        }
+      });
+
       form.parse(req, function(err, fields, files) {
         if (err) {
           res.writeHead(500); res.end();
@@ -258,23 +277,6 @@ server = http.createServer(function (req, res) {
         }, 10 * 60 * 1000);
       });
       
-      form.on('fileBegin', function(name, file){
-        filecache[pathname] = file;
-      });
-
-
-      form.on('progress', function(received, expected){
-        if (received > 10 && filecache[pathname] && !filecache[pathname].mimetype){
-          mime.fileWrapper(filecache[pathname].path + ".pdf", function (err, type) {
-            if (err)
-                filecache[pathname].mimetype = require('mime').lookup(pathname);
-            else
-              filecache[pathname].mimetype = type;
-          //filecache[pathname].contentLength = expected  - 300;
-          });
-        }
-      });
-
   }
 
   if (pathname.indexOf('/api') == 0) return;
