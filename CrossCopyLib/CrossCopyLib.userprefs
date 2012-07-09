@@ -1,10 +1,26 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../Dropbox/Projects/Repository/MonoDroid.Dialog/MonoDroid.Dialog/EntryElement.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Helpers.cs">
     <Files>
-      <File FileName="../../Dropbox/Projects/Repository/MonoDroid.Dialog/MonoDroid.Dialog/DialogActivity.cs" Line="41" Column="38" />
-      <File FileName="../../Dropbox/Projects/Repository/MonoDroid.Dialog/MonoDroid.Dialog/EntryElement.cs" Line="85" Column="7" />
+      <File FileName="Helpers.cs" Line="1" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="CrossCopyLib" expanded="True">
+            <Node name="Helpers.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>this.ListenersCount</Value>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
