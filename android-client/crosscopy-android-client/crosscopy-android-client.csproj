@@ -62,7 +62,10 @@
     <Compile Include="..\..\CrossCopyLib\Server.cs">
       <Link>CrossCopyLib\Server.cs</Link>
     </Compile>
-    <Compile Include="Activity1.cs" />
+    <Compile Include="SecretsActivity.cs" />
+    <Compile Include="SessionActivity.cs" />
+    <Compile Include="AndroidHelpers.cs" />
+    <Compile Include="AppDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
