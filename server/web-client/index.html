@@ -65,16 +65,22 @@
 
 <script>        
         var uploader;
-        function createUploader(){            
+        function createUploader(){
+            var hasStarted = false;
             uploader = new qq.FileUploader({
                 element: document.getElementById('upload'),
                 action: 'api/' + secret + '/',
                 debug: false,
-                onSubmit: function(id, fileName){
-                    share("/" + uploader._options.action + fileName);
+                onSubmit: function(id, filename){
+                  hasStarted = false;
                 },
                 onProgress: function(id, filename, loaded, total){
                   $('.qq-upload-progress').width((loaded/total * 100).toString() +"%");
+                  if (!hasStarted){
+                  console.log(loaded);
+                    hasStarted = true;
+                    share("/" + uploader._options.action + filename);
+                  }
                 },
                 onComplete: function(id, filename, response){
                   trackEvent('succsess', 'POST');
