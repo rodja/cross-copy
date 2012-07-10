@@ -229,6 +229,8 @@ namespace CrossCopy.iOSClient
                     Server.DownloadFileAsync (dataElement.Data, 
                         (s, e) => {
                         var bytes = e.Result;
+                        if (bytes == null)
+                            throw e.Error;
                         var mediaHelper = new MediaHelper ();
                         mediaHelper.FileSavedToPhotosAlbum += (sender, args) => {
                             dataElement.Data = args.ReferenceUrl;
