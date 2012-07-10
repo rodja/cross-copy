@@ -114,8 +114,7 @@ namespace CrossCopy.iOSClient
             navigation.SetNavigationBarHidden (true, false);
             window.RootViewController = navigation;
             
-            server.TransferEvent += (sender, e) => {
-                Paste (e.Data); };
+            server.TransferEvent += Paste;
 
             return true;
         }
