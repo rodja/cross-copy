@@ -16,7 +16,7 @@ namespace CrossCopy.Api
 
         public delegate void StatusChanged ();
 
-        public static string SERVER = @"http://www.cross-copy.net";
+		public static string SERVER = @"http://www.cross-copy.net";
         const string API = @"/api/{0}";
         static string DeviceID = string.Format (
                 "?device_id={0}",
@@ -77,7 +77,6 @@ namespace CrossCopy.Api
         {
             if (CurrentSecret == null)
                 return;
-            receiveClient.CancelAsync ();
             Uri uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
                                               SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId)
             );
@@ -95,6 +94,7 @@ namespace CrossCopy.Api
             if (CurrentSecret == null)
                 return;
 
+			shareClient.CancelAsync();
             shareClient.UploadStringAsync (
                 new Uri (String.Format ("{0}/api/{1}.json{2}",
                 SERVER, CurrentSecret, DeviceID)
