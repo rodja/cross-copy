@@ -17,20 +17,20 @@ namespace CrossCopy.AndroidClient.Helpers
 
             if (!string.IsNullOrEmpty(serialized))
             {
-                AppDelegate.HistoryData = SerializeHelper<History>.FromXmlString(serialized);
-                foreach (Secret s in AppDelegate.HistoryData.Secrets){
+                CrossCopyApp.HistoryData = SerializeHelper<History>.FromXmlString(serialized);
+                foreach (Secret s in CrossCopyApp.HistoryData.Secrets){
                     s.StartWatching();
                 }
             }
             else 
             {
-                AppDelegate.HistoryData = new History();
+                CrossCopyApp.HistoryData = new History();
             }
         }
      
         public static void Save(Context appContext)
         {
-            string serialized = SerializeHelper<History>.ToXmlString(AppDelegate.HistoryData);
+            string serialized = SerializeHelper<History>.ToXmlString(CrossCopyApp.HistoryData);
 			var preferences = PreferenceManager.GetDefaultSharedPreferences(appContext);
 			var editor = preferences.Edit();
 			editor.PutString(historyKey, serialized);

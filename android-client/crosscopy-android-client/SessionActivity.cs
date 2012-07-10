@@ -14,56 +14,81 @@ using CrossCopy.Helpers;
 
 namespace CrossCopy.AndroidClient
 {
-    [Activity(Label = "SessionActivity",
+	[Activity(Label = "SessionActivity",
         WindowSoftInputMode = SoftInput.AdjustPan,
         ConfigurationChanges = ConfigChanges.KeyboardHidden | ConfigChanges.Orientation,
         LaunchMode = LaunchMode.SingleTop)]
-    public class SessionActivity : DialogActivity
-    {
+	public class SessionActivity : DialogActivity
+	{
 		#region Private members
 		Secret secret;
 		EntryElement dataEntry;
+
+		Section EntriesSection { get; set; }
+
 		#endregion
 
 		#region Methods
-		protected override void OnCreate(Bundle bundle)
-        {
-            InitializeRoot();
-            base.OnCreate(bundle);
-        }
-
-		protected override void OnStop ()
+		protected override void OnCreate (Bundle bundle)
 		{
-			base.OnStop ();
-			AppDelegate.EntriesSection = null;
+			InitializeRoot ();
+			base.OnCreate (bundle);
 		}
 
-        private void InitializeRoot()
-        {
-			string serializedSecret = Intent.GetStringExtra("Secret");
-			secret = SerializeHelper<Secret>.FromXmlString(serializedSecret);
+		protected override void OnResume ()
+		{
+			base.OnResume ();
+			CrossCopyApp.Srv.TransferEvent += Paste;
+		}
+
+		protected override void OnPause ()
+		{
+			CrossCopyApp.Srv.TransferEvent -= Paste;
+			base.OnPause ();
+		}
+
+		private void InitializeRoot ()
+		{
+			string phrase = Intent.GetStringExtra ("Secret");
+			secret = new Secret (phrase);
 			this.Root = new RootElement (secret.Phrase) 
             {
                 new Section ("Keep on server (1 min)") {
                     (dataEntry = new EntryElement ("Text", "your message", null)),
 					new ButtonElement("Send", delegate {
-						AppDelegate.Srv.Send (dataEntry.Value.Trim ());
+						CrossCopyApp.Srv.Send (dataEntry.Value.Trim ());
 					})
 				},
-                (AppDelegate.EntriesSection = new Section ("History"))
+                (EntriesSection = new Section ("History"))
             };
 
-            AppDelegate.EntriesSection.Elements.AddRange (
+			EntriesSection.Elements.AddRange (
                 from d in secret.DataItems
-                select ((Element)new StringElement(d.Data))
-            );
+                select ((Element)new StringElement (d.Data))
+			);
             
-            AppDelegate.Srv.CurrentSecret = secret;
-			AppDelegate.CurrentSecret = secret;
-            AppDelegate.Srv.Listen ();
+			CrossCopyApp.Srv.CurrentSecret = secret;
+			CrossCopyApp.Srv.Listen ();
+		}
+
+		public void Paste (DataItem item)
+		{
+			//RunOnUiThread (() => {
+			CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
+			
+			if (EntriesSection != null) {
+				StringElement element;
+				if (item.Direction == DataItemDirection.Out) {
+					element = new StringElement (item.Data);	
+				} else {
+					element = new StringElement ("", item.Data);
+				}
+				EntriesSection.Insert (0, element);
+			}
+			//});
 		}
 		#endregion
-    }
+	}
 }
 
 

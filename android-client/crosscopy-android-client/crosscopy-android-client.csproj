@@ -65,7 +65,7 @@
     <Compile Include="SecretsActivity.cs" />
     <Compile Include="SessionActivity.cs" />
     <Compile Include="AndroidHelpers.cs" />
-    <Compile Include="AppDelegate.cs" />
+    <Compile Include="CrossCopyApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

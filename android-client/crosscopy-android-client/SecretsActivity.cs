@@ -27,7 +27,7 @@ namespace CrossCopy.AndroidClient
 		{
 			base.OnCreate (bundle);
 
-			var root = CreateRootElement (); 
+			RootElement root = CreateRootElement (); 
 			rootDA = new DialogAdapter (this, root);
 			var lv = new ListView (this) { Adapter = rootDA };
 			SetContentView (lv);
@@ -37,13 +37,19 @@ namespace CrossCopy.AndroidClient
 		{
 			base.OnResume ();
 
-			AppDelegate.Srv.Abort (); 
-            AppDelegate.CurrentSecret = null;
+			CrossCopyApp.Srv.Abort (); 
+            
+			foreach (Secret s in CrossCopyApp.HistoryData.Secrets) {
+				secretsSection.Add((Element)new StringElement (s.Phrase));
+			}
+			if (secretsSection.Count == 0) {
+                ((RootElement) secretsSection.Parent).RemoveAt (0);
+            }
 		}
 
 		private RootElement CreateRootElement ()
 		{
-			var root = new RootElement ("Secrets"); 
+			RootElement root = new RootElement ("Secrets"); 
 			secretsSection = new Section ("Secrets");
             var newSecretSection = new Section () 
             {
@@ -52,14 +58,14 @@ namespace CrossCopy.AndroidClient
 					if (String.IsNullOrEmpty (secretEntry.Value))
 	                    return;
 
-	                var newSecret = new Secret (secretEntry.Value);
-	                AppDelegate.HistoryData.Secrets.Add (newSecret);
+	                Secret newSecret = new Secret (secretEntry.Value);
+	                CrossCopyApp.HistoryData.Secrets.Add (newSecret);
 
 	                if (root.Count == 1)
 	                    root.Insert (0, secretsSection);
 
 	                secretsSection.Insert (
-	                    secretsSection.Elements.Count,
+	                    0,
 	                    new StringElement(newSecret.Phrase)
 	                );
 	                secretEntry.Value = "";
@@ -67,12 +73,7 @@ namespace CrossCopy.AndroidClient
 				})
             };
 
-			foreach (var s in AppDelegate.HistoryData.Secrets) {
-				secretsSection.Add((Element)new StringElement (s.Phrase));
-			}
-			if (secretsSection.Count == 0) {
-                root.RemoveAt (0);
-            }
+
 
 			root.Add(new List<Section>() { secretsSection, newSecretSection });
 			return root;
@@ -82,9 +83,7 @@ namespace CrossCopy.AndroidClient
         {
             var sessionIntent = new Intent();
             sessionIntent.SetClass(this, typeof(SessionActivity));
-            sessionIntent.AddFlags(ActivityFlags.NewTask);
-			string serializedSecret = SerializeHelper<Secret>.ToXmlString(secret);
-            sessionIntent.PutExtra("Secret", serializedSecret);
+            sessionIntent.PutExtra("Secret", secret.Phrase);
 			StartActivity(sessionIntent);
         }
 		#endregion

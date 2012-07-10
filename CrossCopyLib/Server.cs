@@ -10,7 +10,7 @@ namespace CrossCopy.Api
 {
     public class Server
     {
-        public delegate void TransferEventHandler (object sender,TransferEventArgs e);
+        public delegate void TransferEventHandler (DataItem data);
 
         public delegate void EventDelegate (object sender,DownloadDataCompletedEventArgs e);
 
@@ -45,7 +45,7 @@ namespace CrossCopy.Api
                 foreach (JsonValue i in items) {
                     DataItem item = new DataItem (i,
                         DataItemDirection.In, DateTime.Now);
-                    TransferEvent (this, new TransferEventArgs (item));
+                    TransferEvent (item);
                 }
                 Listen ();
             };
@@ -63,7 +63,7 @@ namespace CrossCopy.Api
 
                 DataItem item = new DataItem (JsonObject.Parse (e.Result),
                     DataItemDirection.Out, DateTime.Now);
-                TransferEvent (this, new TransferEventArgs (item));
+                TransferEvent (item);
             };
         }
 
@@ -159,16 +159,6 @@ namespace CrossCopy.Api
             webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler (dwnldCompletedDelegate);
             webClient.DownloadDataAsync (url);
         }
-    }
-
-    public class TransferEventArgs : EventArgs
-    {
-        public TransferEventArgs (DataItem data)
-        {
-            Data = data;
-        }
-
-        public DataItem Data{ get; set; }
     }
 }
 
