@@ -58,6 +58,8 @@ namespace CrossCopy.iOSClient
         Server server = new Server ();
         List<string> selectedFilePathArray;
         StyledDialogViewController rootDVC, sectionDVC;
+        UIDocumentInteractionController interactionController;
+        UIDocumentInteractionControllerDelegateClass interactionControllerDelegate;
         #endregion
         
         #region Public props
@@ -304,7 +306,7 @@ namespace CrossCopy.iOSClient
                 movieController.View.AddSubview (moviePlayer.View);
                 movieController.View.AddSubview (btnClose);
                 navigation.PresentModalViewController (movieController, true);
-            } else {
+            }  else if (ext.ToUpper () == ".JPEG" || ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
                 ALAssetsLibrary library = new ALAssetsLibrary ();
                 library.AssetForUrl (new NSUrl (filePath), 
                     (asset) => {
@@ -356,6 +358,13 @@ namespace CrossCopy.iOSClient
                     }
                 }
                 );
+            }  else {
+                interactionControllerDelegate = new  UIDocumentInteractionControllerDelegateClass(navigation);
+                interactionController = UIDocumentInteractionController.FromUrl(NSUrl.FromFilename(filePath));
+                interactionController.Delegate = interactionControllerDelegate;
+                InvokeOnMainThread(delegate {
+                    interactionController.PresentPreview(true);
+                });
             }
         }
         

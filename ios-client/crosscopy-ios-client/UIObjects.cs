@@ -537,6 +537,31 @@ namespace CrossCopy.iOSClient.UI
             return true;
         }
     }
+
+    public class UIDocumentInteractionControllerDelegateClass : UIDocumentInteractionControllerDelegate
+    {
+        UIViewController viewC;
+
+        public UIDocumentInteractionControllerDelegateClass(UIViewController controller)
+        {
+            viewC = controller;
+        }
+
+        public override UIViewController ViewControllerForPreview (UIDocumentInteractionController controller)
+        {
+            return viewC;
+        }
+
+        public override UIView ViewForPreview (UIDocumentInteractionController controller)
+        {
+            return viewC.View;
+        }
+
+        public override RectangleF RectangleForPreview (UIDocumentInteractionController controller)
+        {
+            return viewC.View.Frame;
+        }
+  }
 }
 
 

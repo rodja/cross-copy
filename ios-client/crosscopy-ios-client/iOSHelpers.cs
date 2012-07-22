@@ -265,7 +265,10 @@ namespace CrossCopy.iOSClient.Helpers
                 });
                 img.Dispose();
             } else {
-                // TODO save other files in the App and make them accessable through itunes; also they should still be opend with iOS build in preview
+                File.WriteAllBytes (filePath, fileData);
+                if (FileSavedToPhotosAlbum != null) {
+                    FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (filePath));
+                }
             }
         }
     }
