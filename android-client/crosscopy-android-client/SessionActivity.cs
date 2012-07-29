@@ -42,7 +42,6 @@ namespace CrossCopy.AndroidClient
 			string phrase = Intent.GetStringExtra ("Secret");
 			CrossCopyApp.Srv.CurrentSecret = secret;
 			CrossCopyApp.Srv.Listen ();
-			
 		}
 
 		protected override void OnPause ()
