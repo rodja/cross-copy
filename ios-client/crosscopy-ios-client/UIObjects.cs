@@ -391,11 +391,13 @@ namespace CrossCopy.iOSClient.UI
                 return activity.IsAnimating;
             }
             set {
-                if (value) {
-                    activity.StartAnimating ();
-                } else {
-                    activity.StopAnimating ();
-                }
+                UIApplication.SharedApplication.InvokeOnMainThread (delegate() { 
+                    if (value) {
+                       activity.StartAnimating (); 
+                    } else {
+                        activity.StopAnimating ();
+                    }
+                });
             }
         }
 
