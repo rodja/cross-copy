@@ -12,58 +12,58 @@
     <AssemblyName>crosscopyiosclient</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchI18n />
     <MtouchLink>None</MtouchLink>
-    <ConsolePause>false</ConsolePause>
-    <MtouchProfiling>true</MtouchProfiling>
-    <MtouchDebug>true</MtouchDebug>
+    <ConsolePause>False</ConsolePause>
+    <MtouchProfiling>True</MtouchProfiling>
+    <MtouchDebug>True</MtouchDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <ConsolePause>False</ConsolePause>
     <MtouchLink>None</MtouchLink>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <IpaPackageName />
     <MtouchI18n />
-    <BuildIpa>true</BuildIpa>
-    <ConsolePause>false</ConsolePause>
+    <BuildIpa>True</BuildIpa>
+    <ConsolePause>False</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <MtouchProfiling>true</MtouchProfiling>
-    <MtouchDebug>true</MtouchDebug>
+    <MtouchProfiling>True</MtouchProfiling>
+    <MtouchDebug>True</MtouchDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchI18n />
-    <ConsolePause>false</ConsolePause>
+    <ConsolePause>False</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <BuildIpa>true</BuildIpa>
+    <BuildIpa>True</BuildIpa>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\Ad-Hoc</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -73,29 +73,29 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TestFlight|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\iPhone\Distribution</OutputPath>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer: Rodja Trappe (SFFWUYR4JW)</CodesignKey>
-    <BuildIpa>true</BuildIpa>
-    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <BuildIpa>True</BuildIpa>
+    <MtouchUseLlvm>True</MtouchUseLlvm>
     <MtouchArch>ARMv6_ARMv7</MtouchArch>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchUseSGen>True</MtouchUseSGen>
+    <MtouchUseRefCounting>True</MtouchUseRefCounting>
     <MtouchI18n />
     <DefineConstants>TESTFLIGHT</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\iPhone\AppStore</OutputPath>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Distribution: Rodja Trappe</CodesignKey>
     <CodesignProvision>BB279395-B117-477E-A28B-B1917F033B3E</CodesignProvision>
-    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchUseLlvm>True</MtouchUseLlvm>
     <MtouchArch>ARMv6_ARMv7</MtouchArch>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchUseSGen>True</MtouchUseSGen>
+    <MtouchUseRefCounting>True</MtouchUseRefCounting>
     <MtouchI18n />
     <DefineConstants>APPSTORE</DefineConstants>
   </PropertyGroup>
@@ -111,6 +111,9 @@
     </Reference>
     <Reference Include="TestFlight">
       <HintPath>TestFlight.dll</HintPath>
+    </Reference>
+    <Reference Include="FlurryAnalytics">
+      <HintPath>FlurryAnalytics.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -22,6 +22,8 @@ using MonoTouch.TestFlight;
 using CrossCopy.Api;
 using MonoTouch.AssetsLibrary;
 
+using Flurry = FlurryAnalytics.FlurryAnalytics;
+
 namespace CrossCopy.iOSClient
 {
     [Register ("AppDelegate")]
@@ -79,6 +81,8 @@ namespace CrossCopy.iOSClient
 #if APPSTORE
             Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
 #endif
+            Flurry.StartSession("M3QY6NMPR8H9HSWT6YSM");
+            Flurry.SetSessionReportsOnPause(true);
 
             Analytics.SharedTracker.TrackPageView ("/launched", out error);
 
@@ -112,6 +116,7 @@ namespace CrossCopy.iOSClient
             rootDVC.View.AddSubview(aboutButton);
 
             navigation = new UINavigationController ();
+            Flurry.LogAllPageViews(navigation);
             navigation.PushViewController (rootDVC, false);
             navigation.SetNavigationBarHidden (true, false);
             window.RootViewController = navigation;
