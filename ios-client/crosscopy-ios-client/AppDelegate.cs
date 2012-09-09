@@ -283,7 +283,7 @@ namespace CrossCopy.iOSClient
         private void OpenFile (string filePath)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
-            string ext = Path.GetExtension (filePath);                   
+            string ext = UrlHelper.GetExtension(filePath);
                   
             if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
                 var movieController = new AdvancedUIViewController ();
