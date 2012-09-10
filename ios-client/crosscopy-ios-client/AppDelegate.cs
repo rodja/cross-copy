@@ -80,9 +80,9 @@ namespace CrossCopy.iOSClient
 #endif
 #if APPSTORE
             Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
-#endif
             Flurry.StartSession("M3QY6NMPR8H9HSWT6YSM");
             Flurry.SetSessionReportsOnPause(true);
+#endif
 
             Analytics.SharedTracker.TrackPageView ("/launched", out error);
 
