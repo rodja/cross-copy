@@ -20,6 +20,16 @@ namespace CrossCopy.Api
 
             return fileName;
         }
+
+        public static string GetExtension (string filePath)
+        {
+            string ext = Path.GetExtension (filePath);
+            int idx = ext.IndexOf("?");
+            if (idx >= 0) {
+                ext = ext.Substring(0, idx);
+            }
+            return ext;
+        }
     }
 
 }

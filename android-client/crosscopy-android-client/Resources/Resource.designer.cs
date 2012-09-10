@@ -82,6 +82,9 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f05000c
 			public const int iFormFieldValue = 2131034124;
 			
+			// aapt resource value: 0x7f05000d
+			public const int textView1 = 2131034125;
+			
 			private Id()
 			{
 			}
@@ -146,6 +149,9 @@ namespace CrossCopy.AndroidClient
 			
 			// aapt resource value: 0x7f030012
 			public const int main = 2130903058;
+			
+			// aapt resource value: 0x7f030013
+			public const int Secrets = 2130903059;
 			
 			private Layout()
 			{
