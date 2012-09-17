@@ -96,6 +96,7 @@
     <AndroidResource Include="Resources\drawable\dialog_disclosure.png" />
     <AndroidResource Include="Resources\drawable\dialog_expander_ic_minimized.9.png" />
     <AndroidResource Include="Resources\layout\Secrets.axml" />
+    <AndroidResource Include="Resources\layout\secret.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
