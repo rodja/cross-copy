@@ -20,6 +20,8 @@ namespace CrossCopy.AndroidClient
 		//	DialogAdapter rootDA;
 		//	EntryElement secretEntry; 
 		//	Section secretsSection;
+		ListView dataList;
+		string listData;
 #endregion
 		
 		#region Methods
@@ -28,6 +30,7 @@ namespace CrossCopy.AndroidClient
 			base.OnCreate (bundle);
 			SetContentView(Resource.Layout.secret);
 			var normalButton = FindViewById<Button>(Resource.Id.btnListen);
+			dataList = FindViewById<ListView>(Resource.Id.dataList);
 			var txtEditSecret = FindViewById<EditText>(Resource.Id.txtEditSecret);
 			normalButton.Click += (sender, args) => {
 				Toast.MakeText(this, "Normal button clicked", ToastLength.Short).Show();
@@ -36,6 +39,20 @@ namespace CrossCopy.AndroidClient
 					Secret newSecret = new Secret (txtEditSecret.Text);
 					CrossCopyApp.HistoryData.Secrets.Add (newSecret);
 					DisplaySecretDetail (newSecret);
+					if(listData.Length>0)
+					{
+						listData = listData + ",";
+						listData = listData + txtEditSecret.Text.Trim();
+					}
+					else
+					{
+						listData = listData + txtEditSecret.Text.Trim();
+					}
+					string [] myArr = listData.Split (',');
+					if (myArr.Length > 0) {
+						IListAdapter myAdapter= new ArrayAdapter<string>(this,Resource.Layout.listitem,myArr);
+						dataList.Adapter = myAdapter;
+					}
 				}
 				
 			};

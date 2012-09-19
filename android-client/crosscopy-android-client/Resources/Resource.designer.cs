@@ -43,8 +43,11 @@ namespace CrossCopy.AndroidClient
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f050012
-			public const int btnListen = 2131034130;
+			// aapt resource value: 0x7f050014
+			public const int btnListen = 2131034132;
+			
+			// aapt resource value: 0x7f05000f
+			public const int dataList = 2131034127;
 			
 			// aapt resource value: 0x7f050000
 			public const int dialog_BoolField = 2131034112;
@@ -88,20 +91,38 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f05000d
 			public const int l1 = 2131034125;
 			
-			// aapt resource value: 0x7f05000e
-			public const int relativeLayout1 = 2131034126;
+			// aapt resource value: 0x7f05001a
+			public const int lblHistory = 2131034138;
 			
-			// aapt resource value: 0x7f050011
-			public const int relativeLayout2 = 2131034129;
-			
-			// aapt resource value: 0x7f050013
-			public const int textView1 = 2131034131;
+			// aapt resource value: 0x7f050018
+			public const int lblMsg = 2131034136;
 			
 			// aapt resource value: 0x7f050010
-			public const int txtEditSecret = 2131034128;
+			public const int relativeLayout1 = 2131034128;
 			
-			// aapt resource value: 0x7f05000f
-			public const int txtSecret = 2131034127;
+			// aapt resource value: 0x7f050013
+			public const int relativeLayout2 = 2131034131;
+			
+			// aapt resource value: 0x7f050017
+			public const int relativeLayout3 = 2131034135;
+			
+			// aapt resource value: 0x7f05000e
+			public const int relativeLayout4 = 2131034126;
+			
+			// aapt resource value: 0x7f050015
+			public const int textView1 = 2131034133;
+			
+			// aapt resource value: 0x7f050012
+			public const int txtEditSecret = 2131034130;
+			
+			// aapt resource value: 0x7f050019
+			public const int txtMsg = 2131034137;
+			
+			// aapt resource value: 0x7f050011
+			public const int txtSecret = 2131034129;
+			
+			// aapt resource value: 0x7f050016
+			public const int txtTitle = 2131034134;
 			
 			private Id()
 			{
@@ -166,13 +187,19 @@ namespace CrossCopy.AndroidClient
 			public const int dialog_textfieldright = 2130903057;
 			
 			// aapt resource value: 0x7f030012
-			public const int main = 2130903058;
+			public const int listitem = 2130903058;
 			
 			// aapt resource value: 0x7f030013
-			public const int secret = 2130903059;
+			public const int main = 2130903059;
 			
 			// aapt resource value: 0x7f030014
-			public const int Secrets = 2130903060;
+			public const int secret = 2130903060;
+			
+			// aapt resource value: 0x7f030015
+			public const int Secrets = 2130903061;
+			
+			// aapt resource value: 0x7f030016
+			public const int session = 2130903062;
 			
 			private Layout()
 			{
