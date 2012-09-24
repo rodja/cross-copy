@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#E0E0E0">
+    <TextView
+        android:text="Cross Copy"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewTitle"
+        android:gravity="center"
+        android:textColor="#000000" />
+    <TextView
+        android:text="Open this app or the iOS App or the site http://cross-copy.net on different devices and choose the same secret. You can then transfer messages and files between them without any further setup."
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewDesc"
+        android:padding="10dp"
+        android:textColor="#737373" />
+    <TableLayout
+        android:background="@drawable/round_border"
+        android:stretchColumns="1"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tableLayout1"
+        android:layout_margin="10dp">
+        <TableRow
+            android:id="@+id/tableRowSecret"
+            android:gravity="center">
+            <TextView
+                android:text="Secret"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_column="0"
+                android:id="@+id/textViewSecret"
+                android:textColor="#000000" />
+            <EditText
+                android:layout_column="1"
+                android:id="@+id/editTextSecret"
+                android:hint="enter new phrase" />
+            <Button
+                android:text="Go"
+                android:layout_column="2"
+                android:minHeight="30px"
+                android:id="@+id/buttonGo"
+                android:textColor="#000000" />
+        </TableRow>
+    </TableLayout>
+    <TextView
+        android:text="Secrets"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewSecrets"
+        android:textColor="#000000"
+        android:layout_marginLeft="10dp" />
+    <ListView
+        android:background="@drawable/round_border"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/listView1"
+        android:layout_margin="10dp" />
+</LinearLayout>

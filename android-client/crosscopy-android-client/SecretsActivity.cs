@@ -28,8 +28,9 @@ namespace CrossCopy.AndroidClient
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
-			SetContentView(Resource.Layout.secret);
-			var normalButton = FindViewById<Button>(Resource.Id.btnListen);
+			SetContentView(Resource.Layout.Share);
+			
+			/*var normalButton = FindViewById<Button>(Resource.Id.btnListen);
 			dataList = FindViewById<ListView>(Resource.Id.dataList);
 			var txtEditSecret = FindViewById<EditText>(Resource.Id.txtEditSecret);
 			normalButton.Click += (sender, args) => {
@@ -55,7 +56,7 @@ namespace CrossCopy.AndroidClient
 					}
 				}
 				
-			};
+			};*/
 		}
 		
 		protected override void OnResume ()

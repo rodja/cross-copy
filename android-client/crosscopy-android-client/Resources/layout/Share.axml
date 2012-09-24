@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#E0E0E0"
+    android:padding="10dp">
+    <TextView
+        android:text="Share with 1 device"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewShare"
+        android:textColor="#737373"
+        android:padding="10dp" />
+    <TableLayout
+        android:background="@drawable/round_border"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tableLayout1"
+        android:shrinkColumns="0"
+        android:stretchColumns="1">
+        <TableRow
+            android:layout_margin="3dp"
+            android:background="@drawable/table_border"
+            android:id="@+id/tableRow1">
+            <TextView
+                android:text="Photo"
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textView1"
+                android:textColor="#000000"
+                android:padding="5dp" />
+            <TextView
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textView5" />
+            <Button
+                android:text="Choose"
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/buttonChoose"
+                android:textColor="#000000" />
+        </TableRow>
+        <TableRow
+            android:layout_margin="3dp"
+            android:background="@drawable/table_border"
+            android:id="@+id/tableRow3">
+            <TextView
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textViewText"
+                android:padding="5dp"
+                android:text="Text"
+                android:textColor="#000000" />
+            <TextView
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textViewUpload"
+                android:hint="your message" />
+            <Button
+                android:text="Go"
+                android:minHeight="30px"
+                android:id="@+id/buttonGo"
+                android:textColor="#000000" />
+        </TableRow>
+    </TableLayout>
+    <TextView
+        android:text="History"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewHistory"
+        android:padding="10dp"
+        android:textColor="#737373" />
+    <ListView
+        android:background="@drawable/round_border"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/listView1" />
+</LinearLayout>

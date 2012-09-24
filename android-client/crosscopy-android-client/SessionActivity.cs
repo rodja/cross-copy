@@ -82,8 +82,8 @@ namespace CrossCopy.AndroidClient
 					}
 					string [] myArr = listData.Split (',');
 					if (myArr.Length > 0) {
-						IListAdapter myAdapter= new ArrayAdapter<string>(this,Resource.Layout.listitem,myArr);
-						dataList.Adapter = myAdapter;
+						//IListAdapter myAdapter= new ArrayAdapter<string>(this,Resource.Layout.listitem,myArr);
+						//dataList.Adapter = myAdapter;
 					}
 				}
 
@@ -119,8 +119,8 @@ namespace CrossCopy.AndroidClient
 
 			string [] myArr = listData.Split (',');
 			if (myArr.Length > 0) {
-				IListAdapter myAdapter= new ArrayAdapter<string>(this,Resource.Layout.listitem,myArr);
-				dataList.Adapter = myAdapter;
+				//IListAdapter myAdapter= new ArrayAdapter<string>(this,Resource.Layout.listitem,myArr);
+				//dataList.Adapter = myAdapter;
 			}
 
 
