@@ -28,7 +28,7 @@ namespace CrossCopy.AndroidClient
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
-			SetContentView(Resource.Layout.Share);
+			SetContentView(Resource.Layout.MainScreen);
 			
 			/*var normalButton = FindViewById<Button>(Resource.Id.btnListen);
 			dataList = FindViewById<ListView>(Resource.Id.dataList);
