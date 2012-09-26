@@ -28,7 +28,7 @@ namespace CrossCopy.AndroidClient
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
-			SetContentView(Resource.Layout.MainScreen);
+			SetContentView (Resource.Layout.MainScreen);
 			
 			/*var normalButton = FindViewById<Button>(Resource.Id.btnListen);
 			dataList = FindViewById<ListView>(Resource.Id.dataList);
@@ -63,7 +63,18 @@ namespace CrossCopy.AndroidClient
 		{
 			base.OnResume ();
 			
-			CrossCopyApp.Srv.Abort (); 
+			CrossCopyApp.Srv.Abort ();
+
+			FindViewById<Button>(Resource.Id.buttonGo).Click +=(sender, e) => {
+				string phrase = FindViewById<EditText>(Resource.Id.editTextSecret).Text;
+				if (String.IsNullOrEmpty (phrase))
+					return;
+
+				Secret newSecret = new Secret (phrase);
+				CrossCopyApp.HistoryData.Secrets.Add (newSecret);
+				
+				DisplaySecretDetail (newSecret);
+			};
 			
 			//			foreach (Secret s in CrossCopyApp.HistoryData.Secrets) {
 			//				secretsSection.Add((Element)new StringElement (s.Phrase));
@@ -73,44 +84,12 @@ namespace CrossCopy.AndroidClient
 			//            }
 		}
 		
-		//		private RootElement CreateRootElement ()
-		//		{
-		//			RootElement root = new RootElement ("Secrets"); 
-		//			secretsSection = new Section ("Secrets");
-		//            var newSecretSection = new Section () 
-		//            {
-		//                (secretEntry = new EntryElement ("Secret", "")),
-		//				new ButtonElement("Listen", delegate {
-		//					if (String.IsNullOrEmpty (secretEntry.Value))
-		//	                    return;
-		//
-		//	                Secret newSecret = new Secret (secretEntry.Value);
-		//	                CrossCopyApp.HistoryData.Secrets.Add (newSecret);
-		//
-		//	                if (root.Count == 1)
-		//	                    root.Insert (0, secretsSection);
-		//
-		//	                secretsSection.Insert (
-		//	                    0,
-		//	                    new StringElement(newSecret.Phrase)
-		//	                );
-		//	                secretEntry.Value = "";
-		//	                DisplaySecretDetail (newSecret);
-		//				})
-		//            };
-		//
-		//
-		//
-		//			root.Add(new List<Section>() { secretsSection, newSecretSection });
-		//			return root;
-		//		}
-		
 		private void DisplaySecretDetail (Secret secret)
 		{
-			var sessionIntent = new Intent();
-			sessionIntent.SetClass(this, typeof(SessionActivity));
-			sessionIntent.PutExtra("Secret", secret.Phrase);
-			StartActivity(sessionIntent);
+			var sessionIntent = new Intent ();
+			sessionIntent.SetClass (this, typeof(SessionActivity));
+			sessionIntent.PutExtra ("Secret", secret.Phrase);
+			StartActivity (sessionIntent);
 		}
 #endregion
 	}

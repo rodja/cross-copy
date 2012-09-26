@@ -32,16 +32,10 @@
         <TableRow
             android:id="@+id/tableRowSecret"
             android:gravity="center">
-            <TextView
-                android:text="Secret"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_column="0"
-                android:id="@+id/textViewSecret"
-                android:textColor="#000000" />
             <EditText
                 android:layout_column="1"
                 android:id="@+id/editTextSecret"
-                android:hint="enter new phrase" />
+                android:hint="enter new secret phrase" />
             <Button
                 android:text="Go"
                 android:layout_column="2"

@@ -55,7 +55,7 @@
                 android:padding="5dp"
                 android:text="Text"
                 android:textColor="#000000" />
-            <TextView
+            <EditText
                 android:minWidth="30px"
                 android:minHeight="30px"
                 android:id="@+id/textViewUpload"
@@ -72,14 +72,13 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewHistory"
         android:padding="10dp"
         android:textColor="#737373" />
-    <ListView
+    <TextView
         android:background="@drawable/round_border"
         android:minWidth="25px"
         android:minHeight="25px"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/listView1" />
+        android:id="@+id/history" />
 </LinearLayout>
