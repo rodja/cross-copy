@@ -70,7 +70,7 @@ namespace CrossCopy.AndroidClient
 			btnSend.Click += (sender, args) => {
 				if (!String.IsNullOrEmpty (txtMsg.Text)) {
 					CrossCopyApp.Srv.Send (txtMsg.Text.Trim ());
-					Paste (new DataItem (txtMsg.Text.Trim (), DataItemDirection.Out, DateTime.Now));
+					//Paste (new DataItem (txtMsg.Text.Trim (), DataItemDirection.Out, DateTime.Now));
 				}
 			};
 
@@ -85,7 +85,7 @@ namespace CrossCopy.AndroidClient
 			var history = FindViewById<TextView> (Resource.Id.history);
 
 			RunOnUiThread (() => {
-				history.Text = item.Data + history.Text +  "\n";
+				history.Text = item.Data + "\n" + history.Text;
 			});
 		}
 		#endregion
