@@ -11,6 +11,7 @@ using CrossCopy.BL;
 using System.Collections.Generic;
 using CrossCopy.Helpers;
 
+
 namespace CrossCopy.AndroidClient
 {
 	[Activity (Label = "cross copy", MainLauncher = true, WindowSoftInputMode = SoftInput.AdjustPan)]
@@ -20,6 +21,7 @@ namespace CrossCopy.AndroidClient
 		//	DialogAdapter rootDA;
 		//	EntryElement secretEntry; 
 		//	Section secretsSection;
+		SecretListAdapter secretListAdap;
 		ListView dataList;
 		string listData;
 #endregion
@@ -30,6 +32,22 @@ namespace CrossCopy.AndroidClient
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.MainScreen);
 			
+			List<SecretsList> sl = new List<SecretsList> () {
+            new SecretsList() { Secret="Secret1", Devices = "1 device",
+                Image = Resource.Drawable.remove },
+             new SecretsList() { Secret="Secret2", Devices = "2 devices",
+                Image = Resource.Drawable.remove },
+				 new SecretsList() { Secret="Secret3", Devices = "3 devices",
+                Image = Resource.Drawable.remove },
+             new SecretsList() { Secret="Secret4", Devices = "2 devices",
+                Image = Resource.Drawable.remove }
+			};
+			secretListAdap = new SecretListAdapter (this, sl);
+			var listView = FindViewById<ListView> (Resource.Id.listViewSecrets);
+			listView.Adapter = secretListAdap;
+			listView.ItemClick += listView_ItemClick;
+
+				
 			/*var normalButton = FindViewById<Button>(Resource.Id.btnListen);
 			dataList = FindViewById<ListView>(Resource.Id.dataList);
 			var txtEditSecret = FindViewById<EditText>(Resource.Id.txtEditSecret);
@@ -57,6 +75,12 @@ namespace CrossCopy.AndroidClient
 				}
 				
 			};*/
+		}
+
+		void listView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+		{
+			var item = this.secretListAdap.GetItem (e.Position);
+			Toast.MakeText (this, " Clicked!", ToastLength.Short).Show ();
 		}
 		
 		protected override void OnResume ()

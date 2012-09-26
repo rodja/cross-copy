@@ -11,6 +11,7 @@ using Android.Content.PM;
 using MonoDroid.Dialog;
 using CrossCopy.BL;
 using CrossCopy.Helpers;
+using System.Collections.Generic;
 
 namespace CrossCopy.AndroidClient
 {
@@ -21,6 +22,7 @@ namespace CrossCopy.AndroidClient
 	public class SessionActivity : Activity
 	{
 		#region Private members
+		HistoryListAdapter historyListAdap;
 		Secret secret;
 		EntryElement dataEntry;
 
@@ -36,6 +38,20 @@ namespace CrossCopy.AndroidClient
 		{
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.Share);
+			
+			List<HistoryList> hl = new List<HistoryList> () {
+            new HistoryList() { Left="History1", Right="" },
+             new HistoryList() { Left="", Right="History2" },
+				new HistoryList() { Left="History3", Right="" },
+             new HistoryList() { Left="", Right="History4" },
+				new HistoryList() { Left="History5", Right="" },
+             new HistoryList() { Left="", Right="History6" }
+			};
+			historyListAdap = new HistoryListAdapter (this, hl);
+			var listView = FindViewById<ListView> (Resource.Id.listViewHistory);
+			listView.Adapter = historyListAdap;
+			listView.ItemClick += listView_ItemClick;
+			
 			listData = "";
 			var btnSend = FindViewById<Button> (Resource.Id.buttonGo);
 			var txtMsg = FindViewById<EditText> (Resource.Id.textViewUpload);
@@ -49,6 +65,12 @@ namespace CrossCopy.AndroidClient
 			string phrase = Intent.GetStringExtra ("Secret");
 			secret = new Secret (phrase);
 			CrossCopyApp.Srv.CurrentSecret = secret;
+		}
+		
+		void listView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+		{
+			var item = this.historyListAdap.GetItem(e.Position);
+			Toast.MakeText(this, " Clicked!", ToastLength.Short).Show();
 		}
 
 		protected override void OnResume ()
@@ -76,11 +98,11 @@ namespace CrossCopy.AndroidClient
 		public void Paste (DataItem item)
 		{
 			CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
-			var history = FindViewById<TextView> (Resource.Id.history);
+			/*var history = FindViewById<TextView> (Resource.Id.history);
 
 			RunOnUiThread (() => {
 				history.Text = item.Data + "\n" + history.Text;
-			});
+			});*/
 		}
 		#endregion
 	}

@@ -17,24 +17,24 @@
     <AssemblyName>crosscopyandroidclient</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
+    <ConsolePause>false</ConsolePause>
     <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+    <ConsolePause>false</ConsolePause>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
   </PropertyGroup>
   <ItemGroup>
@@ -66,6 +66,10 @@
     <Compile Include="SessionActivity.cs" />
     <Compile Include="AndroidHelpers.cs" />
     <Compile Include="CrossCopyApp.cs" />
+    <Compile Include="HistoryList.cs" />
+    <Compile Include="SecretsList.cs" />
+    <Compile Include="SecretListAdapter.cs" />
+    <Compile Include="HistoryListAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -80,6 +84,18 @@
     <AndroidResource Include="Resources\drawable\round_border.xml" />
     <AndroidResource Include="Resources\layout\Share.axml" />
     <AndroidResource Include="Resources\drawable\table_border.xml" />
+    <AndroidResource Include="Resources\drawable\browse.png" />
+    <AndroidResource Include="Resources\drawable\download.png" />
+    <AndroidResource Include="Resources\drawable\file.png" />
+    <AndroidResource Include="Resources\drawable\folder.png" />
+    <AndroidResource Include="Resources\drawable\remove.png" />
+    <AndroidResource Include="Resources\drawable\upload.png" />
+    <AndroidResource Include="Resources\layout\ListViewHistory.axml" />
+    <AndroidResource Include="Resources\layout\ListViewSecrets.axml" />
+    <AndroidResource Include="Resources\drawable\crosscopyicon114.png" />
+    <AndroidResource Include="Resources\drawable\crosscopyicon144.png" />
+    <AndroidResource Include="Resources\drawable\crosscopyicon57.png" />
+    <AndroidResource Include="Resources\drawable\crosscopyicon72.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

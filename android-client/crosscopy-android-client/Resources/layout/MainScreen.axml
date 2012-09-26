@@ -32,6 +32,10 @@
         <TableRow
             android:id="@+id/tableRowSecret"
             android:gravity="center">
+            <TextView
+                android:minWidth="1px"
+                android:minHeight="1px"
+                android:id="@+id/textView1" />
             <EditText
                 android:layout_column="1"
                 android:id="@+id/editTextSecret"
@@ -39,7 +43,6 @@
             <Button
                 android:text="Go"
                 android:layout_column="2"
-                android:minHeight="30px"
                 android:id="@+id/buttonGo"
                 android:textColor="#000000" />
         </TableRow>
@@ -49,7 +52,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewSecrets"
+        android:id="@+id/textViewSecretsLbl"
         android:textColor="#000000"
         android:layout_marginLeft="10dp" />
     <ListView
@@ -57,7 +60,7 @@
         android:minWidth="25px"
         android:minHeight="25px"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/listView1"
+        android:layout_height="wrap_content"
+        android:id="@+id/listViewSecrets"
         android:layout_margin="10dp" />
 </LinearLayout>

@@ -74,11 +74,10 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textColor="#737373" />
-    <TextView
-        android:background="@drawable/round_border"
+    <ListView
         android:minWidth="25px"
         android:minHeight="25px"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/history" />
+        android:layout_height="wrap_content"
+        android:id="@+id/listViewHistory" />
 </LinearLayout>
