@@ -73,7 +73,7 @@ namespace CrossCopy.AndroidClient
 				Secret newSecret = new Secret (phrase);
 				CrossCopyApp.HistoryData.Secrets.Add (newSecret);
 				
-				DisplaySecretDetail (newSecret);
+				DisplaySecretDetail (phrase);
 			};
 			
 			//			foreach (Secret s in CrossCopyApp.HistoryData.Secrets) {
@@ -84,11 +84,11 @@ namespace CrossCopy.AndroidClient
 			//            }
 		}
 		
-		private void DisplaySecretDetail (Secret secret)
+		private void DisplaySecretDetail (string phrase)
 		{
 			var sessionIntent = new Intent ();
 			sessionIntent.SetClass (this, typeof(SessionActivity));
-			sessionIntent.PutExtra ("Secret", secret.Phrase);
+			sessionIntent.PutExtra ("Secret", phrase);
 			StartActivity (sessionIntent);
 		}
 #endregion

@@ -5,6 +5,7 @@ using MonoDroid.Dialog;
 using CrossCopy.Api;
 using CrossCopy.BL;
 using CrossCopy.AndroidClient.Helpers;
+using System.Threading;
 
 namespace CrossCopy.AndroidClient
 {
@@ -28,6 +29,8 @@ namespace CrossCopy.AndroidClient
 		public override void OnCreate()
         {
 			base.OnCreate();
+			System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
+			ThreadPool.SetMinThreads(100, 4);
 			StoreHelper.Load (ApplicationContext);
 			Srv = new Server ();
         }

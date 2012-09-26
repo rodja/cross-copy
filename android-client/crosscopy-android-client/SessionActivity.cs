@@ -34,8 +34,21 @@ namespace CrossCopy.AndroidClient
 		#region Methods
 		protected override void OnCreate (Bundle bundle)
 		{
-			InitializeRoot ();
 			base.OnCreate (bundle);
+			SetContentView (Resource.Layout.Share);
+			listData = "";
+			var btnSend = FindViewById<Button> (Resource.Id.buttonGo);
+			var txtMsg = FindViewById<EditText> (Resource.Id.textViewUpload);
+			btnSend.Click += (sender, args) => {
+				if (!String.IsNullOrEmpty (txtMsg.Text)) {
+					CrossCopyApp.Srv.Send (txtMsg.Text.Trim ());
+					//Paste (new DataItem (txtMsg.Text.Trim (), DataItemDirection.Out, DateTime.Now));
+				}
+			};
+			
+			string phrase = Intent.GetStringExtra ("Secret");
+			secret = new Secret (phrase);
+			CrossCopyApp.Srv.CurrentSecret = secret;
 		}
 
 		protected override void OnResume ()
@@ -58,25 +71,6 @@ namespace CrossCopy.AndroidClient
 		{
 			base.OnNewIntent (intent);
 			Intent = intent; // overwrite old intent
-		}
-
-		private void InitializeRoot ()
-		{
-
-			SetContentView (Resource.Layout.Share);
-			listData = "";
-			var btnSend = FindViewById<Button> (Resource.Id.buttonGo);
-			var txtMsg = FindViewById<EditText> (Resource.Id.textViewUpload);
-			btnSend.Click += (sender, args) => {
-				if (!String.IsNullOrEmpty (txtMsg.Text)) {
-					CrossCopyApp.Srv.Send (txtMsg.Text.Trim ());
-					//Paste (new DataItem (txtMsg.Text.Trim (), DataItemDirection.Out, DateTime.Now));
-				}
-			};
-
-			string phrase = Intent.GetStringExtra ("Secret");
-			secret = new Secret (phrase);
-			CrossCopyApp.Srv.CurrentSecret = secret;
 		}
 
 		public void Paste (DataItem item)
