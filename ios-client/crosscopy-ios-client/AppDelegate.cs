@@ -34,21 +34,21 @@ namespace CrossCopy.iOSClient
         static UIImage imgDownload = UIImage.FromFile ("Images/download.png");
         static UIImage imgUpload = UIImage.FromFile ("Images/upload.png");
         static UIColor backgroundColor = new UIColor (
-                224 / 255.0f,
-                224 / 255.0f,
-                224 / 255.0f,
-                1.0f
+            224 / 255.0f,
+            224 / 255.0f,
+            224 / 255.0f,
+            1.0f
             );
         static UIColor lightTextColor = new UIColor (
-                115 / 255.0f,
-                115 / 255.0f,
-                115 / 255.0f,
-                1.0f
+            115 / 255.0f,
+            115 / 255.0f,
+            115 / 255.0f,
+            1.0f
             );
         static UIImagePickerController imagePicker;
         static MPMoviePlayerController moviePlayer;
         const string ASSETS_LIBRARY = "assets-library://";
-        #endregion
+#endregion
         
         #region Private members
         UIWindow window;
@@ -62,12 +62,15 @@ namespace CrossCopy.iOSClient
         StyledDialogViewController rootDVC, sectionDVC;
         UIDocumentInteractionController interactionController;
         UIDocumentInteractionControllerDelegateClass interactionControllerDelegate;
-        #endregion
+        enum FileType { Photo, Video, Other};
+        string ResharedItem;
+        FileType ResharedItemType;
+#endregion
         
         #region Public props
         public static History HistoryData { get; set; }
-        #endregion
-
+#endregion
+        
         #region Methods
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
@@ -75,7 +78,7 @@ namespace CrossCopy.iOSClient
 #if TESTFLIGHT
             Analytics.SharedTracker.StartTracker("UA-31324545-3",120, null);
             Analytics.SharedTracker.SetReferrer("TestFlight", out error);
-
+            
             TestFlight.TakeOff("88e03730ca852e81d199baba95b9fc61_MTAxMDc3MjAxMi0wNi0xNyAyMzo0OToxNy44NzEzOTI");
 #endif
 #if APPSTORE
@@ -83,11 +86,11 @@ namespace CrossCopy.iOSClient
             Flurry.StartSession("M3QY6NMPR8H9HSWT6YSM");
             Flurry.SetSessionReportsOnPause(true);
 #endif
-
+            
             Analytics.SharedTracker.TrackPageView ("/launched", out error);
-
+            
             StoreHelper.Load ();
-
+            
             window = new UIWindow (UIScreen.MainScreen.Bounds);
             window.MakeKeyAndVisible ();
             
@@ -95,41 +98,17 @@ namespace CrossCopy.iOSClient
                 selectedFilePathArray = new List<string> ();
             }
             
-            RootElement root = CreateRootElement ();
-            rootDVC = new StyledDialogViewController (root, null, backgroundColor)
-            {
-                Autorotate = true, 
-                HidesBottomBarWhenPushed = true
-            };
-            rootDVC.ViewAppearing += (sender, e) => {
-                server.Abort (); 
-                currentSecret = null;
-                NSError err;
-                Analytics.SharedTracker.TrackPageView ("/secrets", out err);
-                ReOrderSecrets();
-            };
-
-            var aboutButton = UIHelper.CreateInfoButton(40f, 60f);
-            aboutButton.TouchDown += (sender, e) => {
-                ShowAboutView();
-            };
-            rootDVC.View.AddSubview(aboutButton);
-
-            navigation = new UINavigationController ();
-            Flurry.LogAllPageViews(navigation);
-            navigation.PushViewController (rootDVC, false);
-            navigation.SetNavigationBarHidden (true, false);
-            window.RootViewController = navigation;
+            ShowSecretsView();
             
             server.TransferEvent += Paste;
-
+            
             return true;
         }
         
         public override void OnActivated (UIApplication application)
         {
         }
-
+        
         public override void DidEnterBackground (UIApplication application)
         {
             Analytics.SharedTracker.Dispatch ();
@@ -151,7 +130,7 @@ namespace CrossCopy.iOSClient
                 32,
                 UITextAlignment.Center,
                 UIColor.Black
-            );
+                );
             UILabel subcaptionLabel = UIHelper.CreateLabel (
                 "Open this App or http://cross-copy.net on different devices and choose the same secret. " + 
                 "You can then transfer messages and files between them without any further setup.",
@@ -160,13 +139,13 @@ namespace CrossCopy.iOSClient
                 85,
                 UITextAlignment.Center,
                 lightTextColor
-            );
-         
+                );
+            
             captionLabel.Frame = new Rectangle (0, 10, 320, 40);
             subcaptionLabel.Frame = new Rectangle (20, 55, 280, 100);
             UIView header = new UIView (new Rectangle (0, 0, 300, 145));
             header.AddSubviews (captionLabel, subcaptionLabel);
-
+            
             var root = new RootElement ("Secrets") 
             {
                 new Section (header),
@@ -178,28 +157,28 @@ namespace CrossCopy.iOSClient
             };
             
             secretsSection.AddAll (from s in AppDelegate.HistoryData.Secrets select (Element)CreateImageButtonStringElement (s));
-
+            
             secretEntry.AutocapitalizationType = UITextAutocapitalizationType.None;
             secretEntry.ShouldReturn += delegate {
-
+                
                 if (String.IsNullOrEmpty (secretEntry.Value))
                     return false;
-
+                
                 var newSecret = new Secret (secretEntry.Value);
                 AppDelegate.HistoryData.Secrets.Add (newSecret);
-
+                
                 if (root.Count == 2)
                     root.Insert (1, secretsSection);
-
+                
                 secretsSection.Insert (
                     secretsSection.Elements.Count,
                     UITableViewRowAnimation.Fade,
                     CreateImageButtonStringElement (newSecret)
-                );
+                    );
                 secretEntry.Value = "";
                 secretEntry.ResignFirstResponder (false);
                 DisplaySecretDetail (newSecret);
-
+                
                 return true;
             };
             secretEntry.ReturnKeyType = UIReturnKeyType.Go;
@@ -209,11 +188,11 @@ namespace CrossCopy.iOSClient
             }
             return root;
         }
-
+        
         private Element CreateDataItemElement (DataItem item)
         {
             Element element;
-
+            
             if ((item.Data.StartsWith (server.CurrentPath)) ||
                 (item.Data.StartsWith (ASSETS_LIBRARY)) ||
                 (item.Data.StartsWith (BaseDir))) {
@@ -221,19 +200,21 @@ namespace CrossCopy.iOSClient
                     Path.GetFileName (item.Data),
                     (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
                     item.Data
-                );
+                    );
                 dataElement.Tapped += delegate {
-                    OpenFile (dataElement.Data);
+                    if (!dataElement.Downloading){
+                        OpenFile (dataElement.Data);
+                    }
                 };
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
-                if ((item.Direction == DataItemDirection.In) && 
-                    (item.Data.StartsWith (server.CurrentPath))) {
+                if (item.Data.StartsWith (server.CurrentPath)) {
                     dataElement.Animating = true;
+                    dataElement.Downloading = true;
                     var localFilePath = Path.Combine (
                         BaseDir,
                         dataElement.Caption);
                     Server.DownloadFileAsync (dataElement.Data, 
-                        (s, e) => {
+                                              (s, e) => {
                         var bytes = e.Result;
                         if (bytes == null)
                             throw e.Error;
@@ -242,6 +223,7 @@ namespace CrossCopy.iOSClient
                             dataElement.Data = args.ReferenceUrl;
                             item.Data = dataElement.Data;
                             dataElement.Animating = false;
+                            dataElement.Downloading = false;
                         };
                         mediaHelper.SaveFileToPhotosAlbum (localFilePath, bytes);
                     }
@@ -249,7 +231,7 @@ namespace CrossCopy.iOSClient
                 } else {
                     dataElement.Animating = false;
                 }
-
+                
                 element = (Element)dataElement;
             } else {
                 UITextAlignment alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
@@ -257,19 +239,19 @@ namespace CrossCopy.iOSClient
                     null,
                     item.Data,
                     alignment
-                );
+                    );
                 element = (Element)htmlElement;
             }
-
+            
             return element;
         }
-
+        
         private void PasteData (string data, DataItemDirection direction)
         {
             DataItem item = new DataItem (data, direction, DateTime.Now);
             Paste (item);                
         }
-
+        
         private void Paste (DataItem item)
         {
             UIApplication.SharedApplication.InvokeOnMainThread (delegate { 
@@ -277,14 +259,55 @@ namespace CrossCopy.iOSClient
                 entriesSection.Insert (0, CreateDataItemElement (item));
             }
             );
-
         }
-       
+        
+        private void ReshareData ()
+        {
+            if (rootDVC.View.ViewWithTag(2) != null) {
+                rootDVC.View.ViewWithTag(2).RemoveFromSuperview();
+            }
+            
+            var referenceUrl = new NSUrl(ResharedItem);
+            NSUrl mediaUrl = null;
+            switch (ResharedItemType)
+            {
+            case FileType.Photo:
+                ALAssetsLibrary library = new ALAssetsLibrary ();
+                library.AssetForUrl (new NSUrl (ResharedItem), 
+                                     (asset) => {
+                    if (asset != null) {
+                        mediaUrl = null;
+                        UIImage image = UIImage.FromImage (asset.DefaultRepresentation.GetImage());
+                        UploadMedia (image, referenceUrl, mediaUrl);
+                        
+                    } else {
+                        Console.Out.WriteLine ("Asset is null.");
+                    }
+                }, 
+                (failureError) => {
+                    if (failureError != null) {
+                        Console.Out.WriteLine ("Error: " + failureError.LocalizedDescription);
+                    }
+                }
+                );
+                break;
+            case FileType.Video: 
+            case FileType.Other:
+                var fileUrl = NSUrl.FromFilename (ResharedItem);
+                UploadMedia(null, fileUrl, fileUrl);
+                break;
+            default:
+                Console.Out.WriteLine ("Error: Resharing file type is not set");
+                break;
+            }
+            ResharedItem = String.Empty;
+        }
+        
         private void OpenFile (string filePath)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
             string ext = UrlHelper.GetExtension(filePath);
-                  
+            
             if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
                 var movieController = new AdvancedUIViewController ();
                 moviePlayer = new MPMoviePlayerController (NSUrl.FromFilename (filePath));
@@ -292,8 +315,8 @@ namespace CrossCopy.iOSClient
                     sbounds.X,
                     sbounds.Y - 20,
                     sbounds.Width,
-                    sbounds.Height
-                );
+                    sbounds.Height - 30
+                    );
                 moviePlayer.ControlStyle = MPMovieControlStyle.Fullscreen;
                 moviePlayer.View.AutoresizingMask = (UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight);
                 moviePlayer.ShouldAutoplay = true;
@@ -308,13 +331,29 @@ namespace CrossCopy.iOSClient
                     movieController.DismissModalViewControllerAnimated (true);
                 };
                 
+                var btnShare = UIButton.FromType (UIButtonType.RoundedRect);
+                btnShare.Frame = new RectangleF (
+                    (sbounds.Width / 2) - 50,
+                    sbounds.Height - 50,
+                    100,
+                    30
+                    );
+                btnShare.SetTitle ("Share", UIControlState.Normal);
+                btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
+                btnShare.TouchDown += delegate {
+                    ResharedItem = filePath;
+                    ResharedItemType = FileType.Video;
+                    ShowSecretsView();
+                };
+                
                 movieController.View.AddSubview (moviePlayer.View);
                 movieController.View.AddSubview (btnClose);
+                movieController.View.AddSubview (btnShare);
                 navigation.PresentModalViewController (movieController, true);
             }  else if (ext.ToUpper () == ".JPEG" || ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
                 ALAssetsLibrary library = new ALAssetsLibrary ();
                 library.AssetForUrl (new NSUrl (filePath), 
-                    (asset) => {
+                                     (asset) => {
                     if (asset != null) {
                         var imageController = new AdvancedUIViewController (); 
                         var image = UIImage.FromImage (asset.DefaultRepresentation.GetFullScreenImage ());
@@ -323,20 +362,35 @@ namespace CrossCopy.iOSClient
                         imageView.UserInteractionEnabled = true;
                         imageView.ClipsToBounds = true;
                         imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
-                            
+                        
                         var btnClose = UIButton.FromType (UIButtonType.RoundedRect);
                         btnClose.Frame = new RectangleF (
-                                (sbounds.Width / 2) - 50,
-                                20,
-                                100,
-                                30
-                        );
+                            (sbounds.Width / 2) - 50,
+                            20,
+                            100,
+                            30
+                            );
                         btnClose.SetTitle ("Close", UIControlState.Normal);
                         btnClose.SetTitleColor (UIColor.Black, UIControlState.Normal);
                         btnClose.TouchDown += delegate {
                             imageController.DismissModalViewControllerAnimated (true);
                         };
-                            
+                        
+                        var btnShare = UIButton.FromType (UIButtonType.RoundedRect);
+                        btnShare.Frame = new RectangleF (
+                            (sbounds.Width / 2) - 50,
+                            sbounds.Height - 60,
+                            100,
+                            30
+                            );
+                        btnShare.SetTitle ("Share", UIControlState.Normal);
+                        btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
+                        btnShare.TouchDown += delegate {
+                            ResharedItem = filePath;
+                            ResharedItemType = FileType.Photo;
+                            ShowSecretsView();
+                        };
+                        
                         var scrollView = new UIScrollView (sbounds);
                         scrollView.ClipsToBounds = true;
                         scrollView.ContentSize = sbounds.Size;
@@ -348,22 +402,40 @@ namespace CrossCopy.iOSClient
                         scrollView.ViewForZoomingInScrollView = delegate(UIScrollView sv) {
                             return imageView;
                         };
-                             
+                        
                         scrollView.AddSubview (imageView);
                         imageController.View.AddSubview (scrollView);
                         imageController.View.AddSubview (btnClose);
+                        imageController.View.AddSubview (btnShare);
                         navigation.PresentModalViewController (imageController, true);
                     } else {
                         Console.Out.WriteLine ("Asset is null.");
                     }
                 }, 
-                    (error) => {
+                (error) => {
                     if (error != null) {
                         Console.Out.WriteLine ("Error: " + error.LocalizedDescription);
                     }
                 }
                 );
             }  else {
+                var btnShare = UIButton.FromType (UIButtonType.RoundedRect);
+                btnShare.Frame = new RectangleF (
+                    (sbounds.Width / 2) - 50,
+                    sbounds.Height - 50,
+                    100,
+                    30
+                    );
+                btnShare.SetTitle ("Share", UIControlState.Normal);
+                btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
+                btnShare.Tag = 1;
+                btnShare.TouchDown += delegate {
+                    ResharedItem = filePath;
+                    ResharedItemType = FileType.Other;
+                    ShowSecretsView();
+                };
+                
+                navigation.Add(btnShare);
                 interactionControllerDelegate = new  UIDocumentInteractionControllerDelegateClass(navigation);
                 interactionController = UIDocumentInteractionController.FromUrl(NSUrl.FromFilename(filePath));
                 interactionController.Delegate = interactionControllerDelegate;
@@ -384,7 +456,7 @@ namespace CrossCopy.iOSClient
                 NSUrl referenceUrl = e.Info [UIImagePickerController.ReferenceUrl] as NSUrl;
                 UIImage image = null;
                 NSUrl mediaUrl = null;
-                    
+                
                 if (isImage) {
                     image = e.Info [UIImagePickerController.OriginalImage] as UIImage;
                 } else {
@@ -414,10 +486,10 @@ namespace CrossCopy.iOSClient
                 Console.Out.WriteLine ("No media to upload!");
                 return;
             }
-
+            
             LoadingView loading = new LoadingView ();
             loading.Show ("Uploading file, please wait ...");
-             
+            
             server.UploadFileAsync (
                 referenceUrl.AbsoluteString,
                 mediaByteArray,
@@ -426,14 +498,14 @@ namespace CrossCopy.iOSClient
             }
             );
         }
-
+        
         private ImageButtonStringElement CreateImageButtonStringElement (Secret secret)
         {
             var secretElement = new ImageButtonStringElement (secret.Phrase, secret, "Images/remove.png", 
-                      delegate {
+                                                              delegate {
                 DisplaySecretDetail (secret);
             }, 
-                      delegate {
+            delegate {
                 AppDelegate.HistoryData.Secrets.Remove (secret);
                 Element found = null;
                 foreach (var element in secretsSection.Elements) {
@@ -442,7 +514,7 @@ namespace CrossCopy.iOSClient
                         break;
                     }
                 }
-                        
+                
                 if (found != null) {
                     secretsSection.Remove (found);
                     if (secretsSection.Count == 0)
@@ -459,15 +531,15 @@ namespace CrossCopy.iOSClient
                 }
                 );
             };
-
+            
             return secretElement;
         }
-
+        
         private void DisplaySecretDetail (Secret s)
         {
             NSError error;
             Analytics.SharedTracker.TrackPageView ("/session", out error);
-
+            
             var subRoot = new RootElement (s.Phrase) 
             {
                 (shareSection = new Section ("Keep on server (1 min)") {
@@ -475,7 +547,7 @@ namespace CrossCopy.iOSClient
                     (dataEntry = new AdvancedEntryElement ("Text", "your message", null))}),
                 (entriesSection = new Section ("History"))
             };
-
+            
             pickPhoto.Accessory = UITableViewCellAccessory.DisclosureIndicator;
             dataEntry.ShouldReturn += delegate {
                 UIApplication.SharedApplication.InvokeOnMainThread (delegate {
@@ -488,29 +560,29 @@ namespace CrossCopy.iOSClient
                 return true;
             };
             dataEntry.ReturnKeyType = UIReturnKeyType.Send;
-
-
+            
+            
             entriesSection.Elements.AddRange (
                 from d in s.DataItems
                 select ((Element)CreateDataItemElement (d))
-            );
-
+                );
+            
             subRoot.UnevenRows = true;
-
+            
             sectionDVC = new StyledDialogViewController (
                 subRoot,
                 true,
                 null,
                 backgroundColor
-            );
+                );
             sectionDVC.HidesBottomBarWhenPushed = false;
             navigation.SetNavigationBarHidden (false, true);
             navigation.PushViewController (sectionDVC, true);
-
+            
             server.CurrentSecret = s;
             currentSecret = s;
             server.Listen ();
-
+            
             currentSecret.WatchEvent += (secret) => {
                 int count = secret.ListenersCount - 1;
                 string pattern = "Keep on server (1 min)";
@@ -525,8 +597,72 @@ namespace CrossCopy.iOSClient
                 }
                 );
             };
+            
+            sectionDVC.ViewAppearing += delegate {
+                if (navigation.View.ViewWithTag(1) != null) {
+                    navigation.View.ViewWithTag(1).RemoveFromSuperview();
+                }
+            };
+            
+            if (!String.IsNullOrEmpty (ResharedItem)) {
+                ReshareData();
+            }
         }
-
+        
+        private void ShowSecretsView ()
+        {
+            var secret = currentSecret;
+            RootElement root = CreateRootElement ();
+            rootDVC = new StyledDialogViewController (root, null, backgroundColor)
+            {
+                Autorotate = true, 
+                HidesBottomBarWhenPushed = true
+            };
+            rootDVC.ViewAppearing += (sender, e) => {
+                server.Abort (); 
+                currentSecret = null;
+                NSError err;
+                Analytics.SharedTracker.TrackPageView ("/secrets", out err);
+                ReOrderSecrets ();
+            };
+            
+            var aboutButton = UIHelper.CreateInfoButton(40f, 60f);
+            aboutButton.TouchDown += (sender, e) => {
+                ShowAboutView();
+            };
+            rootDVC.View.AddSubview(aboutButton);
+            
+            navigation = new UINavigationController ();
+            Flurry.LogAllPageViews(navigation);
+            navigation.SetNavigationBarHidden (true, false);
+            navigation.PushViewController (rootDVC, false);
+            
+            window.RootViewController = navigation;
+            
+            if (!String.IsNullOrEmpty (ResharedItem)) 
+            {
+                var sbounds = UIScreen.MainScreen.Bounds;
+                var btnCancel = UIButton.FromType (UIButtonType.RoundedRect);
+                btnCancel.Tag = 2;
+                btnCancel.Frame = new RectangleF (
+                    10,
+                    sbounds.Height - 60f,
+                    100,
+                    30
+                    );
+                btnCancel.SetTitle ("Cancel", UIControlState.Normal);
+                btnCancel.SetTitleColor (UIColor.Black, UIControlState.Normal);
+                btnCancel.TouchDown += delegate {
+                    ResharedItem = String.Empty;
+                    if (rootDVC.View.ViewWithTag(2) != null) {
+                        rootDVC.View.ViewWithTag(2).RemoveFromSuperview();
+                    }
+                    DisplaySecretDetail(secret);
+                };
+                rootDVC.View.AddSubview (btnCancel);
+            }
+        }
+        
         private void ShowAboutView ()
         {
             var captionLabel = UIHelper.CreateLabel (
@@ -536,18 +672,18 @@ namespace CrossCopy.iOSClient
                 32,
                 UITextAlignment.Center,
                 UIColor.Black
-            );
+                );
             captionLabel.Frame = new Rectangle (0, 10, 320, 40);
             UIView header = new UIView (new Rectangle (0, 0, 300, 40));
             header.AddSubviews (captionLabel);
-
+            
             var closeButton = new StyledStringElement ("Close");
             closeButton.BackgroundColor = UIColor.LightGray;
             closeButton.Alignment = UITextAlignment.Center;
             closeButton.Tapped += delegate { 
                 navigation.DismissModalViewControllerAnimated(true); 
             };
-
+            
             var root = new RootElement ("About") 
             {
                 new Section (header),
@@ -564,7 +700,7 @@ namespace CrossCopy.iOSClient
             };
             navigation.PresentModalViewController(dvc, true);
         }
-
+        
         private void ReOrderSecrets ()
         {
             secretsSection.Elements.Sort (delegate(Element e1, Element e2) {
@@ -581,7 +717,6 @@ namespace CrossCopy.iOSClient
             });
             rootDVC.ReloadComplete();
         }
-        #endregion
+#endregion
     }
 }
-

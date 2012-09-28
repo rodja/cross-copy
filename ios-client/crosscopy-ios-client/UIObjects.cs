@@ -349,7 +349,8 @@ namespace CrossCopy.iOSClient.UI
     {
         UIActivityIndicatorView activity;
         public string Data;
-        
+        public bool Downloading;
+                
         public DataImageStringElement (string caption, UIImage image, string data) 
             : base (caption, image)
         {
