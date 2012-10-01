@@ -48,6 +48,12 @@ namespace CrossCopy.iOSClient
         static UIImagePickerController imagePicker;
         static MPMoviePlayerController moviePlayer;
         const string ASSETS_LIBRARY = "assets-library://";
+        const int SHARE_BUTTON_TAG = 1;
+        const int CANCEL_BUTTON_TAG = 2;
+        const int MAIN_SCREEN_LABEL_TAG = 3;
+        const string WELCOME_LABEL_TEXT = "Open this App or http://cross-copy.net on different d\tevices and choose the same secret. " + 
+            "You can then transfer messages and files between them without any further setup.";
+        const string SHARE_LABEL_TEXT = "Please select a secret where '{0}' should be send to.";
 #endregion
         
         #region Private members
@@ -64,6 +70,7 @@ namespace CrossCopy.iOSClient
         UIDocumentInteractionControllerDelegateClass interactionControllerDelegate;
         enum FileType { Photo, Video, Other};
         string ResharedItem;
+        string ReshareFileName;
         FileType ResharedItemType;
 #endregion
         
@@ -132,14 +139,14 @@ namespace CrossCopy.iOSClient
                 UIColor.Black
                 );
             UILabel subcaptionLabel = UIHelper.CreateLabel (
-                "Open this App or http://cross-copy.net on different devices and choose the same secret. " + 
-                "You can then transfer messages and files between them without any further setup.",
+                WELCOME_LABEL_TEXT,
                 false,
                 14,
                 85,
                 UITextAlignment.Center,
                 lightTextColor
                 );
+            subcaptionLabel.Tag = 3;
             
             captionLabel.Frame = new Rectangle (0, 10, 320, 40);
             subcaptionLabel.Frame = new Rectangle (20, 55, 280, 100);
@@ -202,7 +209,9 @@ namespace CrossCopy.iOSClient
                     item.Data
                     );
                 dataElement.Tapped += delegate {
-                    if (!dataElement.Downloading){
+                    if (!dataElement.Downloading)
+                    {
+                        ReshareFileName = UrlHelper.GetFileName(dataElement.Data);
                         OpenFile (dataElement.Data);
                     }
                 };
@@ -214,7 +223,7 @@ namespace CrossCopy.iOSClient
                         BaseDir,
                         dataElement.Caption);
                     Server.DownloadFileAsync (dataElement.Data, 
-                                              (s, e) => {
+                        (s, e) => {
                         var bytes = e.Result;
                         if (bytes == null)
                             throw e.Error;
@@ -263,9 +272,11 @@ namespace CrossCopy.iOSClient
         
         private void ReshareData ()
         {
-            if (rootDVC.View.ViewWithTag(2) != null) {
-                rootDVC.View.ViewWithTag(2).RemoveFromSuperview();
+            if (rootDVC.View.ViewWithTag(CANCEL_BUTTON_TAG) != null) {
+                rootDVC.View.ViewWithTag(CANCEL_BUTTON_TAG).RemoveFromSuperview();
             }
+
+            UpdateSecretsViewLabel(WELCOME_LABEL_TEXT);
             
             var referenceUrl = new NSUrl(ResharedItem);
             NSUrl mediaUrl = null;
@@ -307,7 +318,7 @@ namespace CrossCopy.iOSClient
         {
             var sbounds = UIScreen.MainScreen.Bounds;
             string ext = UrlHelper.GetExtension(filePath);
-            
+
             if (ext.ToUpper () == ".MOV" || ext.ToUpper () == ".M4V") {
                 var movieController = new AdvancedUIViewController ();
                 moviePlayer = new MPMoviePlayerController (NSUrl.FromFilename (filePath));
@@ -353,7 +364,7 @@ namespace CrossCopy.iOSClient
             }  else if (ext.ToUpper () == ".JPEG" || ext.ToUpper () == ".JPG" || ext.ToUpper () == ".PNG") {
                 ALAssetsLibrary library = new ALAssetsLibrary ();
                 library.AssetForUrl (new NSUrl (filePath), 
-                                     (asset) => {
+                  (asset) => {
                     if (asset != null) {
                         var imageController = new AdvancedUIViewController (); 
                         var image = UIImage.FromImage (asset.DefaultRepresentation.GetFullScreenImage ());
@@ -428,7 +439,7 @@ namespace CrossCopy.iOSClient
                     );
                 btnShare.SetTitle ("Share", UIControlState.Normal);
                 btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
-                btnShare.Tag = 1;
+                btnShare.Tag = SHARE_BUTTON_TAG;
                 btnShare.TouchDown += delegate {
                     ResharedItem = filePath;
                     ResharedItemType = FileType.Other;
@@ -599,8 +610,8 @@ namespace CrossCopy.iOSClient
             };
             
             sectionDVC.ViewAppearing += delegate {
-                if (navigation.View.ViewWithTag(1) != null) {
-                    navigation.View.ViewWithTag(1).RemoveFromSuperview();
+                if (navigation.View.ViewWithTag(SHARE_BUTTON_TAG) != null) {
+                    navigation.View.ViewWithTag(SHARE_BUTTON_TAG).RemoveFromSuperview();
                 }
             };
             
@@ -643,7 +654,7 @@ namespace CrossCopy.iOSClient
             {
                 var sbounds = UIScreen.MainScreen.Bounds;
                 var btnCancel = UIButton.FromType (UIButtonType.RoundedRect);
-                btnCancel.Tag = 2;
+                btnCancel.Tag = CANCEL_BUTTON_TAG;
                 btnCancel.Frame = new RectangleF (
                     10,
                     sbounds.Height - 60f,
@@ -654,12 +665,24 @@ namespace CrossCopy.iOSClient
                 btnCancel.SetTitleColor (UIColor.Black, UIControlState.Normal);
                 btnCancel.TouchDown += delegate {
                     ResharedItem = String.Empty;
-                    if (rootDVC.View.ViewWithTag(2) != null) {
-                        rootDVC.View.ViewWithTag(2).RemoveFromSuperview();
+                    if (rootDVC.View.ViewWithTag(CANCEL_BUTTON_TAG) != null) {
+                        rootDVC.View.ViewWithTag(CANCEL_BUTTON_TAG).RemoveFromSuperview();
                     }
+                    UpdateSecretsViewLabel(WELCOME_LABEL_TEXT);
                     DisplaySecretDetail(secret);
                 };
                 rootDVC.View.AddSubview (btnCancel);
+
+                UpdateSecretsViewLabel(String.Format(SHARE_LABEL_TEXT, ReshareFileName));
+            }
+        }
+
+        private void UpdateSecretsViewLabel (string caption)
+        {
+            var label = (UILabel)rootDVC.View.ViewWithTag(MAIN_SCREEN_LABEL_TAG);
+            if (label != null)
+            {
+                label.Text = caption;
             }
         }
         
@@ -700,7 +723,7 @@ namespace CrossCopy.iOSClient
             };
             navigation.PresentModalViewController(dvc, true);
         }
-        
+
         private void ReOrderSecrets ()
         {
             secretsSection.Elements.Sort (delegate(Element e1, Element e2) {
