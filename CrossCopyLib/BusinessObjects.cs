@@ -144,6 +144,9 @@ namespace CrossCopy.BL
 		[XmlIgnore]
 		public DataItemDirection Direction { get; set; }
 
+        [XmlAttribute("itempath")]
+        public string ItemPath { get; set; }
+
 		[XmlAttribute("direction")]
 		[EditorBrowsable(EditorBrowsableState.Never), Browsable(false)]
 		public int DirectionInt {
