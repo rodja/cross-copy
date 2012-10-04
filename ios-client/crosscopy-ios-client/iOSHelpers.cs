@@ -214,11 +214,17 @@ namespace CrossCopy.iOSClient.Helpers
 
     public class FilesSavedToPhotosAlbumArgs : System.EventArgs
     {
-        public FilesSavedToPhotosAlbumArgs(string referenceUrl) { 
-            ReferenceUrl = referenceUrl; 
+        public FilesSavedToPhotosAlbumArgs(string referenceUrl, string filePath) { 
+            ReferenceUrl = referenceUrl;
+            FilePath = filePath;
         } 
     
         public string ReferenceUrl { 
+            get; 
+            set; 
+        }
+
+        public string FilePath { 
             get; 
             set; 
         }
@@ -239,7 +245,7 @@ namespace CrossCopy.iOSClient.Helpers
                     UIVideo.SaveToPhotosAlbum(filePath, (path, error) => {
                         if (error == null) {
                             if (FileSavedToPhotosAlbum != null) {
-                                FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (path));
+                                FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (path, path));
                             }
                         } else {
                             Console.Out.WriteLine ("Video {0} cannot be saved to photos album!", filePath);
@@ -257,7 +263,7 @@ namespace CrossCopy.iOSClient.Helpers
                     (assetUrl, error) => {
                         if (error == null) {
                             if (FileSavedToPhotosAlbum != null) {
-                                FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (assetUrl.ToString()));
+                                FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (assetUrl.ToString(), filePath));
                         } else {
                             Console.Out.WriteLine ("Image {0} cannot be saved to photos album!", filePath);
                         }
@@ -267,7 +273,7 @@ namespace CrossCopy.iOSClient.Helpers
             } else {
                 File.WriteAllBytes (filePath, fileData);
                 if (FileSavedToPhotosAlbum != null) {
-                    FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (filePath));
+                    FileSavedToPhotosAlbum (this, new FilesSavedToPhotosAlbumArgs (filePath, filePath));
                 }
             }
         }

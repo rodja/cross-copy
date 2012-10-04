@@ -69,8 +69,7 @@ namespace CrossCopy.iOSClient
         UIDocumentInteractionController interactionController;
         UIDocumentInteractionControllerDelegateClass interactionControllerDelegate;
         enum FileType { Photo, Video, Other};
-        string ResharedItem;
-        string ReshareFileName;
+        DataItem ResharedItem;
         FileType ResharedItemType;
 #endregion
         
@@ -204,15 +203,14 @@ namespace CrossCopy.iOSClient
                 (item.Data.StartsWith (ASSETS_LIBRARY)) ||
                 (item.Data.StartsWith (BaseDir))) {
                 var dataElement = new DataImageStringElement (
-                    Path.GetFileName (item.Data),
+                    Path.GetFileName (String.IsNullOrEmpty(item.ItemPath) ? item.Data : item.ItemPath),
                     (item.Direction == DataItemDirection.In) ? imgDownload : imgUpload,
                     item.Data
                     );
                 dataElement.Tapped += delegate {
                     if (!dataElement.Downloading)
                     {
-                        ReshareFileName = UrlHelper.GetFileName(dataElement.Data);
-                        OpenFile (dataElement.Data);
+                        OpenFile (dataElement.Data, item);
                     }
                 };
                 dataElement.Alignment = (item.Direction == DataItemDirection.In) ? UITextAlignment.Right : UITextAlignment.Left;
@@ -230,6 +228,7 @@ namespace CrossCopy.iOSClient
                         var mediaHelper = new MediaHelper ();
                         mediaHelper.FileSavedToPhotosAlbum += (sender, args) => {
                             dataElement.Data = args.ReferenceUrl;
+                            item.ItemPath = args.FilePath;
                             item.Data = dataElement.Data;
                             dataElement.Animating = false;
                             dataElement.Downloading = false;
@@ -254,7 +253,7 @@ namespace CrossCopy.iOSClient
             
             return element;
         }
-        
+
         private void PasteData (string data, DataItemDirection direction)
         {
             DataItem item = new DataItem (data, direction, DateTime.Now);
@@ -278,19 +277,16 @@ namespace CrossCopy.iOSClient
 
             UpdateSecretsViewLabel(WELCOME_LABEL_TEXT);
             
-            var referenceUrl = new NSUrl(ResharedItem);
-            NSUrl mediaUrl = null;
             switch (ResharedItemType)
             {
             case FileType.Photo:
                 ALAssetsLibrary library = new ALAssetsLibrary ();
-                library.AssetForUrl (new NSUrl (ResharedItem), 
-                                     (asset) => {
+                library.AssetForUrl (new NSUrl (ResharedItem.Data), 
+                    (asset) => {
                     if (asset != null) {
-                        mediaUrl = null;
                         UIImage image = UIImage.FromImage (asset.DefaultRepresentation.GetImage());
-                        UploadMedia (image, referenceUrl, mediaUrl);
-                        
+                        UploadMedia (image, NSUrl.FromFilename(ResharedItem.ItemPath), null);
+                        ResharedItem = null;
                     } else {
                         Console.Out.WriteLine ("Asset is null.");
                     }
@@ -304,17 +300,17 @@ namespace CrossCopy.iOSClient
                 break;
             case FileType.Video: 
             case FileType.Other:
-                var fileUrl = NSUrl.FromFilename (ResharedItem);
+                var fileUrl = NSUrl.FromFilename (ResharedItem.Data);
                 UploadMedia(null, fileUrl, fileUrl);
+                ResharedItem = null;
                 break;
             default:
                 Console.Out.WriteLine ("Error: Resharing file type is not set");
                 break;
             }
-            ResharedItem = String.Empty;
         }
         
-        private void OpenFile (string filePath)
+        private void OpenFile (string filePath, DataItem item)
         {
             var sbounds = UIScreen.MainScreen.Bounds;
             string ext = UrlHelper.GetExtension(filePath);
@@ -352,7 +348,7 @@ namespace CrossCopy.iOSClient
                 btnShare.SetTitle ("Share", UIControlState.Normal);
                 btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
                 btnShare.TouchDown += delegate {
-                    ResharedItem = filePath;
+                    ResharedItem = item;
                     ResharedItemType = FileType.Video;
                     ShowSecretsView();
                 };
@@ -397,7 +393,7 @@ namespace CrossCopy.iOSClient
                         btnShare.SetTitle ("Share", UIControlState.Normal);
                         btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
                         btnShare.TouchDown += delegate {
-                            ResharedItem = filePath;
+                            ResharedItem = item;
                             ResharedItemType = FileType.Photo;
                             ShowSecretsView();
                         };
@@ -441,7 +437,7 @@ namespace CrossCopy.iOSClient
                 btnShare.SetTitleColor (UIColor.Black, UIControlState.Normal);
                 btnShare.Tag = SHARE_BUTTON_TAG;
                 btnShare.TouchDown += delegate {
-                    ResharedItem = filePath;
+                    ResharedItem = item;
                     ResharedItemType = FileType.Other;
                     ShowSecretsView();
                 };
@@ -615,7 +611,7 @@ namespace CrossCopy.iOSClient
                 }
             };
             
-            if (!String.IsNullOrEmpty (ResharedItem)) {
+            if (ResharedItem != null) {
                 ReshareData();
             }
         }
@@ -650,7 +646,7 @@ namespace CrossCopy.iOSClient
             
             window.RootViewController = navigation;
             
-            if (!String.IsNullOrEmpty (ResharedItem)) 
+            if (ResharedItem != null) 
             {
                 var sbounds = UIScreen.MainScreen.Bounds;
                 var btnCancel = UIButton.FromType (UIButtonType.RoundedRect);
@@ -664,7 +660,7 @@ namespace CrossCopy.iOSClient
                 btnCancel.SetTitle ("Cancel", UIControlState.Normal);
                 btnCancel.SetTitleColor (UIColor.Black, UIControlState.Normal);
                 btnCancel.TouchDown += delegate {
-                    ResharedItem = String.Empty;
+                    ResharedItem = null;
                     if (rootDVC.View.ViewWithTag(CANCEL_BUTTON_TAG) != null) {
                         rootDVC.View.ViewWithTag(CANCEL_BUTTON_TAG).RemoveFromSuperview();
                     }
@@ -673,7 +669,7 @@ namespace CrossCopy.iOSClient
                 };
                 rootDVC.View.AddSubview (btnCancel);
 
-                UpdateSecretsViewLabel(String.Format(SHARE_LABEL_TEXT, ReshareFileName));
+                UpdateSecretsViewLabel(String.Format(SHARE_LABEL_TEXT, UrlHelper.GetFileName(ResharedItem.ItemPath)));
             }
         }
 
