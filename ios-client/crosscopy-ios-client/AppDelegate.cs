@@ -50,8 +50,8 @@ namespace CrossCopy.iOSClient
         const string ASSETS_LIBRARY = "assets-library://";
         const int SHARE_BUTTON_TAG = 1;
         const int CANCEL_BUTTON_TAG = 2;
-        const int MAIN_SCREEN_LABEL_TAG = 3;
-        const string WELCOME_LABEL_TEXT = "Open this App or http://cross-copy.net on different d\tevices and choose the same secret. " + 
+        UILabel subcaptionLabel = null;
+        const string WELCOME_LABEL_TEXT = "Open this App or http://cross-copy.net on different devices and choose the same secrets. " + 
             "You can then transfer messages and files between them without any further setup.";
         const string SHARE_LABEL_TEXT = "Please select a secret where '{0}' should be send to.";
 #endregion
@@ -137,7 +137,7 @@ namespace CrossCopy.iOSClient
                 UITextAlignment.Center,
                 UIColor.Black
                 );
-            UILabel subcaptionLabel = UIHelper.CreateLabel (
+            subcaptionLabel = UIHelper.CreateLabel (
                 WELCOME_LABEL_TEXT,
                 false,
                 14,
@@ -145,8 +145,7 @@ namespace CrossCopy.iOSClient
                 UITextAlignment.Center,
                 lightTextColor
                 );
-            subcaptionLabel.Tag = 3;
-            
+
             captionLabel.Frame = new Rectangle (0, 10, 320, 40);
             subcaptionLabel.Frame = new Rectangle (20, 55, 280, 100);
             UIView header = new UIView (new Rectangle (0, 0, 300, 145));
@@ -675,10 +674,9 @@ namespace CrossCopy.iOSClient
 
         private void UpdateSecretsViewLabel (string caption)
         {
-            var label = (UILabel)rootDVC.View.ViewWithTag(MAIN_SCREEN_LABEL_TAG);
-            if (label != null)
+            if (subcaptionLabel != null)
             {
-                label.Text = caption;
+                subcaptionLabel.Text = caption;
             }
         }
         
