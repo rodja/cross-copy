@@ -1,33 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-
 namespace CrossCopy.AndroidClient
 {
-	public class SecretsList
-	{
-        public string Secret {
-            get;
-            set;
+        public class SecretsList
+        {
+                public string Secret { get; set; }
+                public string Devices { get; set; }
+                public int Image { get; set; }
         }
-
-        public string Devices {
-            get;
-            set;
-        }
-
-        public int Image {
-            get;
-            set;
-        }
-    }
 }
 
