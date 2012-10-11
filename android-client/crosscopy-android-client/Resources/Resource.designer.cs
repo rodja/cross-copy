@@ -82,8 +82,8 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f050000
 			public const int RelativeLayout01 = 2131034112;
 			
-			// aapt resource value: 0x7f050013
-			public const int btnChooseImage = 2131034131;
+			// aapt resource value: 0x7f050015
+			public const int btnChooseImage = 2131034133;
 			
 			// aapt resource value: 0x7f05000d
 			public const int buttonGo = 2131034125;
@@ -91,11 +91,14 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f05000c
 			public const int editTextSecret = 2131034124;
 			
+			// aapt resource value: 0x7f050012
+			public const int frameLayout1 = 2131034130;
+			
 			// aapt resource value: 0x7f050004
 			public const int imageButtonDel = 2131034116;
 			
-			// aapt resource value: 0x7f050017
-			public const int listViewHistory = 2131034135;
+			// aapt resource value: 0x7f050019
+			public const int listViewHistory = 2131034137;
 			
 			// aapt resource value: 0x7f05000f
 			public const int listViewSecrets = 2131034127;
@@ -106,17 +109,14 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f050011
 			public const int tableRow1 = 2131034129;
 			
-			// aapt resource value: 0x7f050014
-			public const int tableRow3 = 2131034132;
+			// aapt resource value: 0x7f050016
+			public const int tableRow3 = 2131034134;
 			
 			// aapt resource value: 0x7f05000a
 			public const int tableRowSecret = 2131034122;
 			
 			// aapt resource value: 0x7f05000b
 			public const int textView1 = 2131034123;
-			
-			// aapt resource value: 0x7f050012
-			public const int textView5 = 2131034130;
 			
 			// aapt resource value: 0x7f050008
 			public const int textViewDesc = 2131034120;
@@ -139,14 +139,20 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f050010
 			public const int textViewShare = 2131034128;
 			
-			// aapt resource value: 0x7f050015
-			public const int textViewText = 2131034133;
+			// aapt resource value: 0x7f050017
+			public const int textViewText = 2131034135;
 			
 			// aapt resource value: 0x7f050007
 			public const int textViewTitle = 2131034119;
 			
-			// aapt resource value: 0x7f050016
-			public const int textViewUpload = 2131034134;
+			// aapt resource value: 0x7f050018
+			public const int textViewUpload = 2131034136;
+			
+			// aapt resource value: 0x7f050014
+			public const int tvUploadFilename = 2131034132;
+			
+			// aapt resource value: 0x7f050013
+			public const int uploadProgress = 2131034131;
 			
 			// aapt resource value: 0x7f050003
 			public const int widget28 = 2131034115;

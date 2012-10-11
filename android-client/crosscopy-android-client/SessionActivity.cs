@@ -8,6 +8,8 @@ using Android.Content;
 using MonoDroid.Dialog;
 using CrossCopy.BL;
 using System.Collections.Generic;
+using CrossCopy.Api;
+using System.Net;
 
 namespace CrossCopy.AndroidClient
 {
@@ -22,6 +24,8 @@ namespace CrossCopy.AndroidClient
                 HistoryListAdapter _adapter;
                 ListView _dataList;
                 TextView _textToSend;
+                TextView _uploadFilename;
+                ProgressBar _uploadProgress;
 #endregion
                 Secret _secret;
                 Section EntriesSection { get; set; }
@@ -36,6 +40,9 @@ namespace CrossCopy.AndroidClient
 
                         _dataList = FindViewById<ListView> (Resource.Id.listViewHistory);
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
+
+                        _uploadFilename = FindViewById<TextView> (Resource.Id.tvUploadFilename);
+                        _uploadProgress = FindViewById<ProgressBar> (Resource.Id.uploadProgress);
 
                         var btnSend = FindViewById<Button> (Resource.Id.buttonGo);
                         btnSend.Click += SendText;
@@ -91,9 +98,9 @@ namespace CrossCopy.AndroidClient
                 history.Text = item.Data + "\n" + history.Text;
                 });*/
                 }
-                #endregion
+#endregion
 
-                #region Image Management
+        #region Image Management
                 void ChooseImage (object sender, EventArgs e)
                 {
                         var imageIntent = new Intent ();
@@ -106,13 +113,26 @@ namespace CrossCopy.AndroidClient
                 {
                         base.OnActivityResult (requestCode, resultCode, data);
                         
-                        if (resultCode == Result.Ok) {
-                                
-                                //         var imageView = FindViewById<ImageView> (Resource.Id.myImageView);
-                                //         imageView.SetImageURI (data.Data);
+                        if (resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
+                                _uploadProgress.Progress = 0;
+                                _uploadProgress.Visibility = ViewStates.Visible;
+                                _uploadFilename.Visibility = ViewStates.Invisible;
+                                CrossCopyApp.Srv.UploadFileAsync (data.DataString, OnUploadProgress, OnUploadCompleted);
                         }
                 }
-                #endregion
+
+                void OnUploadProgress (UploadProgressChangedEventArgs e)
+                {
+                        _uploadProgress.Progress = e.ProgressPercentage;
+                }
+
+                void OnUploadCompleted ()
+                {
+                        _uploadProgress.Progress = 100;
+                        _uploadFilename.Visibility = ViewStates.Visible;
+                        _uploadProgress.Visibility = ViewStates.Invisible;
+                }
+#endregion
 
                 void listView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
                 {
@@ -120,7 +140,7 @@ namespace CrossCopy.AndroidClient
                         Toast.MakeText (this, " Clicked!", ToastLength.Short).Show ();
                 }
 
-                #region Text Management
+		#region Text Management
                 void SendText (object sender, EventArgs e)
                 {
                         if (!String.IsNullOrEmpty (_textToSend.Text)) {

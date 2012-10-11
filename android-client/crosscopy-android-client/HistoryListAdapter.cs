@@ -1,7 +1,9 @@
-using System.Collections.Generic;
+using System.Text;
+
 using Android.App;
 using Android.Views;
 using Android.Widget;
+using System.Collections.Generic;
 
 namespace CrossCopy.AndroidClient
 {
@@ -17,19 +19,27 @@ namespace CrossCopy.AndroidClient
                 }
 
                 public override int Count {
-                        get { return this._listHistory.Count; }
+                        get { return _listHistory.Count; }
                 }
 
                 public override HistoryList this [int position] {
-                        get { return this._listHistory [position]; }
+                        get {
+                                // Assert entry conditions
+                                System.Diagnostics.Debug.Assert (position < _listHistory.Count);
+                                return _listHistory [position]; 
+                        }
                 }
 
                 public override View GetView (int position, View convertView, ViewGroup parent)
                 {
+                        // Assert entry conditions
+                        System.Diagnostics.Debug.Assert (position < _listHistory.Count);
                         var item = _listHistory [position];
+
                         var view = convertView;
                         if (convertView == null || !(convertView is LinearLayout))
                                 view = _context.LayoutInflater.Inflate (Resource.Layout.ListViewHistory, parent, false);
+		
                         var textLeft = view.FindViewById<TextView> (Resource.Id.textViewLeft);
                         var textRight = view.FindViewById<TextView> (Resource.Id.textViewRight);
 
@@ -42,7 +52,6 @@ namespace CrossCopy.AndroidClient
                 {
                         return position;
                 }
-		
         }
 }
 

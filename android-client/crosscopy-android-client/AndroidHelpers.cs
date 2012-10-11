@@ -17,7 +17,7 @@ namespace CrossCopy.AndroidClient.Helpers
 
                         if (!string.IsNullOrEmpty (serialized)) {
                                 CrossCopyApp.HistoryData = SerializeHelper<History>.FromXmlString (serialized);
-                                foreach (Secret s in CrossCopyApp.HistoryData.Secrets) {
+                                foreach (var s in CrossCopyApp.HistoryData.Secrets) {
                                         s.StartWatching ();
                                 }
                         } else {

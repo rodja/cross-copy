@@ -6,7 +6,7 @@ using CrossCopy.Api;
 using CrossCopy.BL;
 using CrossCopy.AndroidClient.Helpers;
 using System.Threading;
- 
+
 namespace CrossCopy.AndroidClient
 {
         [Application(Label = "cross copy")]
@@ -15,16 +15,15 @@ namespace CrossCopy.AndroidClient
                 #region Public props
                 public static History HistoryData { get; set; }
                 public static Server Srv { get; set; }
-
-        #endregion
-
-        #region Ctor
+#endregion
+                
+                #region Ctor
                 public CrossCopyApp (IntPtr handle, JniHandleOwnership transfer)
-            : base(handle, transfer)
+                        : base(handle, transfer)
                 {
                 }
-                #endregion
-
+#endregion
+                
                 #region Methods
                 public override void OnCreate ()
                 {
@@ -34,19 +33,17 @@ namespace CrossCopy.AndroidClient
                         StoreHelper.Load (ApplicationContext);
                         Srv = new Server ();
                 }
-
+                
                 public override void OnLowMemory ()
                 {
                         base.OnLowMemory ();
                 }
-
+                
                 public override void OnTerminate ()
                 {
                         base.OnTerminate ();
                         StoreHelper.Save (ApplicationContext);
                 }
-
-
-                #endregion
+#endregion
         }
 }

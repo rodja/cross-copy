@@ -33,10 +33,28 @@
                 android:id="@+id/textView1"
                 android:textColor="#000000"
                 android:padding="5dp" />
-            <TextView
-                android:minWidth="30px"
-                android:minHeight="30px"
-                android:id="@+id/textView5" />
+            <FrameLayout
+                android:minWidth="25px"
+                android:minHeight="25px"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/frameLayout1"
+                android:layout_gravity="center_vertical">
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:minWidth="30px"
+                    android:minHeight="30px"
+                    android:id="@+id/uploadProgress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:visibility="invisible" />
+                <TextView
+                    android:minWidth="30px"
+                    android:minHeight="30px"
+                    android:id="@+id/tvUploadFilename"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
+            </FrameLayout>
             <Button
                 android:text="Choose"
                 android:minWidth="30px"
