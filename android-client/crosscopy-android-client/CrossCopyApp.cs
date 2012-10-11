@@ -6,7 +6,7 @@ using CrossCopy.Api;
 using CrossCopy.BL;
 using CrossCopy.AndroidClient.Helpers;
 using System.Threading;
-
+ 
 namespace CrossCopy.AndroidClient
 {
         [Application(Label = "cross copy")]

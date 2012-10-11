@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:background="#E0E0E0">
     <TextView
-        android:text="Cross Copy"
+        android:text="@string/CrossCopy"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
         android:gravity="center"
         android:textColor="#000000" />
     <TextView
-        android:text="Open this app or the iOS App or the site http://cross-copy.net on different devices and choose the same secret. You can then transfer messages and files between them without any further setup."
+        android:text="@string/CrossCopyDesc"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -39,16 +39,16 @@
             <EditText
                 android:layout_column="1"
                 android:id="@+id/editTextSecret"
-                android:hint="enter new secret phrase" />
+                android:hint="@string/EnterNewSecretPhrase" />
             <Button
-                android:text="Go"
+                android:text="@string/Go"
                 android:layout_column="2"
                 android:id="@+id/buttonGo"
                 android:textColor="#000000" />
         </TableRow>
     </TableLayout>
     <TextView
-        android:text="Secrets"
+        android:text="@string/Secrets"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

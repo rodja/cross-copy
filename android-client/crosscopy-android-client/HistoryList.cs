@@ -5,5 +5,5 @@ namespace CrossCopy.AndroidClient
                 public string Left { get; set; }
                 public string Right { get; set; }
         }
-}
+} 
 

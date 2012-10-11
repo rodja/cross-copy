@@ -6,7 +6,7 @@ using Android.Widget;
 using System.Collections.Generic;
 
 namespace CrossCopy.AndroidClient
-{
+{ 
         class HistoryListAdapter:BaseAdapter<HistoryList>
         {
                 Activity _context;
@@ -39,7 +39,7 @@ namespace CrossCopy.AndroidClient
                         var view = convertView;
                         if (convertView == null || !(convertView is LinearLayout))
                                 view = _context.LayoutInflater.Inflate (Resource.Layout.ListViewHistory, parent, false);
-		
+
                         var textLeft = view.FindViewById<TextView> (Resource.Id.textViewLeft);
                         var textRight = view.FindViewById<TextView> (Resource.Id.textViewRight);
 
@@ -54,5 +54,4 @@ namespace CrossCopy.AndroidClient
                 }
         }
 }
-
 

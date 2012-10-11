@@ -6,7 +6,6 @@
     android:background="#E0E0E0"
     android:padding="10dp">
     <TextView
-        android:text="Share with 1 device"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -27,7 +26,7 @@
             android:background="@drawable/table_border"
             android:id="@+id/tableRow1">
             <TextView
-                android:text="Photo"
+                android:text="@string/Photo"
                 android:minWidth="30px"
                 android:minHeight="30px"
                 android:id="@+id/textView1"
@@ -47,16 +46,22 @@
                     android:id="@+id/uploadProgress"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:visibility="invisible" />
+                    android:visibility="invisible"
+                    android:padding="5dp"
+                    android:max="100"
+                    android:progress="0" />
                 <TextView
                     android:minWidth="30px"
                     android:minHeight="30px"
                     android:id="@+id/tvUploadFilename"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent" />
+                    android:layout_height="fill_parent"
+                    android:padding="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical" />
             </FrameLayout>
             <Button
-                android:text="Choose"
+                android:text="@string/Choose"
                 android:minWidth="30px"
                 android:minHeight="30px"
                 android:id="@+id/btnChooseImage"
@@ -71,15 +76,15 @@
                 android:minHeight="30px"
                 android:id="@+id/textViewText"
                 android:padding="5dp"
-                android:text="Text"
+                android:text="@string/Text"
                 android:textColor="#000000" />
             <EditText
                 android:minWidth="30px"
                 android:minHeight="30px"
                 android:id="@+id/textViewUpload"
-                android:hint="your message" />
+                android:hint="@string/TextHint" />
             <Button
-                android:text="Go"
+                android:text="@string/Go"
                 android:minHeight="30px"
                 android:id="@+id/buttonGo"
                 android:textColor="#000000" />

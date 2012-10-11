@@ -6,5 +6,5 @@ namespace CrossCopy.AndroidClient
                 public string Devices { get; set; }
                 public int Image { get; set; }
         }
-}
+} 
 

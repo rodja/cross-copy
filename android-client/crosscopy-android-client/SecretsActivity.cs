@@ -7,7 +7,6 @@ using Android.Widget;
 using CrossCopy.BL;
 using System.Collections.Generic;
 
-
 namespace CrossCopy.AndroidClient
 {
         [Activity (Label = "cross copy", MainLauncher = true, WindowSoftInputMode = SoftInput.AdjustPan)]

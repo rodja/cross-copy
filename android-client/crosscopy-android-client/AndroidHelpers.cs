@@ -3,7 +3,7 @@ using Android.Preferences;
 using Android.Content;
 using CrossCopy.Helpers;
 using CrossCopy.BL;
- 
+
 namespace CrossCopy.AndroidClient.Helpers
 {
         public class StoreHelper
