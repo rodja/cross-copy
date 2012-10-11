@@ -6,61 +6,54 @@ using CrossCopy.BL;
 
 namespace CrossCopy.Helpers
 {
-    public class DeviceHelper
-    {
-        public static string GetMacAddress()
+        public class DeviceHelper
         {
-            string macAddresses = "";
-    
-            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                if (nic.OperationalStatus == OperationalStatus.Up)
+                public static string GetMacAddress ()
                 {
-                    macAddresses += nic.GetPhysicalAddress().ToString();
-                    break;
-                }
-            }
-            
-            return macAddresses;
-        }
-    }
+                        var macAddresses = "";
     
-    public static class SerializeHelper<T>
-    {
-        public static string ToXmlString(T obj)
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            System.IO.TextWriter writer = new System.IO.StringWriter();
-            try
-            {
-                serializer.Serialize(writer, obj);
-            }
-            finally
-            {
-                writer.Flush();
-                writer.Close();
-            }
-
-            return writer.ToString();
+                        foreach (var nic in NetworkInterface.GetAllNetworkInterfaces()) {
+                                if (nic.OperationalStatus == OperationalStatus.Up) {
+                                        macAddresses += nic.GetPhysicalAddress ().ToString ();
+                                        break;
+                                }
+                        }
+            
+                        return macAddresses;
+                }
         }
+    
+        public static class SerializeHelper<T>
+        {
+                public static string ToXmlString (T obj)
+                {
+                        var serializer = new XmlSerializer (typeof(T));
+                        var writer = new System.IO.StringWriter ();
+                        try {
+                                serializer.Serialize (writer, obj);
+                        } finally {
+                                writer.Flush ();
+                                writer.Close ();
+                        }
+
+                        return writer.ToString ();
+                }
         
-        public static T FromXmlString(string serialized)
-        {
-            if (serialized.Length <= 0) throw new ArgumentOutOfRangeException("serialized", "Cannot thaw a zero-length string");
+                public static T FromXmlString (string serialized)
+                {
+                        if (serialized.Length <= 0)
+                                throw new ArgumentOutOfRangeException ("serialized", "Cannot thaw a zero-length string");
 
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            System.IO.TextReader reader = new System.IO.StringReader(serialized);
-            object @object = default(T); 
-            try
-            {
-                @object = serializer.Deserialize(reader);
-            }
-            finally
-            {
-                reader.Close();
-            }
-            return (T)@object;
+                        var serializer = new XmlSerializer (typeof(T));
+                        var reader = new System.IO.StringReader (serialized);
+                        var obj = default(T); 
+                        try {
+                                obj = (T)serializer.Deserialize (reader);
+                        } finally {
+                                reader.Close ();
+                        }
+                        return (T)obj;
+                }
         }
-    }
- }
+}
 
