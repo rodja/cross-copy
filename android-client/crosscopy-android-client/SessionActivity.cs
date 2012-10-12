@@ -57,9 +57,8 @@ namespace CrossCopy.AndroidClient
                         var btnChooseImage = FindViewById<Button> (Resource.Id.btnChooseImage);
                         btnChooseImage.Click += ChooseImage;
 
-                        _tvShare.Text = GetString (Resource.String.ShareWith1Device);
-
                         _secret = new Secret (Intent.GetStringExtra ("Secret"));
+                        _secret.WatchEvent += NewStuff;
                         CrossCopyApp.Srv.CurrentSecret = _secret;
 
                         LoadHistory ();
@@ -104,11 +103,22 @@ namespace CrossCopy.AndroidClient
                         Intent = intent; // overwrite old intent
                 }
 
+                void NewStuff (Secret secret)
+                {
+                        RunOnUiThread (() => { 
+                                _tvShare.Text = _secret.ListenersCount == 1 
+                                        ? GetString (Resource.String.ShareWith1Device)
+                                                : string.Format (GetString (Resource.String.ShareWithNDevices), _secret.ListenersCount); 
+                        });
+                }
+                
+
                 public void Paste (DataItem item)
                 {
-                        CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
+                        RunOnUiThread (() => { 
+                                CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
+                        });
                         /*var history = FindViewById<TextView> (Resource.Id.history);
-
                 RunOnUiThread (() => {
                 history.Text = item.Data + "\n" + history.Text;
                 });*/

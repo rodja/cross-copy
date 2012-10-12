@@ -29,7 +29,7 @@ namespace CrossCopy.AndroidClient
                 {
                         base.OnCreate ();
                         System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
-                        ThreadPool.SetMinThreads (100, 4);
+                        //  ThreadPool.SetMinThreads (100, 4);
                         StoreHelper.Load (ApplicationContext);
                         Srv = new Server ();
                 }
