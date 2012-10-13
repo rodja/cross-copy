@@ -6,7 +6,7 @@ using System.Json;
 using System.Net;
 using System.Net.Cache;
 using CrossCopy.Api;
-
+ 
 namespace CrossCopy.BL
 {
         [System.Diagnostics.DebuggerDisplay("History - Secrets {Secrets.Count}")]
@@ -28,16 +28,15 @@ namespace CrossCopy.BL
         public class Secret
         {
                 WebClient watchClient = new BugfixedWebClient ();
-        
+
                 public Secret ()
                 {
                         DataItems = new List<DataItem> ();
                 }
-        
+
                 public Secret (string phrase) : this()
                 {
                         Phrase = phrase;
-
                         StartWatching ();
                 }
 
@@ -69,25 +68,31 @@ namespace CrossCopy.BL
                 public void StartWatching ()
                 {
                         watchClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
-                        watchClient.CancelAsync ();
-                        watchClient.DownloadStringCompleted += (sender, e) => { 
-                                if (e.Cancelled) {
 
-                                } else if (e.Error != null) {
-                                        Console.Out.WriteLine ("Error watching listeners: {0}", e.Error.Message);
-                                } else
-                                        try {
-                                                ListenersCount = Convert.ToInt32 (e.Result);
-                                                if (WatchEvent != null) {
-                                                        WatchEvent (this);
-                                                }
-                                        } catch (Exception ex) {
-                                                Console.Out.WriteLine ("Error downloding listener count: {0}", ex.Message);
+                        try {
+                                watchClient.CancelAsync ();
+                        } catch (Exception e) {
+                        }
+                        watchClient.DownloadStringCompleted += OnDownloadStringCompleted;
+                        Watch ();
+                }
+
+                void OnDownloadStringCompleted (object sender, DownloadStringCompletedEventArgs e)
+                {
+                        if (e.Cancelled) {
+                                
+                        } else if (e.Error != null) {
+                                Console.Out.WriteLine ("Error watching listeners: {0}", e.Error.Message);
+                        } else {
+                                try {
+                                        ListenersCount = Convert.ToInt32 (e.Result.TrimEnd ('\n'));
+                                        if (WatchEvent != null) {
+                                                WatchEvent (this);
                                         }
-                 
-                                Watch ();
-                        };
-
+                                } catch (Exception ex) {
+                                        Console.Out.WriteLine ("Error downloding listener count: {0}", ex.Message);
+                                }
+                        }
                         Watch ();
                 }
 
@@ -96,8 +101,7 @@ namespace CrossCopy.BL
                         watchClient.CancelAsync ();
                         watchClient.Dispose ();
                         watchClient.DownloadStringAsync (new Uri (String.Format ("{0}/api/{1}?watch=listeners&count={2}", 
-                                                                                 Server.SERVER, Phrase, ListenersCount)
-                        ));   
+                                                                                 Server.SERVER, Phrase, ListenersCount)));
                 }
 
                 public override string ToString ()
@@ -170,7 +174,6 @@ namespace CrossCopy.BL
                         req.AllowWriteStreamBuffering = false;
                         req.KeepAlive = false;
                         req.Pipelined = false;
-                        Console.WriteLine ("getting request");
                         return req;
                 } 
         }

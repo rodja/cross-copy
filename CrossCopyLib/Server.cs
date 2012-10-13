@@ -6,7 +6,7 @@ using System.Text;
 using System.Json;
 using CrossCopy.BL;
 using System.Threading;
- 
+
 namespace CrossCopy.Api
 {
         public class Server
@@ -36,35 +36,39 @@ namespace CrossCopy.Api
                 {
                         CurrentSecret = null;
                         receiveClient.CachePolicy = new RequestCachePolicy (RequestCacheLevel.BypassCache);
-                        receiveClient.DownloadStringCompleted += (sender, e) => { 
-                                if (e.Cancelled)
-                                        return;
-
-                                if (e.Error != null) {
-                                        Console.Out.WriteLine ("Error fetching data: {0}", e.Error.Message);
-                                        Listen ();
-                                        return;
-                                }
-
-                                foreach (var i in JsonArray.Parse (e.Result))
-                                        TransferEvent (new DataItem ((string)i, DataItemDirection.In, DateTime.Now));
-                                Listen ();
-                        };
+                        receiveClient.DownloadStringCompleted += new DownloadStringCompletedEventHandler (GotSomethingFromWeb);
                 }
 
                 public void Listen ()
                 {
                         if (CurrentSecret == null)
                                 return;
-                        var uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
-                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId));
+                        //       var uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
+//                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId));
+                        var uri = new Uri (String.Format ("{0}/api/{1}.json", 
+                                              SERVER, CurrentSecret));
                         receiveClient.DownloadStringAsync (uri);
                 }
 
                 public void Abort ()
                 {
                         receiveClient.CancelAsync ();
-                        CurrentSecret = null;
+//                        CurrentSecret = null;
+                }
+
+                void GotSomethingFromWeb (object sender, DownloadStringCompletedEventArgs e)
+                {
+                        if (e.Cancelled)
+                                return;
+                        
+                        if (e.Error == null) {
+                                foreach (var i in JsonArray.Parse (e.Result)) {
+                                        TransferEvent (new DataItem ((JsonValue)i, DataItemDirection.In, DateTime.Now));
+                                }
+                        } else
+                                Console.Out.WriteLine ("Error fetching data: {0}", e.Error.Message);
+                                
+                        Listen ();
                 }
 
                 #region Send Text
@@ -109,7 +113,7 @@ namespace CrossCopy.Api
 
                         client.UploadProgressChanged += (sender, e) => {
                                 uploadProgressChanged (e); };
-                        client.UploadDataCompleted += (sender, e) => {
+                        client.UploadFileCompleted += (sender, e) => {
                                 uploadCompleted ();
                                 if (e.Cancelled) {
                                         Console.Out.WriteLine ("Upload file cancelled.");
