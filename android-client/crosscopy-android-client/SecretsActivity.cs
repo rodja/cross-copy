@@ -27,11 +27,11 @@ namespace CrossCopy.AndroidClient
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.MainScreen);
 
-                        var sl = new List<SecretsList> {
-                                new SecretsList { Secret="Secret1", Devices = "1 device", Image = Resource.Drawable.remove },
-                                new SecretsList { Secret="Secret2", Devices = "2 devices",Image = Resource.Drawable.remove },
-                                new SecretsList { Secret="Secret3", Devices = "3 devices",Image = Resource.Drawable.remove },
-                                new SecretsList { Secret="Secret4", Devices = "2 devices",Image = Resource.Drawable.remove }
+                        var sl = new List<SecretItem> {
+                                new SecretItem { Secret="Secret1", Devices = "1 device", Image = Resource.Drawable.remove },
+                                new SecretItem { Secret="Secret2", Devices = "2 devices",Image = Resource.Drawable.remove },
+                                new SecretItem { Secret="Secret3", Devices = "3 devices",Image = Resource.Drawable.remove },
+                                new SecretItem { Secret="Secret4", Devices = "2 devices",Image = Resource.Drawable.remove }
                         };
                         _secretListAdap = new SecretListAdapter (this, sl);
                         var listView = FindViewById<ListView> (Resource.Id.listViewSecrets);

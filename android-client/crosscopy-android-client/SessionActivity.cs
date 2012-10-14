@@ -27,7 +27,8 @@ namespace CrossCopy.AndroidClient
                 #region Private members
                 #region UI Members
                 HistoryListAdapter _adapter;
-                ListView _dataList;
+                List<HistoryItem> _historyItems;
+                ListView _history;
                 TextView _textToSend;
                 TextView _uploadFilename;
                 TextView _tvShare;
@@ -44,7 +45,7 @@ namespace CrossCopy.AndroidClient
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.Share);
 
-                        _dataList = FindViewById<ListView> (Resource.Id.listViewHistory);
+                        _history = FindViewById<ListView> (Resource.Id.listViewHistory);
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
                         _tvShare = FindViewById<TextView> (Resource.Id.textViewShare);
 
@@ -66,19 +67,11 @@ namespace CrossCopy.AndroidClient
 
                 void LoadHistory ()
                 {
+                        _historyItems = new List<HistoryItem> ();
                         Task.Factory.StartNew (() => {
-                                var hl = new List<HistoryList> {
-                                new HistoryList { Left="History1", Right="" },
-                                new HistoryList { Left="", Right="History2" },
-                                new HistoryList { Left="History3", Right="" },
-                                new HistoryList { Left="", Right="History4" },
-                                new HistoryList { Left="History5", Right="" },
-                                new HistoryList { Left="", Right="History6" }
-                        };
-                        
-                                _adapter = new HistoryListAdapter (this, hl);
-                                _dataList.Adapter = _adapter;
-                                _dataList.ItemClick += listView_ItemClick;
+                                _adapter = new HistoryListAdapter (this, _historyItems);
+                                _history.Adapter = _adapter;
+                                _history.ItemClick += listView_ItemClick;
                         });
                 }
 
@@ -115,13 +108,10 @@ namespace CrossCopy.AndroidClient
 
                 public void Paste (DataItem item)
                 {
-                        RunOnUiThread (() => { 
-                                CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
-                        });
-                        /*var history = FindViewById<TextView> (Resource.Id.history);
-                RunOnUiThread (() => {
-                history.Text = item.Data + "\n" + history.Text;
-                });*/
+                        CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
+                        RunOnUiThread (() => {
+                                _historyItems.Add (new HistoryItem { Incoming = item.Data});
+                                _adapter.NotifyDataSetChanged (); });
                 }
 #endregion
 

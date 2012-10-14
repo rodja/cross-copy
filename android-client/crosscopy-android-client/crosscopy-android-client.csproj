@@ -67,10 +67,10 @@
     <Compile Include="SessionActivity.cs" />
     <Compile Include="AndroidHelpers.cs" />
     <Compile Include="CrossCopyApp.cs" />
-    <Compile Include="HistoryList.cs" />
-    <Compile Include="SecretsList.cs" />
     <Compile Include="SecretListAdapter.cs" />
     <Compile Include="HistoryListAdapter.cs" />
+    <Compile Include="HistoryItem.cs" />
+    <Compile Include="SecretItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -6,35 +6,35 @@ using Android.Widget;
  
 namespace CrossCopy.AndroidClient
 {
-        class SecretListAdapter: BaseAdapter<SecretsList>
+        class SecretListAdapter: BaseAdapter<SecretItem>
         {
                 Activity _context;
-                public List<SecretsList> _listSecrets;
+                public List<SecretItem> _secrets;
 
-                public SecretListAdapter (Activity context, List<SecretsList> lSecrets): base()
+                public SecretListAdapter (Activity context, List<SecretItem> lSecrets): base()
                 {
                         _context = context;
-                        _listSecrets = lSecrets;
+                        _secrets = lSecrets;
                 }
 
                 public override int Count {
-                        get { return _listSecrets.Count; }
+                        get { return _secrets.Count; }
                 }
 
-                public override SecretsList this [int position] {
+                public override SecretItem this [int position] {
                         get {
                                 // Assert entry conditions
-                                System.Diagnostics.Debug.Assert (position < _listSecrets.Count);
-                                return _listSecrets [position]; 
+                                System.Diagnostics.Debug.Assert (position < _secrets.Count);
+                                return _secrets [position]; 
                         }
                 }
 
                 public override View GetView (int position, View convertView, ViewGroup parent)
                 {
                         // Assert entry conditions
-                        System.Diagnostics.Debug.Assert (position < _listSecrets.Count);
+                        System.Diagnostics.Debug.Assert (position < _secrets.Count);
 
-                        var item = _listSecrets [position];
+                        var item = _secrets [position];
                         var view = convertView;
                         if (convertView == null || !(convertView is LinearLayout))
                                 view = _context.LayoutInflater.Inflate (Resource.Layout.ListViewSecrets, parent, false);

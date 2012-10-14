@@ -7,12 +7,12 @@ using System.Collections.Generic;
 
 namespace CrossCopy.AndroidClient
 { 
-        class HistoryListAdapter:BaseAdapter<HistoryList>
+        class HistoryListAdapter:BaseAdapter<HistoryItem>
         {
                 Activity _context;
-                public List<HistoryList> _listHistory;
+                public List<HistoryItem> _listHistory;
 
-                public HistoryListAdapter (Activity context, List<HistoryList> lHistory): base()
+                public HistoryListAdapter (Activity context, List<HistoryItem> lHistory): base()
                 {
                         _context = context;
                         _listHistory = lHistory;
@@ -22,7 +22,7 @@ namespace CrossCopy.AndroidClient
                         get { return _listHistory.Count; }
                 }
 
-                public override HistoryList this [int position] {
+                public override HistoryItem this [int position] {
                         get {
                                 // Assert entry conditions
                                 System.Diagnostics.Debug.Assert (position < _listHistory.Count);
@@ -43,8 +43,8 @@ namespace CrossCopy.AndroidClient
                         var textLeft = view.FindViewById<TextView> (Resource.Id.textViewLeft);
                         var textRight = view.FindViewById<TextView> (Resource.Id.textViewRight);
 
-                        textLeft.SetText (item.Left, TextView.BufferType.Normal);
-                        textRight.SetText (item.Right, TextView.BufferType.Normal);
+                        textLeft.SetText (item.Outgoing, TextView.BufferType.Normal);
+                        textRight.SetText (item.Incoming, TextView.BufferType.Normal);
                         return view;
                 }
 
