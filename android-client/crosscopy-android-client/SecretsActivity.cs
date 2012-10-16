@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using System.Linq;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -13,94 +15,84 @@ namespace CrossCopy.AndroidClient
         public class SecretsActivity : Activity
         {
                 #region Private members
-                //	DialogAdapter rootDA;
-                //	EntryElement secretEntry; 
-                //	Section secretsSection;
-                SecretListAdapter _secretListAdap;
-                ListView dataList;
-                string listData;
+                #region UI Members
+                ListView _secrets;
+                SecretListAdapter _adapter;
+                Button _showSecret;
+                EditText _newSecret;
+#endregion
+                #region Secrets Members
+                List<SecretItem> _previousSecrets = new List<SecretItem> ();
+#endregion
 #endregion
 
-                #region Methods
+                #region Activity Lifecycle
                 protected override void OnCreate (Bundle bundle)
                 {
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.MainScreen);
 
-                        var sl = new List<SecretItem> {
-                                new SecretItem { Secret="Secret1", Devices = "1 device", Image = Resource.Drawable.remove },
-                                new SecretItem { Secret="Secret2", Devices = "2 devices",Image = Resource.Drawable.remove },
-                                new SecretItem { Secret="Secret3", Devices = "3 devices",Image = Resource.Drawable.remove },
-                                new SecretItem { Secret="Secret4", Devices = "2 devices",Image = Resource.Drawable.remove }
-                        };
-                        _secretListAdap = new SecretListAdapter (this, sl);
-                        var listView = FindViewById<ListView> (Resource.Id.listViewSecrets);
-                        listView.Adapter = _secretListAdap;
-                        listView.ItemClick += listView_ItemClick;
+                        _secrets = FindViewById<ListView> (Resource.Id.listViewSecrets);
+                        _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
+                        _showSecret = FindViewById<Button> (Resource.Id.buttonGo);
 
-
-                        /*var normalButton = FindViewById<Button>(Resource.Id.btnListen);
-                        dataList = FindViewById<ListView>(Resource.Id.dataList);
-                        var txtEditSecret = FindViewById<EditText>(Resource.Id.txtEditSecret);
-                        normalButton.Click += (sender, args) => {
-                        Toast.MakeText(this, "Normal button clicked", ToastLength.Short).Show();
-                        if (!String.IsNullOrEmpty (txtEditSecret.Text))
-                        {
-                        Secret newSecret = new Secret (txtEditSecret.Text);
-                        CrossCopyApp.HistoryData.Secrets.Add (newSecret);
-                        DisplaySecretDetail (newSecret);
-                        if(listData.Length>0)
-                        {
-                        listData = listData + ",";
-                        listData = listData + txtEditSecret.Text.Trim();
-                        }
-                        else
-                        {
-                        listData = listData + txtEditSecret.Text.Trim();
-                        }
-                        string [] myArr = listData.Split (',');
-                        if (myArr.Length > 0) {
-                        IListAdapter myAdapter= new ArrayAdapter<string>(this,Resource.Layout.listitem,myArr);
-                        dataList.Adapter = myAdapter;
-                        }
-                        }
-
-                        };*/
-                }
-
-                void listView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
-                {
-                        var item = _secretListAdap.GetItem (e.Position);
-                        Toast.MakeText (this, " Clicked!", ToastLength.Short).Show ();
+                        _showSecret.Click += OnNewSecret;
+                        LoadPreviousSecrets ();
                 }
 
                 protected override void OnResume ()
                 {
                         base.OnResume ();
-
+                        
                         CrossCopyApp.Srv.Abort ();
-
-                        FindViewById<Button> (Resource.Id.buttonGo).Click += (sender, e) => {
-                                var phrase = FindViewById<EditText> (Resource.Id.editTextSecret).Text;
-                                if (String.IsNullOrEmpty (phrase))
-                                        return;
-
-                                var newSecret = new Secret (phrase);
-                                CrossCopyApp.HistoryData.Secrets.Add (newSecret);
-
-                                DisplaySecretDetail (phrase);
-                        };
-
-                        //foreach (Secret s in CrossCopyApp.HistoryData.Secrets) {
-                        //secretsSection.Add((Element)new StringElement (s.Phrase));
-                        //}
-                        //if (secretsSection.Count == 0) {
-                        //  ((RootElement) secretsSection.Parent).RemoveAt (0);
-                        //            }
+                }
+#endregion
+ 
+                #region Secrets Management
+                void LoadPreviousSecrets ()
+                {
+                        Task.Factory.StartNew (() => {
+                                foreach (var s in CrossCopyApp.HistoryData.Secrets) {
+                                        s.WatchEvent += UpdateSecretDeviceCount;
+                                        _previousSecrets.Add (new SecretItem { Secret = s.Phrase, Devices = s.ListenersCount });
+                                }
+                                _adapter = new SecretListAdapter (this, _previousSecrets);
+                                _secrets.Adapter = _adapter;
+                                _secrets.ItemClick += OnShowSecret;
+                        });
                 }
 
-                private void DisplaySecretDetail (string phrase)
+                void UpdateSecretDeviceCount (Secret secret)
                 {
+                        var item = _previousSecrets.Where (s => s.Secret == secret.Phrase).SingleOrDefault ();
+                        if (item == null)
+                                return;
+
+                        RunOnUiThread (() => {
+                                item.Devices = secret.ListenersCount;
+                                _adapter.NotifyDataSetChanged (); });
+                }
+
+                void OnShowSecret (object sender, AdapterView.ItemClickEventArgs e)
+                {
+                        var item = _adapter [e.Position];
+                        ShowSecret (item.Secret);
+                }
+
+                void OnNewSecret (object sender, EventArgs e)
+                {
+                        var phrase = _newSecret.Text.Trim ();
+                        if (String.IsNullOrEmpty (phrase))
+                                return;
+
+                        ShowSecret (phrase);
+                }
+
+                void ShowSecret (string phrase)
+                {
+                        var newSecret = new Secret (phrase);
+                        CrossCopyApp.HistoryData.Secrets.Add (newSecret);
+                        
                         var sessionIntent = new Intent ();
                         sessionIntent.SetClass (this, typeof(SessionActivity));
                         sessionIntent.PutExtra ("Secret", phrase);

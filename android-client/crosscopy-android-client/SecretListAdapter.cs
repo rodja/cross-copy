@@ -42,7 +42,7 @@ namespace CrossCopy.AndroidClient
                         var textDevices = view.FindViewById<TextView> (Resource.Id.textViewDevices);
 
                         textSecret.SetText (item.Secret, TextView.BufferType.Normal);
-                        textDevices.SetText (item.Devices, TextView.BufferType.Normal);
+                        textDevices.SetText (item.Devices.ToString (), TextView.BufferType.Normal);
 
                         var imageButton = view.FindViewById (Resource.Id.imageButtonDel) as ImageButton;
                         //imageButton.Click += imageButtonClick;
