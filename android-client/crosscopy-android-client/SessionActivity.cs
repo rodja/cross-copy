@@ -35,7 +35,7 @@ namespace CrossCopy.AndroidClient
                 ProgressBar _uploadProgress;
 #endregion
                 Secret _secret;
-                Section EntriesSection { get; set; }
+                static string BaseDir = "/sdcard/cross-copy";
 
                 #endregion
 
@@ -109,10 +109,29 @@ namespace CrossCopy.AndroidClient
                 public void Paste (DataItem item)
                 {
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
+                        var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
+                        var hItem = new HistoryItem { Incoming = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};
                         RunOnUiThread (() => {
-                                _historyItems.Add (new HistoryItem { Incoming = item.Data});
+                                _historyItems.Add (hItem);
                                 _adapter.NotifyDataSetChanged (); });
+
+                        if (item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath)) {
+                                hItem.Downloading = true;
+                                Server.DownloadFileAsync (item.Data, (s, e) => {
+                                        var bytes = e.Result;   
+                                        if (bytes == null) {
+                                                Console.Out.WriteLine ("Error fetching file");
+                                                return;
+                                        }
+                                        
+                                        Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
+                                        File.WriteAllBytes (hItem.LocalPath, bytes);
+                                        hItem.Downloading = false;
+                                });
+                        }
                 }
+
+
 #endregion
 
         #region Image Management
@@ -168,7 +187,17 @@ namespace CrossCopy.AndroidClient
 
                 void listView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
                 {
-                        var item = this._adapter.GetItem (e.Position);
+                        var item = _adapter.GetItem (e.Position);
+
+                        //    if(item == null || string.IsNullOrEmpty(item.Incoming))
+                        //          return;
+
+                        //var filename = UrlHelper.GetFileName(item.Incoming);
+
+
+
+
+
                         Toast.MakeText (this, " Clicked!", ToastLength.Short).Show ();
                 }
 
