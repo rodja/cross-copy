@@ -39,10 +39,9 @@ namespace CrossCopy.AndroidClient
                         base.OnLowMemory ();
                 }
                 
-                public override void OnTerminate ()
+                public static void Save (Android.Content.Context context)
                 {
-                        base.OnTerminate ();
-                        StoreHelper.Save (ApplicationContext);
+                        StoreHelper.Save (context);
                 }
 #endregion
         }

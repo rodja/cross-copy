@@ -16,7 +16,7 @@ namespace CrossCopy.AndroidClient
         {
                 #region Private members
                 #region UI Members
-                ListView _secrets;
+                ListView _secretsList;
                 SecretListAdapter _adapter;
                 Button _showSecret;
                 EditText _newSecret;
@@ -32,7 +32,7 @@ namespace CrossCopy.AndroidClient
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.MainScreen);
 
-                        _secrets = FindViewById<ListView> (Resource.Id.listViewSecrets);
+                        _secretsList = FindViewById<ListView> (Resource.Id.listViewSecrets);
                         _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
                         _showSecret = FindViewById<Button> (Resource.Id.buttonGo);
 
@@ -46,6 +46,15 @@ namespace CrossCopy.AndroidClient
                         
                         CrossCopyApp.Srv.Abort ();
                 }
+
+                protected override void OnPause ()
+                {
+                        base.OnPause ();
+                        Task.Factory.StartNew (() => {
+                                CrossCopyApp.Save (Application.Context);
+                        });
+                }
+                        
 #endregion
  
                 #region Secrets Management
@@ -57,8 +66,8 @@ namespace CrossCopy.AndroidClient
                                         _previousSecrets.Add (new SecretItem { Secret = s.Phrase, Devices = s.ListenersCount });
                                 }
                                 _adapter = new SecretListAdapter (this, _previousSecrets);
-                                _secrets.Adapter = _adapter;
-                                _secrets.ItemClick += OnShowSecret;
+                                _secretsList.Adapter = _adapter;
+                                _secretsList.ItemClick += OnShowSecret;
                         });
                 }
 
@@ -73,7 +82,7 @@ namespace CrossCopy.AndroidClient
                                 _adapter.NotifyDataSetChanged (); });
                 }
 
-                void OnShowSecret (object sender, AdapterView.ItemClickEventArgs e)
+                public void OnShowSecret (object sender, AdapterView.ItemClickEventArgs e)
                 {
                         var item = _adapter [e.Position];
                         ShowSecret (item.Secret);
