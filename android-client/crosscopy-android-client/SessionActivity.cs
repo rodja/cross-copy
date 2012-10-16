@@ -34,10 +34,13 @@ namespace CrossCopy.AndroidClient
                 TextView _tvShare;
                 ProgressBar _uploadProgress;
 #endregion
+                #region CrossCopyApi Members
                 Secret _secret;
+#endregion
+                #region Constants
                 static string BaseDir = "/sdcard/cross-copy";
-
-                #endregion
+#endregion
+#endregion
 
                 #region Activity Lifecycle
                 protected override void OnCreate (Bundle bundle)
@@ -56,23 +59,14 @@ namespace CrossCopy.AndroidClient
                         btnSend.Click += SendText;
 
                         var btnChooseImage = FindViewById<Button> (Resource.Id.btnChooseImage);
-                        btnChooseImage.Click += ChooseImage;
+                        btnChooseImage.Click += ChooseFile;
 
                         _secret = new Secret (Intent.GetStringExtra ("Secret"));
-                        _secret.WatchEvent += NewStuff;
+                        _secret.WatchEvent += UpdateSharedDevicesCount;
                         CrossCopyApp.Srv.CurrentSecret = _secret;
 
+                        Title = string.Format (GetString (Resource.String.SessionTitle), _secret.Phrase);
                         LoadHistory ();
-                }
-
-                void LoadHistory ()
-                {
-                        _historyItems = new List<HistoryItem> ();
-                        Task.Factory.StartNew (() => {
-                                _adapter = new HistoryListAdapter (this, _historyItems);
-                                _history.Adapter = _adapter;
-                                _history.ItemClick += listView_ItemClick;
-                        });
                 }
 
                 protected override void OnResume ()
@@ -95,8 +89,30 @@ namespace CrossCopy.AndroidClient
                         base.OnNewIntent (intent);
                         Intent = intent; // overwrite old intent
                 }
+#endregion
 
-                void NewStuff (Secret secret)
+                #region History Management
+                /// <summary>
+                /// Populates the list of history items with the 
+                /// values we already know
+                /// </summary>
+                void LoadHistory ()
+                {
+                        _historyItems = new List<HistoryItem> ();
+                        Task.Factory.StartNew (() => {
+                                _adapter = new HistoryListAdapter (this, _historyItems);
+                                _history.Adapter = _adapter;
+                                _history.ItemClick += DisplayHistoryItem;
+                        });
+                }
+
+                /// <summary>
+                /// Updates the shared devices count display.
+                /// </summary>
+                /// <param name='secret'>
+                /// Secret.
+                /// </param>
+                void UpdateSharedDevicesCount (Secret secret)
                 {
                         RunOnUiThread (() => { 
                                 _tvShare.Text = _secret.ListenersCount == 1 
@@ -104,50 +120,102 @@ namespace CrossCopy.AndroidClient
                                                 : string.Format (GetString (Resource.String.ShareWithNDevices), _secret.ListenersCount); 
                         });
                 }
-                
 
+                /// <summary>
+                /// Called when there is something new in the server for the current secret
+                /// Here we have two options:
+                ///  - If the item starts with  '/api/CURRENT_SECRET/' it means that this is 
+                ///    really a file that should be downloaded, then we start the async download
+                ///  - If the item doesn't start with the mentioned text, then is just some text to display.
+                /// 
+                /// In both cases we add the filename or the string to the history.
+                /// </summary>
+                /// <param name='item'>
+                /// Item: The new item, that contains the information of the new staff.
+                /// </param>
                 public void Paste (DataItem item)
                 {
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
-                        var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
-                        var hItem = new HistoryItem { Incoming = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};
+
+                        HistoryItem hItem;
+                        if (item.Direction == DataItemDirection.In)
+                                hItem = CreateIncomingItem (item);
+                        else
+                                hItem = CreateOutgoingItem (item);
+                
                         RunOnUiThread (() => {
                                 _historyItems.Add (hItem);
                                 _adapter.NotifyDataSetChanged (); });
-
-                        if (item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath)) {
-                                hItem.Downloading = true;
-                                Server.DownloadFileAsync (item.Data, (s, e) => {
-                                        var bytes = e.Result;   
-                                        if (bytes == null) {
-                                                Console.Out.WriteLine ("Error fetching file");
-                                                return;
-                                        }
-                                        
-                                        Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
-                                        File.WriteAllBytes (hItem.LocalPath, bytes);
-                                        hItem.Downloading = false;
-                                });
-                        }
                 }
 
+                HistoryItem CreateIncomingItem (DataItem item)
+                {
+                        if (!item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath))
+                                return new HistoryItem { Incoming = item.Data, Downloading = false };
 
+                        var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
+                        var hItem = new HistoryItem { Incoming = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};                               
+                        hItem.Downloading = true;
+                        Server.DownloadFileAsync (item.Data, (s, e) => {
+                                var bytes = e.Result;   
+                                if (bytes == null) {
+                                        Console.Out.WriteLine ("Error fetching file");
+                                        return;
+                                }
+                                
+                                Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
+                                File.WriteAllBytes (hItem.LocalPath, bytes);
+                                hItem.Downloading = false;
+                        });
+                        return hItem;
+                }
+                
+                HistoryItem CreateOutgoingItem (DataItem item)
+                {
+                        if (!item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath))
+                                return new HistoryItem { Outgoing = item.Data, Downloading = false };
+                                        
+                        var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
+                        return new HistoryItem { Outgoing = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};
+                }
 #endregion
 
-        #region Image Management
-                void ChooseImage (object sender, EventArgs e)
+                #region File Selection
+                /// <summary>
+                /// Launches the activity to allow the user
+                /// to choos the file to be uploaded to the current secret.
+                /// </summary>
+                /// <param name='sender'>
+                /// Sender (Ignored).
+                /// </param>
+                /// <param name='e'>
+                /// Also Ignored.
+                /// </param>
+                void ChooseFile (object sender, EventArgs e)
                 {
-                        var imageIntent = new Intent ();
-                        imageIntent.SetType ("image/*");
-                        imageIntent.SetAction (Intent.ActionGetContent);
-                        StartActivityForResult (Intent.CreateChooser (imageIntent, GetString (Resource.String.SelectPhoto)), 0);
+                        var intent = new Intent ();
+                        intent.SetAction (Intent.ActionGetContent);
+                        intent.SetType ("*/*");
+                        StartActivityForResult (Intent.CreateChooser (intent, GetString (Resource.String.SelectFile)), 1);
                 }
 
+                /// <summary>
+                /// Called after the user has selected or canceled the file selection
+                /// </summary>
+                /// <param name='requestCode'>
+                /// Request code, maches the request code used during StartActivityforResult (see ChooseFile above)
+                /// </param>
+                /// <param name='resultCode'>
+                /// Result code. If Ok, then the user selected something that we shoud upload
+                /// </param>
+                /// <param name='data'>
+                /// Data, the uri for the selected file.
+                /// </param>
                 protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
                 {
                         base.OnActivityResult (requestCode, resultCode, data);
                         
-                        if (resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
+                        if (requestCode == 1 && resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
                                 _uploadProgress.Progress = 0;
 
                                 var filePath = GetRealPathFromURI (data.Data);
@@ -157,7 +225,9 @@ namespace CrossCopy.AndroidClient
                                 }
                         }
                 }
+#endregion
 
+                #region Progress Display
                 void OnUploadProgress (UploadProgressChangedEventArgs e)
                 {
                         RunOnUiThread (() => {
@@ -185,7 +255,8 @@ namespace CrossCopy.AndroidClient
                 }
 #endregion
 
-                void listView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+                #region Display History Item
+                void DisplayHistoryItem (object sender, AdapterView.ItemClickEventArgs e)
                 {
                         var item = _adapter.GetItem (e.Position);
 
@@ -195,13 +266,11 @@ namespace CrossCopy.AndroidClient
                         //var filename = UrlHelper.GetFileName(item.Incoming);
 
 
-
-
-
                         Toast.MakeText (this, " Clicked!", ToastLength.Short).Show ();
                 }
+#endregion
 
-                #region Text Management
+                #region Send Text
                 void SendText (object sender, EventArgs e)
                 {
                         if (!String.IsNullOrEmpty (_textToSend.Text)) {
@@ -211,6 +280,7 @@ namespace CrossCopy.AndroidClient
                 }
 #endregion
 
+                #region Utils
                 string GetRealPathFromURI (Android.Net.Uri contentURI)
                 {
                         var cursor = ContentResolver.Query (contentURI, null, null, null, null); 
@@ -220,5 +290,6 @@ namespace CrossCopy.AndroidClient
                         }
                         return "";
                 }
+#endregion
         }
 }

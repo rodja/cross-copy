@@ -5,7 +5,7 @@
         <string name="CrossCopyDesc">Open this app or the iOS App or the site http://cross-copy.net on different devices and choose the same secret. You can then transfer messages and files between them without any further setup.</string>
         <string name="TextHint">your message</string>
         <string name="Text">Text</string>
-        <string name="Photo">Photo</string>
+        <string name="File">File</string>
         <string name="Choose">Choose</string>
         <string name="History">History</string>
         <string name="Secrets">Secrets</string>
@@ -13,5 +13,6 @@
         <string name="ShareWith1Device">Share with 1 device</string>
         <string name="ShareWithNDevices">Share with {0} devices</string>
         <string name="EnterNewSecretPhrase">enter new secret phrase</string>
-        <string name="SelectPhoto">Select photo</string>
+        <string name="SelectFile">Select file</string>
+        <string name="SessionTitle">Secret: {0}</string>
 </resources>

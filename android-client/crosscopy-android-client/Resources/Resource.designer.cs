@@ -197,20 +197,23 @@ namespace CrossCopy.AndroidClient
 			// aapt resource value: 0x7f04000c
 			public const int EnterNewSecretPhrase = 2130968588;
 			
+			// aapt resource value: 0x7f040005
+			public const int File = 2130968581;
+			
 			// aapt resource value: 0x7f040009
 			public const int Go = 2130968585;
 			
 			// aapt resource value: 0x7f040007
 			public const int History = 2130968583;
 			
-			// aapt resource value: 0x7f040005
-			public const int Photo = 2130968581;
-			
 			// aapt resource value: 0x7f040008
 			public const int Secrets = 2130968584;
 			
 			// aapt resource value: 0x7f04000d
-			public const int SelectPhoto = 2130968589;
+			public const int SelectFile = 2130968589;
+			
+			// aapt resource value: 0x7f04000e
+			public const int SessionTitle = 2130968590;
 			
 			// aapt resource value: 0x7f04000a
 			public const int ShareWith1Device = 2130968586;
