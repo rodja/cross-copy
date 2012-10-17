@@ -43,10 +43,10 @@ namespace CrossCopy.Api
                 {
                         if (CurrentSecret == null)
                                 return;
-                        //       var uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
-//                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId));
-                        var uri = new Uri (String.Format ("{0}/api/{1}.json", 
-                                              SERVER, CurrentSecret));
+                        var uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
+                                              SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId));
+//                        var uri = new Uri (String.Format ("{0}/api/{1}.json", 
+                        //                                            SERVER, CurrentSecret));
                         receiveClient.DownloadStringAsync (uri);
                 }
 
