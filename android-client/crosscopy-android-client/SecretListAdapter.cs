@@ -38,22 +38,14 @@ namespace CrossCopy.AndroidClient
                         var view = convertView;
                         if (convertView == null || !(convertView is LinearLayout))
                                 view = _context.LayoutInflater.Inflate (Resource.Layout.ListViewSecrets, parent, false);
+
                         var textSecret = view.FindViewById<TextView> (Resource.Id.textViewSecrets);
                         var textDevices = view.FindViewById<TextView> (Resource.Id.textViewDevices);
 
-                        textSecret.SetText (item.Secret, TextView.BufferType.Normal);
-                        textDevices.SetText (item.Devices.ToString (), TextView.BufferType.Normal);
-
-                        var imageButton = view.FindViewById (Resource.Id.imageButtonDel) as ImageButton;
-                        //imageButton.Click += imageButtonClick;
+                        textSecret.Text = item.Secret;
+                        textDevices.Text = item.Devices.ToString ();
 
                         return view;
-                }
-
-                void imageButtonClick (object sender, EventArgs e)
-                {
-                        var imageButton = sender as ImageButton;
-                        Toast.MakeText (_context, imageButton.Tag + "Button Clicked!", ToastLength.Short).Show ();
                 }
 
                 public override long GetItemId (int position)

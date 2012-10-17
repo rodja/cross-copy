@@ -40,7 +40,7 @@ namespace CrossCopy.AndroidClient
 
                         _adapter = new SecretListAdapter (this, _previousSecrets);
                         _secretsList.Adapter = _adapter;
-                        _secretsList.ItemClick += OnShowSecret;
+                        _secretsList.ItemClick += (s,e) => OnShowSecret (e);
                 }
 
                 protected override void OnResume ()
@@ -89,7 +89,7 @@ namespace CrossCopy.AndroidClient
                                 _adapter.NotifyDataSetChanged (); });
                 }
 
-                public void OnShowSecret (object sender, AdapterView.ItemClickEventArgs e)
+                public void OnShowSecret (AdapterView.ItemClickEventArgs e)
                 {
                         var item = _adapter [e.Position];
                         ShowSecret (item.Secret);
@@ -106,9 +106,10 @@ namespace CrossCopy.AndroidClient
 
                 void ShowSecret (string phrase)
                 {
-                        var newSecret = new Secret (phrase);
-                        CrossCopyApp.HistoryData.Secrets.Add (newSecret);
-                        LoadSecretsList ();
+                        if (!CrossCopyApp.HistoryData.Secrets.Any (s => s.Phrase == phrase)) {
+                                CrossCopyApp.HistoryData.Secrets.Add (new Secret (phrase));
+                                LoadSecretsList ();
+                        }
                         var sessionIntent = new Intent ();
                         sessionIntent.SetClass (this, typeof(SessionActivity));
                         sessionIntent.PutExtra ("Secret", phrase);
