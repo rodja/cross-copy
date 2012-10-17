@@ -221,7 +221,7 @@ namespace CrossCopy.AndroidClient
                                 var filePath = GetRealPathFromURI (data.Data);
                                 if (!String.IsNullOrEmpty (filePath)) {
                                         _uploadFilename.Text = Path.GetFileName (filePath);
-                                        CrossCopyApp.Srv.UploadFileAsync (GetRealPathFromURI (data.Data), OnUploadProgress, OnUploadCompleted);
+                                        CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
                                 }
                         }
                 }
@@ -283,11 +283,15 @@ namespace CrossCopy.AndroidClient
                 #region Utils
                 string GetRealPathFromURI (Android.Net.Uri contentURI)
                 {
-                        var cursor = ContentResolver.Query (contentURI, null, null, null, null); 
-                        if (cursor.MoveToFirst ()) {
-                                var idx = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.Data); 
-                                return cursor.GetString (idx); 
-                        }
+                        if (contentURI.Scheme == "content") {
+                                var cursor = ContentResolver.Query (contentURI, null, null, null, null); 
+                                if (cursor != null && cursor.MoveToFirst ()) {
+                                        var idx = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.Data); 
+                                        return cursor.GetString (idx); 
+                                }
+                        } else if (contentURI.Scheme == "file")
+                                return contentURI.Path;
+
                         return "";
                 }
 #endregion

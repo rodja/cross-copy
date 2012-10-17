@@ -45,8 +45,6 @@ namespace CrossCopy.Api
                                 return;
                         var uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
                                               SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId));
-//                        var uri = new Uri (String.Format ("{0}/api/{1}.json", 
-                        //                                            SERVER, CurrentSecret));
                         receiveClient.DownloadStringAsync (uri);
                 }
 
@@ -101,7 +99,7 @@ namespace CrossCopy.Api
 #endregion
 
                 #region Upload Files
-                public void UploadFileAsync (string filePath, StatusProgressChanged uploadProgressChanged, StatusChanged uploadCompleted)
+                public void UploadFileAsync (string filePath, byte[] fileByteArray, StatusChanged uploadCompleted)
                 {
                         if (CurrentSecret == null)
                                 return;
@@ -111,9 +109,7 @@ namespace CrossCopy.Api
                         client.Headers ["content-type"] = "application/octet-stream";
                         client.Encoding = Encoding.UTF8;
 
-                        client.UploadProgressChanged += (sender, e) => {
-                                uploadProgressChanged (e); };
-                        client.UploadFileCompleted += (sender, e) => {
+                        client.UploadDataCompleted += (sender, e) => {
                                 uploadCompleted ();
                                 if (e.Cancelled) {
                                         Console.Out.WriteLine ("Upload file cancelled.");
@@ -127,6 +123,38 @@ namespace CrossCopy.Api
 
                                 var response = System.Text.Encoding.UTF8.GetString (e.Result);
 
+                                if (!String.IsNullOrEmpty (response)) {
+                                }
+                        };
+                        Send (destinationPath);
+                        client.UploadDataAsync (new Uri (SERVER + destinationPath), "POST", fileByteArray);
+                }
+                public void UploadFileAsync (string filePath, StatusProgressChanged uploadProgressChanged, StatusChanged uploadCompleted)
+                {
+                        if (CurrentSecret == null)
+                                return;
+                        
+                        var destinationPath = String.Format ("/api/{0}/{1}", CurrentSecret, UrlHelper.GetFileName (filePath));
+                        var client = new WebClient ();
+                        client.Headers ["content-type"] = "application/octet-stream";
+                        client.Encoding = Encoding.UTF8;
+                        
+                        client.UploadProgressChanged += (sender, e) => {
+                                uploadProgressChanged (e); };
+                        client.UploadFileCompleted += (sender, e) => {
+                                uploadCompleted ();
+                                if (e.Cancelled) {
+                                        Console.Out.WriteLine ("Upload file cancelled.");
+                                        return;
+                                }
+                                
+                                if (e.Error != null) {
+                                        Console.Out.WriteLine ("Error uploading file: {0}", e.Error.Message);
+                                        return;
+                                }
+                                
+                                var response = System.Text.Encoding.UTF8.GetString (e.Result);
+                                
                                 if (!String.IsNullOrEmpty (response)) {
                                 }
                         };
