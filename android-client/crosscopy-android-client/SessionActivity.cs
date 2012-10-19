@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Android.App;
 using Android.Views;
 using Android.Widget;
@@ -27,7 +28,7 @@ namespace CrossCopy.AndroidClient
                 #region Private members
                 #region UI Members
                 HistoryListAdapter _adapter;
-                List<HistoryItem> _historyItems;
+                List<HistoryItem> _historyItems = new List<HistoryItem> ();
                 ListView _history;
                 TextView _textToSend;
                 TextView _uploadFilename;
@@ -61,12 +62,19 @@ namespace CrossCopy.AndroidClient
                         var btnChooseImage = FindViewById<Button> (Resource.Id.btnChooseImage);
                         btnChooseImage.Click += ChooseFile;
 
-                        _secret = new Secret (Intent.GetStringExtra ("Secret"));
+                        var phrase = Intent.GetStringExtra ("Secret");
+                        _secret = CrossCopyApp.HistoryData.Secrets.Where (s => s.Phrase == phrase).SingleOrDefault ();
+                        if (_secret == null)
+                                Finish ();
+
                         _secret.WatchEvent += UpdateSharedDevicesCount;
                         CrossCopyApp.Srv.CurrentSecret = _secret;
 
                         Title = string.Format (GetString (Resource.String.SessionTitle), _secret.Phrase);
-                        LoadHistory ();
+
+                        _adapter = new HistoryListAdapter (this, _historyItems);
+                        _history.Adapter = _adapter;
+//                        _history.ItemClick += (s,e) => ReshareItem (e);
                 }
 
                 protected override void OnResume ()
@@ -98,11 +106,12 @@ namespace CrossCopy.AndroidClient
                 /// </summary>
                 void LoadHistory ()
                 {
-                        _historyItems = new List<HistoryItem> ();
+                        _historyItems.Clear ();
                         Task.Factory.StartNew (() => {
-                                _adapter = new HistoryListAdapter (this, _historyItems);
-                                _history.Adapter = _adapter;
-                                _history.ItemClick += DisplayHistoryItem;
+                                foreach (var d in CrossCopyApp.Srv.CurrentSecret.DataItems)
+                                        AddItemToHistory (d);
+                                RunOnUiThread (() => {
+                                        _adapter.NotifyDataSetChanged (); });
                         });
                 }
 
@@ -115,9 +124,9 @@ namespace CrossCopy.AndroidClient
                 void UpdateSharedDevicesCount (Secret secret)
                 {
                         RunOnUiThread (() => { 
-                                _tvShare.Text = _secret.ListenersCount == 1 
+                                _tvShare.Text = secret.ListenersCount == 1 
                                         ? GetString (Resource.String.ShareWith1Device)
-                                                : string.Format (GetString (Resource.String.ShareWithNDevices), _secret.ListenersCount); 
+                                                : string.Format (GetString (Resource.String.ShareWithNDevices), secret.ListenersCount); 
                         });
                 }
 
@@ -136,16 +145,17 @@ namespace CrossCopy.AndroidClient
                 public void Paste (DataItem item)
                 {
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
-
-                        HistoryItem hItem;
-                        if (item.Direction == DataItemDirection.In)
-                                hItem = CreateIncomingItem (item);
-                        else
-                                hItem = CreateOutgoingItem (item);
-                
+                        AddItemToHistory (item);
                         RunOnUiThread (() => {
-                                _historyItems.Add (hItem);
                                 _adapter.NotifyDataSetChanged (); });
+                }
+
+                public void AddItemToHistory (DataItem item)
+                {
+                        if (item.Direction == DataItemDirection.In)
+                                _historyItems.Add (CreateIncomingItem (item));
+                        else
+                                _historyItems.Add (CreateOutgoingItem (item));
                 }
 
                 HistoryItem CreateIncomingItem (DataItem item)
@@ -213,6 +223,8 @@ namespace CrossCopy.AndroidClient
                 /// </param>
                 protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
                 {
+                        CrossCopyApp.Srv.CurrentSecret = _secret;
+                        
                         base.OnActivityResult (requestCode, resultCode, data);
                         
                         if (requestCode == 1 && resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
