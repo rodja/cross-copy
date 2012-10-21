@@ -163,7 +163,7 @@ namespace CrossCopy.AndroidClient
                         if (!item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath))
                                 return new HistoryItem { Incoming = item.Data, Downloading = false };
 
-                        var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
+                        var lf = BaseDir + item.Data.Substring (4, item.Data.Length - 4);
                         var hItem = new HistoryItem { Incoming = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};                               
                         hItem.Downloading = true;
                         Server.DownloadFileAsync (item.Data, (s, e) => {
