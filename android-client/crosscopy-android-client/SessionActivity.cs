@@ -40,6 +40,8 @@ namespace CrossCopy.AndroidClient
 #endregion
                 #region Constants
                 static string BaseDir = "/sdcard/cross-copy";
+                static int SELECT_FILE_CODE = 1;
+                static int VIEW_FILE_CODE = 2;
 #endregion
 #endregion
 
@@ -74,7 +76,7 @@ namespace CrossCopy.AndroidClient
 
                         _adapter = new HistoryListAdapter (this, _historyItems);
                         _history.Adapter = _adapter;
-//                        _history.ItemClick += (s,e) => ReshareItem (e);
+                        _history.ItemClick += DisplayHistoryItem;
                 }
 
                 protected override void OnResume ()
@@ -206,7 +208,7 @@ namespace CrossCopy.AndroidClient
                         var intent = new Intent ();
                         intent.SetAction (Intent.ActionGetContent);
                         intent.SetType ("*/*");
-                        StartActivityForResult (Intent.CreateChooser (intent, GetString (Resource.String.SelectFile)), 1);
+                        StartActivityForResult (Intent.CreateChooser (intent, GetString (Resource.String.SelectFile)), SELECT_FILE_CODE);
                 }
 
                 /// <summary>
@@ -227,14 +229,19 @@ namespace CrossCopy.AndroidClient
                         
                         base.OnActivityResult (requestCode, resultCode, data);
                         
-                        if (requestCode == 1 && resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
-                                _uploadProgress.Progress = 0;
+                        if (requestCode == SELECT_FILE_CODE) {
 
-                                var filePath = GetRealPathFromURI (data.Data);
-                                if (!String.IsNullOrEmpty (filePath)) {
-                                        _uploadFilename.Text = Path.GetFileName (filePath);
-                                        CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
+                                if (resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
+                                        _uploadProgress.Progress = 0;
+
+                                        var filePath = GetRealPathFromURI (data.Data);
+                                        if (!String.IsNullOrEmpty (filePath)) {
+                                                _uploadFilename.Text = Path.GetFileName (filePath);
+                                                CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
+                                        }
                                 }
+                        } else if (requestCode == VIEW_FILE_CODE) {
+                                return;
                         }
                 }
 #endregion
@@ -270,25 +277,96 @@ namespace CrossCopy.AndroidClient
                 #region Display History Item
                 void DisplayHistoryItem (object sender, AdapterView.ItemClickEventArgs e)
                 {
-                        var item = _adapter.GetItem (e.Position);
-
-                        //    if(item == null || string.IsNullOrEmpty(item.Incoming))
-                        //          return;
-
-                        //var filename = UrlHelper.GetFileName(item.Incoming);
+                        var item = _adapter [e.Position];
 
 
-                        Toast.MakeText (this, " Clicked!", ToastLength.Short).Show ();
+                        if (item == null 
+                                || string.IsNullOrEmpty (item.Incoming) 
+                                || string.IsNullOrEmpty (item.LocalPath)
+                            )
+                                return;
+
+                        var mimeType = GetMimeTypeForFile (item.LocalPath);
+                        if (string.IsNullOrEmpty (mimeType))
+                                return;
+
+                        var theFile = new Java.IO.File (item.LocalPath);
+                        var intent = new Intent ();
+                        intent.SetAction (Intent.ActionView);
+                        intent.SetDataAndType (Android.Net.Uri.FromFile (theFile), mimeType);
+
+                        if (PackageManager.QueryIntentActivities (intent, 0).Any ())
+                                StartActivityForResult (intent, VIEW_FILE_CODE);
+                        else
+                                Toast.MakeText (this, "Don´t know how to open this file type", ToastLength.Short).Show ();
                 }
+
+                #region Mime types
+
+                string GetMimeTypeForFile (string fileAndPath)
+                {
+                        switch (CrossCopy.Api.UrlHelper.GetExtension (fileAndPath)) {
+                        case  ".apk":
+                                return "application/vnd.android.package-archive";
+                        case ".txt":
+                                return "text/plain";
+                        case ".csv":
+                                return "text/csv";
+                        case ".xml":
+                                return "text/xml";
+                        case ".htm":
+                                return "text/html";
+                        case ".html":
+                                return "text/html";
+                        case ".php":
+                                return "text/php";
+                        case ".png":
+                                return "image/png";
+                        case ".gif":
+                                return "image/gif";
+                        case ".jpg":
+                                return "image/jpg";
+                        case ".jpeg":
+                                return "image/jpeg";
+                        case ".bmp":
+                                return "image/bmp";
+                        case ".mp3":
+                                return "audio/mp3";
+                        case ".wav":
+                                return "audio/wav";
+                        case ".ogg":
+                                return "audio/x-ogg";
+                        case ".mid":
+                                return "audio/mid";
+                        case ".midi":
+                                return "audio/midi";
+                        case ".amr":
+                                return "audio/AMR";
+                        case ".mpeg":
+                                return "video/mpeg";
+                        case ".3gp":
+                                return "video/3gpp";
+                        case ".jar":
+                                return "application/java-archive";
+                        case ".zip":
+                                return "application/zip";
+                        case ".rar":
+                                return "application/x-rar-compressed";
+                        case ".gz":
+                                return "application/gzip";
+                        }
+                
+                        return "";
+                }
+                #endregion
 #endregion
 
                 #region Send Text
                 void SendText (object sender, EventArgs e)
                 {
-                        if (!String.IsNullOrEmpty (_textToSend.Text)) {
-                                CrossCopyApp.Srv.Send (_textToSend.Text.Trim ());
-                                //Paste (new DataItem (txtMsg.Text.Trim (), DataItemDirection.Out, DateTime.Now));
-                        }
+                        if (String.IsNullOrEmpty (_textToSend.Text))
+                                return;
+                        CrossCopyApp.Srv.Send (_textToSend.Text.Trim ());
                 }
 #endregion
 
@@ -301,7 +379,7 @@ namespace CrossCopy.AndroidClient
                                         var idx = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.Data); 
                                         return cursor.GetString (idx); 
                                 }
-                        } else if (contentURI.Scheme == "file")
+                        } else if (contentURI.Scheme == Uri.UriSchemeFile)
                                 return contentURI.Path;
 
                         return "";
