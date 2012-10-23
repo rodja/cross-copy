@@ -41,8 +41,9 @@ namespace CrossCopy.Api
 
                 public void Listen ()
                 {
-                        if (CurrentSecret == null)
+                        if (CurrentSecret == null || receiveClient.IsBusy)
                                 return;
+
                         var uri = new Uri (String.Format ("{0}/api/{1}.json{2}&since={3}", 
                                               SERVER, CurrentSecret, DeviceID, CurrentSecret.LatestId));
                         receiveClient.DownloadStringAsync (uri);
@@ -51,7 +52,7 @@ namespace CrossCopy.Api
                 public void Abort ()
                 {
                         receiveClient.CancelAsync ();
-//                        CurrentSecret = null;
+                        CurrentSecret = null;
                 }
 
                 void GotSomethingFromWeb (object sender, DownloadStringCompletedEventArgs e)
