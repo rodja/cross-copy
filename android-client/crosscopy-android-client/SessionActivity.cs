@@ -85,12 +85,12 @@ namespace CrossCopy.AndroidClient
                         CrossCopyApp.Srv.CurrentSecret = _secret;
                         CrossCopyApp.Srv.TransferEvent += Paste;
                         CrossCopyApp.Srv.Listen ();
+                        LoadHistory ();
                 }
 
                 protected override void OnPause ()
                 {
                         CrossCopyApp.Srv.TransferEvent -= Paste;
-                        CrossCopyApp.Srv.Abort ();
                         base.OnPause ();
                 }
 
@@ -111,9 +111,8 @@ namespace CrossCopy.AndroidClient
                         _historyItems.Clear ();
                         Task.Factory.StartNew (() => {
                                 foreach (var d in CrossCopyApp.Srv.CurrentSecret.DataItems)
-                                        AddItemToHistory (d);
-                                RunOnUiThread (() => {
-                                        _adapter.NotifyDataSetChanged (); });
+                                        AddOldItemToHistory (d);
+                         
                         });
                 }
 
@@ -148,37 +147,43 @@ namespace CrossCopy.AndroidClient
                 {
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
                         AddItemToHistory (item);
+                }
+
+                private void AddOldItemToHistory (DataItem item)
+                {
                         RunOnUiThread (() => {
-                                _adapter.NotifyDataSetChanged (); });
+                                _historyItems.Add ((item.Direction == DataItemDirection.In)
+                                           ? CreateIncomingItem (item, true)
+                                           : CreateOutgoingItem (item)
+                                );
+
+                                _adapter.NotifyDataSetChanged (); }
+                        );
                 }
 
                 public void AddItemToHistory (DataItem item)
                 {
-                        if (item.Direction == DataItemDirection.In)
-                                _historyItems.Add (CreateIncomingItem (item));
-                        else
-                                _historyItems.Add (CreateOutgoingItem (item));
+                        RunOnUiThread (() => {
+                                _historyItems.Insert (0, (item.Direction == DataItemDirection.In)
+                                                ? CreateIncomingItem (item, false)
+                                                : CreateOutgoingItem (item)
+                                );
+                                _adapter.NotifyDataSetChanged (); }
+                        );
                 }
 
-                HistoryItem CreateIncomingItem (DataItem item)
+                HistoryItem CreateIncomingItem (DataItem item, bool alreadyDownloaded)
                 {
                         if (!item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath))
                                 return new HistoryItem { Incoming = item.Data, Downloading = false };
 
-                        var lf = BaseDir + item.Data.Substring (4, item.Data.Length - 4);
-                        var hItem = new HistoryItem { Incoming = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};                               
-                        hItem.Downloading = true;
-                        Server.DownloadFileAsync (item.Data, (s, e) => {
-                                var bytes = e.Result;   
-                                if (bytes == null) {
-                                        Console.Out.WriteLine ("Error fetching file");
-                                        return;
-                                }
-                                
-                                Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
-                                File.WriteAllBytes (hItem.LocalPath, bytes);
-                                hItem.Downloading = false;
-                        });
+                        var hItem = new HistoryItem { Incoming = Path.GetFileName (item.Data),
+                                                      LocalPath = BaseDir + item.Data.Substring (4, item.Data.Length - 4),
+                                                      Downloading = !alreadyDownloaded
+                                                     };
+                        if (hItem.Downloading)
+                                StartDownload (item.Data, hItem);
+
                         return hItem;
                 }
                 
@@ -190,6 +195,20 @@ namespace CrossCopy.AndroidClient
                         var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
                         return new HistoryItem { Outgoing = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};
                 }
+
+                private void StartDownload (string url, HistoryItem hItem)
+                {
+                        Server.DownloadFileAsync (url, (s, e) => {
+                                if (e.Result == null) {
+                                        Console.Out.WriteLine ("Error fetching file");
+                                } else {
+                                        Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
+                                        File.WriteAllBytes (hItem.LocalPath, e.Result);
+                                }
+                                hItem.Downloading = false;
+                        });
+                }
+
 #endregion
 
                 #region File Selection
@@ -281,24 +300,30 @@ namespace CrossCopy.AndroidClient
 
 
                         if (item == null 
-                                || string.IsNullOrEmpty (item.Incoming) 
-                                || string.IsNullOrEmpty (item.LocalPath)
+                                || (string.IsNullOrEmpty (item.Incoming) 
+                                && string.IsNullOrEmpty (item.LocalPath))
                             )
                                 return;
 
-                        var mimeType = GetMimeTypeForFile (item.LocalPath);
-                        if (string.IsNullOrEmpty (mimeType))
+                        if (item.Downloading) {
+                                Toast.MakeText (this, "This file is still being transfered, wait untill it finishes", ToastLength.Short).Show ();
                                 return;
+                        }
 
                         var theFile = new Java.IO.File (item.LocalPath);
                         var intent = new Intent ();
                         intent.SetAction (Intent.ActionView);
-                        intent.SetDataAndType (Android.Net.Uri.FromFile (theFile), mimeType);
+
+                        var mimeType = GetMimeTypeForFile (item.LocalPath);
+                        if (! string.IsNullOrEmpty (mimeType))
+                                intent.SetDataAndType (Android.Net.Uri.FromFile (theFile), mimeType);
+                        else
+                                intent.SetData (Android.Net.Uri.FromFile (theFile));
 
                         if (PackageManager.QueryIntentActivities (intent, 0).Any ())
                                 StartActivityForResult (intent, VIEW_FILE_CODE);
                         else
-                                Toast.MakeText (this, "Don´t know how to open this file type", ToastLength.Short).Show ();
+                                StartActivityForResult (Intent.CreateChooser (intent, "Choose an application to open with:"), VIEW_FILE_CODE);
                 }
 
                 #region Mime types
