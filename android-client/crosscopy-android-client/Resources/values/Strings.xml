@@ -15,4 +15,5 @@
         <string name="EnterNewSecretPhrase">enter new secret phrase</string>
         <string name="SelectFile">Select file</string>
         <string name="SessionTitle">Code Word: {0}</string>
+        <string name="FilterDesc">Choose and existing secret from the list bellow or create a new one to share the content.</string>
 </resources>

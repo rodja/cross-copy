@@ -12,18 +12,30 @@ using System.Collections.Generic;
 namespace CrossCopy.AndroidClient
 {
         [Activity (Label = "cross copy", MainLauncher = true, WindowSoftInputMode = SoftInput.AdjustPan)]
+        [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "text/*" )]
+        [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "image/*" )]
+        [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "video/*" )]
+        [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "*/*" )]
         public class SecretsActivity : Activity
         {
+                //[IntentFilter (new[]{Intent.ActionSendMultiple}, DataPath="/")]  
+                // Currently only support send one item at the time
                 #region Private members
                 #region UI Members
                 ListView _secretsList;
                 SecretListAdapter _adapter;
                 Button _showSecret;
                 EditText _newSecret;
+                TextView _tvDesc;
 #endregion
                 #region Secrets Members
                 List<SecretItem> _previousSecrets = new List<SecretItem> ();
 #endregion
+                #region Intent Filter Members
+                string _theExtraText;
+                Android.Net.Uri _theExtraUri;
+                bool _sharingExternalContent;
+                #endregion
 #endregion
 
                 #region Activity Lifecycle
@@ -35,12 +47,15 @@ namespace CrossCopy.AndroidClient
                         _secretsList = FindViewById<ListView> (Resource.Id.listViewSecrets);
                         _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
                         _showSecret = FindViewById<Button> (Resource.Id.buttonGo);
+                        _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
 
                         _showSecret.Click += OnNewSecret;
 
                         _adapter = new SecretListAdapter (this, _previousSecrets);
                         _secretsList.Adapter = _adapter;
                         _secretsList.ItemClick += (s,e) => OnShowSecret (e);
+
+                        HandleIntentFilterFeature ();
                 }
 
                 protected override void OnResume ()
@@ -59,6 +74,13 @@ namespace CrossCopy.AndroidClient
                         Task.Factory.StartNew (() => {
                                 CrossCopyApp.Save (Application.Context);
                         });
+                }
+
+                protected override void OnNewIntent (Android.Content.Intent intent)
+                {
+                        base.OnNewIntent (intent);
+                        Intent = intent; // overwrite old intent
+                        HandleIntentFilterFeature ();
                 }
                         
 #endregion
@@ -113,7 +135,34 @@ namespace CrossCopy.AndroidClient
                         var sessionIntent = new Intent ();
                         sessionIntent.SetClass (this, typeof(SessionActivity));
                         sessionIntent.PutExtra ("Secret", phrase);
+
+                        if (_sharingExternalContent) {
+                                if (!string.IsNullOrEmpty (_theExtraText))
+                                        sessionIntent.PutExtra ("SharedText", _theExtraText);
+                                else if (_theExtraUri != null)
+                                        sessionIntent.PutExtra ("SharedUri", string.Format ("{0}:{1}", _theExtraUri.Scheme, _theExtraUri.EncodedSchemeSpecificPart));
+                        }
+                               
                         StartActivity (sessionIntent);
+                }
+#endregion
+
+                #region Intent Filter Management
+                void HandleIntentFilterFeature ()
+                {
+                        if (Intent.ActionSend == this.Intent.Action) {
+                                _sharingExternalContent = true;
+                                _tvDesc.SetText (Resource.String.FilterDesc);
+                                if (this.Intent.Type.Equals ("text/plain"))
+                                        _theExtraText = this.Intent.GetStringExtra (Intent.ExtraText);
+                                else
+                                        _theExtraUri = this.Intent.GetParcelableExtra (Intent.ExtraStream) as Android.Net.Uri;
+                        } else {
+                                _sharingExternalContent = false;
+                                _theExtraText = "";
+                                _theExtraUri = null;
+                                _tvDesc.SetText (Resource.String.CrossCopyDesc);
+                        }
                 }
 #endregion
         }

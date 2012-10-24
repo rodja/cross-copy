@@ -81,6 +81,8 @@ namespace CrossCopy.AndroidClient
                         _adapter = new HistoryListAdapter (this, _historyItems);
                         _history.Adapter = _adapter;
                         _history.ItemClick += DisplayHistoryItem;
+
+                        HandlePossibleSharedContent ();
                 }
 
                 protected override void OnResume ()
@@ -105,6 +107,21 @@ namespace CrossCopy.AndroidClient
                 }
 #endregion
 
+                #region Intent Filter Management
+                void HandlePossibleSharedContent ()
+                {
+                        if (this.Intent.HasExtra ("SharedText")) {
+                                RunOnUiThread (() => { 
+                                        _textToSend.Text = Intent.GetStringExtra ("SharedText");
+                                        SendText (this, EventArgs.Empty);
+                                });
+                        } else if (this.Intent.HasExtra ("SharedUri")) {
+                                var uri = Intent.GetStringExtra ("SharedUri");
+                                if (uri != null)
+                                        UploadFile (Android.Net.Uri.Parse (uri));
+                        }
+                }
+#endregion
                 #region History Management
                 /// <summary>
                 /// Populates the list of history items with the 
@@ -258,25 +275,28 @@ namespace CrossCopy.AndroidClient
                 protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
                 {
                         CrossCopyApp.Srv.CurrentSecret = _secret;
-                        
-                        base.OnActivityResult (requestCode, resultCode, data);
-                        
-                        if (requestCode == SELECT_FILE_CODE) {
+                        if (requestCode == SELECT_FILE_CODE && resultCode == Result.Ok)
+                                UploadFile (data.Data);
 
-                                if (resultCode == Result.Ok && !String.IsNullOrEmpty (data.DataString)) {
-                                        _uploadProgress.Progress = 0;
-
-                                        var filePath = GetRealPathFromURI (data.Data);
-                                        if (!String.IsNullOrEmpty (filePath)) {
-                                                _uploadingFilePath = filePath;
-                                                _uploadFilename.Text = Path.GetFileName (filePath);
-                                                CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
-                                        }
-                                }
-                        } else if (requestCode == VIEW_FILE_CODE) {
-                                return;
-                        }
+                        base.OnActivityResult (requestCode, resultCode, data);                        
                 }
+
+                void UploadFile (Android.Net.Uri data)
+                {
+                        _uploadProgress.Progress = 0;
+                        
+                        var filePath = GetRealPathFromURI (data);
+                        if (String.IsNullOrEmpty (filePath))
+                                return;
+
+                        _uploadingFilePath = filePath;
+                        RunOnUiThread (() => { 
+                                _uploadFilename.Text = Path.GetFileName (filePath);
+                        });
+
+                        CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
+                }
+
 #endregion
 
                 #region Progress Display
@@ -415,10 +435,10 @@ namespace CrossCopy.AndroidClient
                                         var idx = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.Data); 
                                         return cursor.GetString (idx); 
                                 }
-                        } else if (contentURI.Scheme == Uri.UriSchemeFile)
-                                return contentURI.Path;
-
-                        return "";
+                        }
+//                        else if (contentURI.Scheme == Uri.UriSchemeFile)
+                        // return contentURI.Path;
+                        return contentURI.Path;
                 }
 #endregion
         }
