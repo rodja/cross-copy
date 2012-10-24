@@ -151,6 +151,7 @@ namespace CrossCopy.AndroidClient
                 {
                         if (item.Direction == DataItemDirection.Out && !string.IsNullOrEmpty (_uploadingFilePath)) {
                                 item.Data = _uploadingFilePath;
+                                _uploadingFilePath = string.Empty;
                         }
 
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
