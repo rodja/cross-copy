@@ -35,6 +35,10 @@ namespace CrossCopy.AndroidClient
                 TextView _tvShare;
                 ProgressBar _uploadProgress;
 #endregion
+                #region Upload File Members
+                string _uploadingFilePath;
+#endregion
+
                 #region CrossCopyApi Members
                 Secret _secret;
 #endregion
@@ -145,7 +149,14 @@ namespace CrossCopy.AndroidClient
                 /// </param>
                 public void Paste (DataItem item)
                 {
+                        if (item.Direction == DataItemDirection.Out && !string.IsNullOrEmpty (_uploadingFilePath)) {
+                                item.Data = _uploadingFilePath;
+                        }
+
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
+                        Task.Factory.StartNew (() => {
+                                CrossCopyApp.Save (Application.Context);
+                        });
                         AddItemToHistory (item);
                 }
 
@@ -154,7 +165,7 @@ namespace CrossCopy.AndroidClient
                         RunOnUiThread (() => {
                                 _historyItems.Add ((item.Direction == DataItemDirection.In)
                                            ? CreateIncomingItem (item, true)
-                                           : CreateOutgoingItem (item)
+                                                   : CreateOutgoingItem (item)
                                 );
 
                                 _adapter.NotifyDataSetChanged (); }
@@ -189,11 +200,12 @@ namespace CrossCopy.AndroidClient
                 
                 HistoryItem CreateOutgoingItem (DataItem item)
                 {
-                        if (!item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath))
+                        if (!File.Exists (item.Data))
                                 return new HistoryItem { Outgoing = item.Data, Downloading = false };
                                         
-                        var lf = Path.Combine (BaseDir, item.Data.Substring (4, item.Data.Length - 4));
-                        return new HistoryItem { Outgoing = Path.GetFileName (item.Data), LocalPath = lf, Downloading = false};
+                        return new HistoryItem { Outgoing = Path.GetFileName (item.Data), 
+                                                 LocalPath = item.Data, 
+                                                 Downloading = false};
                 }
 
                 private void StartDownload (string url, HistoryItem hItem)
@@ -255,6 +267,7 @@ namespace CrossCopy.AndroidClient
 
                                         var filePath = GetRealPathFromURI (data.Data);
                                         if (!String.IsNullOrEmpty (filePath)) {
+                                                _uploadingFilePath = filePath;
                                                 _uploadFilename.Text = Path.GetFileName (filePath);
                                                 CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
                                         }
@@ -299,10 +312,7 @@ namespace CrossCopy.AndroidClient
                         var item = _adapter [e.Position];
 
 
-                        if (item == null 
-                                || (string.IsNullOrEmpty (item.Incoming) 
-                                && string.IsNullOrEmpty (item.LocalPath))
-                            )
+                        if (item == null || string.IsNullOrEmpty (item.LocalPath))
                                 return;
 
                         if (item.Downloading) {
