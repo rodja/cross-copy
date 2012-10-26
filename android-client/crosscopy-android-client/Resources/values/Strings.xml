@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="hello">Hello World, Click Me!</string>
-	<string name="app_name">crosscopy-android-client</string>
+	<string name="app_name">cross copy</string>
+        <string name="CrossCopy">Cross Copy</string>
+        <string name="CrossCopyDesc">Open this App (iOS &amp; Android) or the site http://cross-copy.net on different devices and choose the same code word. You can then transfer messages and files between them without any further setup.</string>
+        <string name="TextHint">your message</string>
+        <string name="Text">Text</string>
+        <string name="File">File</string>
+        <string name="Choose">Choose</string>
+        <string name="History">History</string>
+        <string name="Secrets">Code Words</string>
+        <string name="Go">Send</string>
+        <string name="ShareWith1Device">Share with 1 device</string>
+        <string name="ShareWithNDevices">Share with {0} devices</string>
+        <string name="EnterNewSecretPhrase">enter new secret phrase</string>
+        <string name="SelectFile">Select file</string>
+        <string name="SessionTitle">Code Word: {0}</string>
+        <string name="FilterDesc">Choose and existing secret from the list bellow or create a new one to share the content.</string>
 </resources>

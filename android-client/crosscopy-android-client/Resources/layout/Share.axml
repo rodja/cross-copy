@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#E0E0E0"
+    android:padding="10dp">
+    <TextView
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewShare"
+        android:textColor="#737373"
+        android:padding="10dp" />
+    <TableLayout
+        android:background="@drawable/round_border"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tableLayout1"
+        android:shrinkColumns="0"
+        android:stretchColumns="1">
+        <TableRow
+            android:layout_margin="3dp"
+            android:background="@drawable/table_border"
+            android:id="@+id/tableRow1">
+            <TextView
+                android:text="@string/File"
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textView1"
+                android:textColor="#000000"
+                android:padding="5dp" />
+            <FrameLayout
+                android:minWidth="25px"
+                android:minHeight="25px"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/frameLayout1"
+                android:layout_gravity="center_vertical">
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:minWidth="30px"
+                    android:minHeight="30px"
+                    android:id="@+id/uploadProgress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:visibility="invisible"
+                    android:padding="5dp"
+                    android:max="100"
+                    android:progress="0" />
+                <TextView
+                    android:minWidth="30px"
+                    android:minHeight="30px"
+                    android:id="@+id/tvUploadFilename"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:padding="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical" />
+            </FrameLayout>
+            <Button
+                android:text="@string/Choose"
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/btnChooseImage"
+                android:textColor="#000000" />
+        </TableRow>
+        <TableRow
+            android:layout_margin="3dp"
+            android:background="@drawable/table_border"
+            android:id="@+id/tableRow3">
+            <TextView
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textViewText"
+                android:padding="5dp"
+                android:text="@string/Text"
+                android:textColor="#000000" />
+            <EditText
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:id="@+id/textViewUpload"
+                android:hint="@string/TextHint" />
+            <Button
+                android:text="@string/Go"
+                android:minHeight="30px"
+                android:id="@+id/buttonGo"
+                android:textColor="#000000" />
+        </TableRow>
+    </TableLayout>
+    <TextView
+        android:text="History"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textColor="#737373" />
+    <ListView
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listViewHistory" />
+</LinearLayout>

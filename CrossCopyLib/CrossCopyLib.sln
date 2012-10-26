@@ -1,7 +1,7 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossCopyLib", "CrossCopyLib\CrossCopyLib.csproj", "{E8F26334-B9A8-424F-BED6-D1003A052261}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossCopyLib", "CrossCopyLib.csproj", "{E8F26334-B9A8-424F-BED6-D1003A052261}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +15,6 @@ Global
 		{E8F26334-B9A8-424F-BED6-D1003A052261}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = CrossCopyLib\CrossCopyLib.csproj
+		StartupItem = CrossCopyLib.csproj
 	EndGlobalSection
 EndGlobal

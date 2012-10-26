@@ -349,7 +349,8 @@ namespace CrossCopy.iOSClient.UI
     {
         UIActivityIndicatorView activity;
         public string Data;
-        
+        public bool Downloading;
+                
         public DataImageStringElement (string caption, UIImage image, string data) 
             : base (caption, image)
         {
@@ -391,11 +392,13 @@ namespace CrossCopy.iOSClient.UI
                 return activity.IsAnimating;
             }
             set {
-                if (value) {
-                    activity.StartAnimating ();
-                } else {
-                    activity.StopAnimating ();
-                }
+                UIApplication.SharedApplication.InvokeOnMainThread (delegate() { 
+                    if (value) {
+                       activity.StartAnimating (); 
+                    } else {
+                        activity.StopAnimating ();
+                    }
+                });
             }
         }
 
@@ -537,6 +540,31 @@ namespace CrossCopy.iOSClient.UI
             return true;
         }
     }
+
+    public class UIDocumentInteractionControllerDelegateClass : UIDocumentInteractionControllerDelegate
+    {
+        UIViewController viewC;
+
+        public UIDocumentInteractionControllerDelegateClass(UIViewController controller)
+        {
+            viewC = controller;
+        }
+
+        public override UIViewController ViewControllerForPreview (UIDocumentInteractionController controller)
+        {
+            return viewC;
+        }
+
+        public override UIView ViewForPreview (UIDocumentInteractionController controller)
+        {
+            return viewC.View;
+        }
+
+        public override RectangleF RectangleForPreview (UIDocumentInteractionController controller)
+        {
+            return viewC.View.Frame;
+        }
+  }
 }
 
 

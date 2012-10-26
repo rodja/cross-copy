@@ -10,7 +10,7 @@ would keep its resources in the "Resources" directory of the application:
 Resources/
     drawable-hdpi/
         icon.png
-
+ 
     drawable-ldpi/
         icon.png
 
