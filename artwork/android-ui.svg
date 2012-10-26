@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg25371"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="android-ui.svg">
+  <defs
+     id="defs25373">
+    <clipPath
+       id="clipPath13124"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path13126"
+         d="m 2168.5,2925.59 328,0 0,-1 -328,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath13078"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path13080"
+         d="m 2168.5,2974.59 328,0 0,-1 -328,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath13060"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path13062"
+         d="m 2168.5,3023.59 328,0 0,-1 -328,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath12836"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path12838"
+         d="m 2168.5,3073.59 328,0 0,-2 -328,0 0,2 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath10832"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path10834"
+         d="m 2448.92,3733.59 1,0 0,-38 -1,0 0,38 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath10818"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path10820"
+         d="m 2207.92,3734.59 1,0 0,-39 -1,0 0,39 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath10804"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path10806"
+         d="m 2208.92,3695.59 241,0 0,-1 -241,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath10790"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path10792"
+         d="m 2208.92,3734.59 241,0 0,-1 -241,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath13124-8"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path13126-7"
+         d="m 2168.5,2925.59 328,0 0,-1 -328,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath13078-1"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path13080-4"
+         d="m 2168.5,2974.59 328,0 0,-1 -328,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath13060-3"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path13062-7"
+         d="m 2168.5,3023.59 328,0 0,-1 -328,0 0,1 z" />
+    </clipPath>
+    <clipPath
+       id="clipPath12836-5"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path12838-1"
+         d="m 2168.5,3073.59 328,0 0,-2 -328,0 0,2 z" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#dacdbe"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="525.69594"
+     inkscape:cy="646.53079"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="799"
+     inkscape:window-height="841"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata25376">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       y="-64.17498"
+       x="525.8689"
+       height="821.58118"
+       width="535.72333"
+       id="rect32313"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.77051377;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.77051377;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect26952"
+       width="535.72333"
+       height="821.58118"
+       x="-196.13107"
+       y="-64.17498" />
+    <text
+       xml:space="preserve"
+       style="font-size:55px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="-81.428574"
+       y="17.771885"
+       id="text27747"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan27749"
+         x="-81.428574"
+         y="17.771885"
+         style="font-size:55px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans Bold">cross copy</tspan></text>
+    <text
+       style="font-size:17.09059143px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans"
+       id="text12828"
+       x="-155.03049"
+       y="452.40424"
+       sodipodi:linespacing="125%">
+      <tspan
+         sodipodi:role="line"
+         id="tspan27874"
+         x="-155.03049"
+         y="452.40424">RECENT CODE WORDS</tspan>
+    </text>
+    <text
+       style="font-size:17.09059143px"
+       id="text13052"
+       x="-155.03049"
+       y="507.94888">
+      <tspan
+         id="tspan13054"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="-155.03049"
+         y="507.94888">Demo</tspan>
+    </text>
+    <g
+       transform="matrix(1.424216,0,0,-1.424216,-3253.4125,4838.4153)"
+       id="g13056">
+      <g
+         id="g13058" />
+      <g
+         id="g13064">
+        <g
+           id="g13066"
+           clip-path="url(#clipPath13060)"
+           style="opacity:0.10000598">
+          <path
+             id="path13068"
+             style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             d="m 2496.5,3022.595 -328,0 0,1 328,0 0,-1 z"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <text
+       style="font-size:17.09059143px"
+       id="text13070"
+       x="-155.03049"
+       y="577.73602">
+      <tspan
+         id="tspan13072"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="-155.03049"
+         y="577.73602">AnotherSecret</tspan>
+    </text>
+    <g
+       transform="matrix(1.424216,0,0,-1.424216,-3253.4125,4838.4153)"
+       id="g13074">
+      <g
+         id="g13076" />
+      <g
+         id="g13082">
+        <g
+           id="g13084"
+           clip-path="url(#clipPath13078)"
+           style="opacity:0.10000598">
+          <path
+             id="path13086"
+             style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             d="m 2496.5,2973.595 -328,0 0,1 328,0 0,-1 z"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <text
+       style="font-size:17.09059143px"
+       id="text13116"
+       x="-155.03049"
+       y="647.52258">
+      <tspan
+         id="tspan13118"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="-155.03049"
+         y="647.52258">BigGroup</tspan>
+    </text>
+    <g
+       transform="matrix(1.424216,0,0,-1.424216,-3253.4125,4838.4153)"
+       id="g13120">
+      <g
+         id="g13122" />
+      <g
+         id="g13128">
+        <g
+           id="g13130"
+           clip-path="url(#clipPath13124)"
+           style="opacity:0.10000598">
+          <path
+             id="path13132"
+             style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             d="m 2496.5,2924.595 -328,0 0,1 328,0 0,-1 z"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr;text-anchor:middle;fill:#373739;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="70.007217"
+       y="98.837654"
+       id="text27955"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan27957"
+         x="73.98671"
+         y="98.837654">Open this App (iOS &amp; Android) or the </tspan><tspan
+         sodipodi:role="line"
+         x="73.98671"
+         y="130.08766"
+         id="tspan27959">site http://cross-copy.net on different </tspan><tspan
+         sodipodi:role="line"
+         x="73.98671"
+         y="161.33766"
+         id="tspan27961">devices and choose the same code word. </tspan><tspan
+         sodipodi:role="line"
+         x="73.98671"
+         y="192.58766"
+         id="tspan27963">You can then transfer messages and </tspan><tspan
+         sodipodi:role="line"
+         x="73.98671"
+         y="223.83766"
+         id="tspan27965">files between them without any </tspan><tspan
+         sodipodi:role="line"
+         x="70.007217"
+         y="255.08766"
+         id="tspan27967">further setup.</tspan></text>
+    <g
+       transform="matrix(1.1067924,0,0,-1.25,202.95718,360.66575)"
+       id="g16626">
+      <path
+         id="path16628"
+         style="fill:#33b5e5;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         d="m 0,0 0,-3 -324,0 0,3 -2,0 0,-5 328,0 0,5 -2,0 z"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       id="path10784"
+       style="fill:#cecece;fill-opacity:1;fill-rule:nonzero;stroke:#ececea;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 312.03667,369.47206 -78.21429,0 0,-50 78.21429,0 0,50 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:15px"
+       id="text10842"
+       x="242.97523"
+       y="352.21722">
+      <tspan
+         id="tspan10844"
+         sodipodi:role="line"
+         style="font-size:22.5px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="242.97523"
+         y="352.21722">Open</tspan>
+    </text>
+    <text
+       y="350.25357"
+       x="-155.03049"
+       id="text31845"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#a4a19f;fill-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       sodipodi:linespacing="125%">
+      <tspan
+         sodipodi:role="line"
+         id="tspan31851"
+         x="-155.03049"
+         y="350.25357">enter new code word</tspan>
+    </text>
+    <text
+       style="font-size:17.09059143px"
+       id="text31857"
+       x="166.56332"
+       y="643.94879">
+      <tspan
+         id="tspan31859"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="166.56332"
+         y="643.94879">3 devices</tspan>
+    </text>
+    <text
+       style="font-size:17.09059143px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans"
+       id="text12828-5"
+       x="566.20868"
+       y="321.62344"
+       sodipodi:linespacing="125%">
+      <tspan
+         sodipodi:role="line"
+         id="tspan27874-2"
+         x="566.20868"
+         y="321.62344">HISTORY</tspan>
+    </text>
+    <text
+       style="font-size:17.09059143px"
+       id="text13052-3"
+       x="566.20868"
+       y="377.16812">
+      <tspan
+         id="tspan13054-1"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="566.20868"
+         y="377.16812">animage.jpg</tspan>
+    </text>
+    <g
+       transform="matrix(1.424216,0,0,-1.424216,-2532.1734,4707.6341)"
+       id="g13056-5">
+      <g
+         id="g13058-1" />
+      <g
+         id="g13064-6">
+        <g
+           id="g13066-5"
+           clip-path="url(#clipPath13060-3)"
+           style="opacity:0.10000598">
+          <path
+             id="path13068-7"
+             style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             d="m 2496.5,3022.595 -328,0 0,1 328,0 0,-1 z"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <text
+       style="font-size:17.09059143px"
+       id="text13070-6"
+       x="566.20868"
+       y="446.95425">
+      <tspan
+         id="tspan13072-5"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="566.20868"
+         y="446.95425">Hello!</tspan>
+    </text>
+    <g
+       transform="matrix(1.424216,0,0,-1.424216,-2532.1734,4707.6341)"
+       id="g13074-7">
+      <g
+         id="g13076-0" />
+      <g
+         id="g13082-1">
+        <g
+           id="g13084-1"
+           clip-path="url(#clipPath13078-1)"
+           style="opacity:0.10000598">
+          <path
+             id="path13086-0"
+             style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             d="m 2496.5,2973.595 -328,0 0,1 328,0 0,-1 z"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <text
+       style="font-size:17.09059143px"
+       id="text13116-0"
+       x="566.20868"
+       y="504.73981">
+      <tspan
+         id="tspan13118-4"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="566.20868"
+         y="504.73981" />
+    </text>
+    <g
+       transform="matrix(1.424216,0,0,-1.424216,-2532.1734,4707.6341)"
+       id="g13120-4">
+      <g
+         id="g13122-4" />
+      <g
+         id="g13128-4">
+        <g
+           id="g13130-9"
+           clip-path="url(#clipPath13124-8)"
+           style="opacity:0.10000598">
+          <path
+             id="path13132-5"
+             style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             d="m 2496.5,2924.595 -328,0 0,1 328,0 0,-1 z"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <g
+       transform="matrix(1.1067924,0,0,-1.25,920.19634,167.46803)"
+       id="g16626-1">
+      <path
+         id="path16628-0"
+         style="fill:#33b5e5;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         d="m 0,0 0,-3 -324,0 0,3 -2,0 0,-5 328,0 0,5 -2,0 z"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       id="path10784-3"
+       style="fill:#cecece;fill-opacity:1;fill-rule:nonzero;stroke:#ececea;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 1027.2758,176.27434 -78.21426,0 0,-50 78.21426,0 0,50 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:15px"
+       id="text10842-5"
+       x="960.21442"
+       y="159.01949">
+      <tspan
+         id="tspan10844-2"
+         sodipodi:role="line"
+         style="font-size:22.5px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="960.21442"
+         y="159.01949">Send</tspan>
+    </text>
+    <text
+       y="157.0558"
+       x="562.20868"
+       id="text31845-8"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#a4a19f;fill-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       sodipodi:linespacing="125%">
+      <tspan
+         sodipodi:role="line"
+         id="tspan32285"
+         x="562.20868"
+         y="157.0558">enter a message</tspan>
+    </text>
+    <text
+       style="font-size:17.09059143px"
+       id="text31857-8"
+       x="817.11121"
+       y="513.16602">
+      <tspan
+         id="tspan31859-4"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="817.11121"
+         y="513.16602">some_zipfile.zip</tspan>
+    </text>
+    <text
+       sodipodi:linespacing="125%"
+       y="-10.692001"
+       x="566.20868"
+       id="text32213"
+       style="font-size:17.09059143px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans">
+      <tspan
+         y="-10.692001"
+         x="566.20868"
+         id="tspan32215"
+         sodipodi:role="line">CURRENT CODE WORD</tspan>
+    </text>
+    <text
+       y="32.913586"
+       x="566.20868"
+       id="text32227"
+       style="font-size:17.09059143px">
+      <tspan
+         y="32.913586"
+         x="566.20868"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         sodipodi:role="line"
+         id="tspan32229">Demo</tspan>
+    </text>
+    <text
+       sodipodi:linespacing="125%"
+       y="453.06433"
+       x="566.20868"
+       id="text32235"
+       style="font-size:17.09059143px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans">
+      <tspan
+         y="453.06433"
+         x="566.20868"
+         id="tspan32237"
+         sodipodi:role="line" />
+    </text>
+    <text
+       sodipodi:linespacing="125%"
+       y="97.186142"
+       x="570.20868"
+       id="text32249"
+       style="font-size:17.09059143px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans">
+      <tspan
+         y="97.186142"
+         x="570.20868"
+         id="tspan32251"
+         sodipodi:role="line">SHARE</tspan>
+    </text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot32287"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:40px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+         id="flowRegion32289"><rect
+           id="rect32291"
+           width="189.90868"
+           height="80.812202"
+           x="933.38098"
+           y="98.778183" /></flowRegion><flowPara
+         id="flowPara32293"></flowPara></flowRoot>    <path
+       inkscape:connector-curvature="0"
+       d="m 1029.2758,244.27434 -474.44916,0 0,-50 474.44916,0 0,50 z"
+       style="fill:#cecece;fill-opacity:1;fill-rule:nonzero;stroke:#ececea;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path32295" />
+    <text
+       y="227.01949"
+       x="708.21442"
+       id="text32297"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;stroke:#94908e;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       sodipodi:linespacing="125%">
+      <tspan
+         sodipodi:role="line"
+         id="tspan32301"
+         style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;stroke:#94908e;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         x="708.21442"
+         y="227.01949">Choose Content</tspan>
+    </text>
+    <text
+       y="503.94879"
+       x="192.56332"
+       id="text32305"
+       style="font-size:17.09059143px">
+      <tspan
+         y="503.94879"
+         x="192.56332"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         sodipodi:role="line"
+         id="tspan32307">1 device</tspan>
+    </text>
+    <text
+       style="font-size:17.09059143px"
+       id="text32309"
+       x="903.09131"
+       y="27.46147">
+      <tspan
+         id="tspan32311"
+         sodipodi:role="line"
+         style="font-size:25.63588905px;font-variant:normal;font-weight:normal;font-stretch:normal;writing-mode:lr-tb;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Roboto;-inkscape-font-specification:Roboto-Regular"
+         x="903.09131"
+         y="27.46147">1 device</tspan>
+    </text>
+  </g>
+</svg>
