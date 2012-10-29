@@ -97,6 +97,7 @@
     <AndroidResource Include="Resources\drawable\crosscopyicon144.png" />
     <AndroidResource Include="Resources\drawable\crosscopyicon57.png" />
     <AndroidResource Include="Resources\drawable\crosscopyicon72.png" />
+    <AndroidResource Include="Resources\values\Colors.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup />

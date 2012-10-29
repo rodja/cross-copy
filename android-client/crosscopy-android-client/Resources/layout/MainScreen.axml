@@ -3,58 +3,69 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#E0E0E0">
+    android:background="@color/white">
     <TextView
-        android:text="@string/CrossCopy"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/app_name"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewTitle"
-        android:gravity="center"
-        android:textColor="#000000" />
+        android:textColor="#000000"
+        android:typeface="normal"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textScaleX="1.6"
+        android:textSize="45px"
+        android:layout_marginTop="15px" />
     <TextView
         android:text="@string/CrossCopyDesc"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewDesc"
         android:padding="10dp"
-        android:textColor="#737373" />
-    <TableLayout
-        android:background="@drawable/round_border"
-        android:stretchColumns="1"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="25px"
+        android:layout_marginBottom="25px" />
+    <RelativeLayout
         android:minWidth="25px"
         android:minHeight="25px"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tableLayout1"
-        android:layout_margin="10dp">
-        <TableRow
-            android:id="@+id/tableRowSecret"
-            android:gravity="center">
-            <TextView
-                android:minWidth="1px"
-                android:minHeight="1px"
-                android:id="@+id/textView1" />
-            <EditText
-                android:layout_column="1"
-                android:id="@+id/editTextSecret"
-                android:hint="@string/EnterNewSecretPhrase" />
-            <Button
-                android:text="@string/Go"
-                android:layout_column="2"
-                android:id="@+id/buttonGo"
-                android:textColor="#000000" />
-        </TableRow>
-    </TableLayout>
+        android:id="@+id/linearLayout1">
+        <EditText
+            android:id="@+id/editTextSecret"
+            android:hint="@string/EnterNewSecretPhrase"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:layout_toLeftOf="@+id/btnOpen"
+            android:layout_marginLeft="10px" />
+        <Button
+            android:text="@string/Open"
+            android:id="@+id/btnOpen"
+            android:textColor="#000000"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:maxHeight="30px"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:layout_marginRight="10px" />
+    </RelativeLayout>
     <TextView
-        android:text="@string/Secrets"
+        android:text="@string/ResentCodeWords"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewSecretsLbl"
         android:textColor="#000000"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="45px" />
     <ListView
         android:background="@drawable/round_border"
         android:minWidth="25px"

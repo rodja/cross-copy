@@ -46,7 +46,7 @@ namespace CrossCopy.AndroidClient
 
                         _secretsList = FindViewById<ListView> (Resource.Id.listViewSecrets);
                         _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
-                        _showSecret = FindViewById<Button> (Resource.Id.buttonGo);
+                        _showSecret = FindViewById<Button> (Resource.Id.btnOpen);
                         _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
 
                         _showSecret.Click += OnNewSecret;

@@ -31,9 +31,10 @@ namespace CrossCopy.AndroidClient
                 List<HistoryItem> _historyItems = new List<HistoryItem> ();
                 ListView _history;
                 TextView _textToSend;
-                TextView _uploadFilename;
-                TextView _tvShare;
+                TextView _tvShareCount;
+                TextView _tvCodeWord;
                 ProgressBar _uploadProgress;
+                Button _chooseContent;
 #endregion
                 #region Upload File Members
                 string _uploadingFilePath;
@@ -57,16 +58,16 @@ namespace CrossCopy.AndroidClient
 
                         _history = FindViewById<ListView> (Resource.Id.listViewHistory);
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
-                        _tvShare = FindViewById<TextView> (Resource.Id.textViewShare);
+                        _tvShareCount = FindViewById<TextView> (Resource.Id.tvShareCount);
+                        _tvCodeWord = FindViewById<TextView> (Resource.Id.tvCodeWord);
 
-                        _uploadFilename = FindViewById<TextView> (Resource.Id.tvUploadFilename);
                         _uploadProgress = FindViewById<ProgressBar> (Resource.Id.uploadProgress);
 
-                        var btnSend = FindViewById<Button> (Resource.Id.buttonGo);
+                        var btnSend = FindViewById<Button> (Resource.Id.buttonSend);
                         btnSend.Click += SendText;
 
-                        var btnChooseImage = FindViewById<Button> (Resource.Id.btnChooseImage);
-                        btnChooseImage.Click += ChooseFile;
+                        _chooseContent = FindViewById<Button> (Resource.Id.btnChooseContent);
+                        _chooseContent.Click += ChooseFile;
 
                         var phrase = Intent.GetStringExtra ("Secret");
                         _secret = CrossCopyApp.HistoryData.Secrets.Where (s => s.Phrase == phrase).SingleOrDefault ();
@@ -76,7 +77,9 @@ namespace CrossCopy.AndroidClient
                         _secret.WatchEvent += UpdateSharedDevicesCount;
                         CrossCopyApp.Srv.CurrentSecret = _secret;
 
-                        Title = string.Format (GetString (Resource.String.SessionTitle), _secret.Phrase);
+                        Title = GetString (Resource.String.SessionTitle);
+
+                        _tvCodeWord.Text = _secret.Phrase;
 
                         _adapter = new HistoryListAdapter (this, _historyItems);
                         _history.Adapter = _adapter;
@@ -146,7 +149,7 @@ namespace CrossCopy.AndroidClient
                 void UpdateSharedDevicesCount (Secret secret)
                 {
                         RunOnUiThread (() => { 
-                                _tvShare.Text = secret.ListenersCount == 1 
+                                _tvShareCount.Text = secret.ListenersCount == 1 
                                         ? GetString (Resource.String.ShareWith1Device)
                                                 : string.Format (GetString (Resource.String.ShareWithNDevices), secret.ListenersCount); 
                         });
@@ -290,9 +293,6 @@ namespace CrossCopy.AndroidClient
                                 return;
 
                         _uploadingFilePath = filePath;
-                        RunOnUiThread (() => { 
-                                _uploadFilename.Text = Path.GetFileName (filePath);
-                        });
 
                         CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
                 }
@@ -307,7 +307,7 @@ namespace CrossCopy.AndroidClient
 
                                 if (e.ProgressPercentage > 0) {
                                         _uploadProgress.Visibility = ViewStates.Visible;
-                                        _uploadFilename.Visibility = ViewStates.Invisible;
+                                        _chooseContent.Visibility = ViewStates.Invisible;
                                 }
 
                                 // I'll call the OnUploadComplete here because the
@@ -321,7 +321,7 @@ namespace CrossCopy.AndroidClient
                 {
                         RunOnUiThread (() => {
                                 _uploadProgress.Progress = 100;
-                                _uploadFilename.Visibility = ViewStates.Visible;
+                                _chooseContent.Visibility = ViewStates.Visible;
                                 _uploadProgress.Visibility = ViewStates.Invisible;
                         });
                 }
