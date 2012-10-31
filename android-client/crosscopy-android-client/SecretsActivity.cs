@@ -11,7 +11,10 @@ using System.Collections.Generic;
 
 namespace CrossCopy.AndroidClient
 {
-        [Activity (Label = "cross copy", MainLauncher = true, WindowSoftInputMode = SoftInput.AdjustPan)]
+        [Activity (Label = "cross copy", 
+                   MainLauncher = true, 
+                   WindowSoftInputMode = SoftInput.AdjustPan,
+                   Theme = "@android:style/Theme.NoTitleBar.Fullscreen")]
         [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "text/*" )]
         [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "image/*" )]
         [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "video/*" )]

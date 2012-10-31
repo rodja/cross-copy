@@ -22,19 +22,20 @@ namespace CrossCopy.AndroidClient
         [Activity(Label = "SessionActivity",
         WindowSoftInputMode = SoftInput.AdjustPan,
         ConfigurationChanges = ConfigChanges.KeyboardHidden | ConfigChanges.Orientation,
-        LaunchMode = LaunchMode.SingleTop)]
+        LaunchMode = LaunchMode.SingleTop,
+        Theme = "@android:style/Theme.NoTitleBar.Fullscreen") ]
         public class SessionActivity : Activity
         {
                 #region Private members
                 #region UI Members
-                HistoryListAdapter _adapter;
-                List<HistoryItem> _historyItems = new List<HistoryItem> ();
-                ListView _history;
+                Dictionary<View, HistoryItem> _historyItems = new Dictionary<View, HistoryItem> ();
                 TextView _textToSend;
                 TextView _tvShareCount;
                 TextView _tvCodeWord;
                 ProgressBar _uploadProgress;
                 Button _chooseContent;
+                LinearLayout _mainLayout;
+                LayoutInflater _inflater;
 #endregion
                 #region Upload File Members
                 string _uploadingFilePath;
@@ -56,17 +57,17 @@ namespace CrossCopy.AndroidClient
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.Share);
 
-                        _history = FindViewById<ListView> (Resource.Id.listViewHistory);
+                        //_history = FindViewById<ListView> (Resource.Id.listViewHistory);
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
                         _tvShareCount = FindViewById<TextView> (Resource.Id.tvShareCount);
                         _tvCodeWord = FindViewById<TextView> (Resource.Id.tvCodeWord);
-
                         _uploadProgress = FindViewById<ProgressBar> (Resource.Id.uploadProgress);
+                        _chooseContent = FindViewById<Button> (Resource.Id.btnChooseContent);
+                        _mainLayout = FindViewById<LinearLayout> (Resource.Id.shareLayout);
 
                         var btnSend = FindViewById<Button> (Resource.Id.buttonSend);
                         btnSend.Click += SendText;
 
-                        _chooseContent = FindViewById<Button> (Resource.Id.btnChooseContent);
                         _chooseContent.Click += ChooseFile;
 
                         var phrase = Intent.GetStringExtra ("Secret");
@@ -77,14 +78,12 @@ namespace CrossCopy.AndroidClient
                         _secret.WatchEvent += UpdateSharedDevicesCount;
                         CrossCopyApp.Srv.CurrentSecret = _secret;
 
-                        Title = GetString (Resource.String.SessionTitle);
+                        GetString (Resource.String.SessionTitle);
 
                         _tvCodeWord.Text = _secret.Phrase;
+                        _tvShareCount.Text = GetString (Resource.String.ShareWithNoDevices);
 
-                        _adapter = new HistoryListAdapter (this, _historyItems);
-                        _history.Adapter = _adapter;
-                        _history.ItemClick += DisplayHistoryItem;
-
+                        _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
                         HandlePossibleSharedContent ();
                 }
 
@@ -132,9 +131,14 @@ namespace CrossCopy.AndroidClient
                 /// </summary>
                 void LoadHistory ()
                 {
+                        foreach (var v in _historyItems.Keys)
+                                _mainLayout.RemoveView (v);
+
                         _historyItems.Clear ();
                         Task.Factory.StartNew (() => {
-                                foreach (var d in CrossCopyApp.Srv.CurrentSecret.DataItems)
+                                var its = CrossCopyApp.Srv.CurrentSecret.DataItems.ToList ();
+                                its.Reverse ();
+                                foreach (var d in its)
                                         AddOldItemToHistory (d);
                          
                         });
@@ -178,29 +182,40 @@ namespace CrossCopy.AndroidClient
                         Task.Factory.StartNew (() => {
                                 CrossCopyApp.Save (Application.Context);
                         });
-                        AddItemToHistory (item);
+                        AddNewItemToHistory (item);
                 }
 
                 private void AddOldItemToHistory (DataItem item)
                 {
-                        RunOnUiThread (() => {
-                                _historyItems.Add ((item.Direction == DataItemDirection.In)
-                                           ? CreateIncomingItem (item, true)
-                                                   : CreateOutgoingItem (item)
-                                );
-
-                                _adapter.NotifyDataSetChanged (); }
-                        );
+                        AddItemToHistory (item, true);
                 }
 
-                public void AddItemToHistory (DataItem item)
+                public void AddNewItemToHistory (DataItem item)
+                {
+                        AddItemToHistory (item, false);
+                }
+
+                public void AddItemToHistory (DataItem item, bool isOldItem)
                 {
                         RunOnUiThread (() => {
-                                _historyItems.Insert (0, (item.Direction == DataItemDirection.In)
-                                                ? CreateIncomingItem (item, false)
-                                                : CreateOutgoingItem (item)
-                                );
-                                _adapter.NotifyDataSetChanged (); }
+                                HistoryItem theNewItem;
+                                var view = _inflater.Inflate (Resource.Layout.ListViewHistory, _mainLayout, false);
+
+                                if (item.Direction == DataItemDirection.In) {
+                                        theNewItem = CreateIncomingItem (item, isOldItem);
+                                        var tv = view.FindViewById<TextView> (Resource.Id.textViewLeft);
+                                        tv.Text = theNewItem.Incoming; 
+                                        
+                                } else {
+                                        theNewItem = CreateOutgoingItem (item);
+                                        var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
+                                        tv.Text = theNewItem.Outgoing;  
+                                }
+
+                                _historyItems [view] = theNewItem;
+                                view.Click += DisplayHistoryItem;
+                                _mainLayout.AddView (view, 6);
+                        }
                         );
                 }
 
@@ -328,11 +343,9 @@ namespace CrossCopy.AndroidClient
 #endregion
 
                 #region Display History Item
-                void DisplayHistoryItem (object sender, AdapterView.ItemClickEventArgs e)
+                void DisplayHistoryItem (object sender, EventArgs e)
                 {
-                        var item = _adapter [e.Position];
-
-
+                        var item = _historyItems [sender as View];
                         if (item == null || string.IsNullOrEmpty (item.LocalPath))
                                 return;
 
