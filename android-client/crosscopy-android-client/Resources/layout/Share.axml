@@ -32,7 +32,6 @@
                 android:id="@+id/tvCodeWord"
                 android:textColor="@color/black"
                 android:layout_alignParentLeft="true"
-                android:textStyle="bold"
                 android:layout_toLeftOf="@+id/tvShareCount"
                 android:paddingLeft="10dp"
                 android:textSize="19sp"
@@ -45,7 +44,6 @@
                 android:id="@+id/tvShareCount"
                 android:textColor="@color/black"
                 android:layout_alignParentRight="true"
-                android:textStyle="bold"
                 android:textSize="19sp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="10dp" />
@@ -81,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="2dp"
-                android:textStyle="bold"
+                android:textSize="19sp"
                 android:layout_alignParentRight="true" />
         </RelativeLayout>
         <FrameLayout
@@ -103,11 +101,9 @@
                 android:textColor="#000000"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:typeface="monospace"
                 android:maxHeight="20dp"
                 android:layout_marginTop="5dp"
-                android:textSize="18sp" />
+                android:textSize="19sp" />
         </FrameLayout>
         <TextView
             android:text="@string/History"

@@ -23,7 +23,7 @@ namespace CrossCopy.AndroidClient
         WindowSoftInputMode = SoftInput.AdjustPan,
         ConfigurationChanges = ConfigChanges.KeyboardHidden | ConfigChanges.Orientation,
         LaunchMode = LaunchMode.SingleTop,
-        Theme = "@android:style/Theme.NoTitleBar.Fullscreen") ]
+        Theme = "@android:style/Theme.NoTitleBar") ]
         public class SessionActivity : Activity
         {
                 #region Private members

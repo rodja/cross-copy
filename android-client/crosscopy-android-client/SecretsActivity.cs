@@ -14,7 +14,7 @@ namespace CrossCopy.AndroidClient
         [Activity (Label = "cross copy", 
                    MainLauncher = true, 
                    WindowSoftInputMode = SoftInput.AdjustPan,
-                   Theme = "@android:style/Theme.NoTitleBar.Fullscreen")]
+                   Theme = "@android:style/Theme.NoTitleBar")]
         [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "text/*" )]
         [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "image/*" )]
         [IntentFilter (new[]{Intent.ActionSend}, Categories = new []{ Intent.CategoryDefault }, DataMimeType = "video/*" )]
