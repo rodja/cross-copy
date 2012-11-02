@@ -67,8 +67,6 @@
     <Compile Include="SessionActivity.cs" />
     <Compile Include="AndroidHelpers.cs" />
     <Compile Include="CrossCopyApp.cs" />
-    <Compile Include="SecretListAdapter.cs" />
-    <Compile Include="HistoryListAdapter.cs" />
     <Compile Include="HistoryItem.cs" />
     <Compile Include="SecretItem.cs" />
   </ItemGroup>
@@ -81,9 +79,7 @@
     <AndroidResource Include="Resources\drawable\Icon.png" />
     <AndroidResource Include="Resources\drawable\dialog_disclosure.png" />
     <AndroidResource Include="Resources\drawable\dialog_expander_ic_minimized.9.png" />
-    <AndroidResource Include="Resources\layout\MainScreen.axml" />
     <AndroidResource Include="Resources\drawable\round_border.xml" />
-    <AndroidResource Include="Resources\layout\Share.axml" />
     <AndroidResource Include="Resources\drawable\table_border.xml" />
     <AndroidResource Include="Resources\drawable\browse.png" />
     <AndroidResource Include="Resources\drawable\download.png" />
@@ -91,13 +87,15 @@
     <AndroidResource Include="Resources\drawable\folder.png" />
     <AndroidResource Include="Resources\drawable\remove.png" />
     <AndroidResource Include="Resources\drawable\upload.png" />
-    <AndroidResource Include="Resources\layout\ListViewHistory.axml" />
-    <AndroidResource Include="Resources\layout\ListViewSecrets.axml" />
     <AndroidResource Include="Resources\drawable\crosscopyicon114.png" />
     <AndroidResource Include="Resources\drawable\crosscopyicon144.png" />
     <AndroidResource Include="Resources\drawable\crosscopyicon57.png" />
     <AndroidResource Include="Resources\drawable\crosscopyicon72.png" />
     <AndroidResource Include="Resources\values\Colors.xml" />
+    <AndroidResource Include="Resources\layout\HistoryItemView.axml" />
+    <AndroidResource Include="Resources\layout\SecretItemView.axml" />
+    <AndroidResource Include="Resources\layout\SessionView.axml" />
+    <AndroidResource Include="Resources\layout\CodeWordsView.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup />

@@ -55,7 +55,7 @@ namespace CrossCopy.AndroidClient
                 protected override void OnCreate (Bundle bundle)
                 {
                         base.OnCreate (bundle);
-                        SetContentView (Resource.Layout.Share);
+                        SetContentView (Resource.Layout.SessionView);
 
                         //_history = FindViewById<ListView> (Resource.Id.listViewHistory);
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
@@ -199,7 +199,7 @@ namespace CrossCopy.AndroidClient
                 {
                         RunOnUiThread (() => {
                                 HistoryItem theNewItem;
-                                var view = _inflater.Inflate (Resource.Layout.ListViewHistory, _mainLayout, false);
+                                var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
 
                                 if (item.Direction == DataItemDirection.In) {
                                         theNewItem = CreateIncomingItem (item, isOldItem);

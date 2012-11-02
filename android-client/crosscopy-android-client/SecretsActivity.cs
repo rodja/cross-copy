@@ -25,14 +25,12 @@ namespace CrossCopy.AndroidClient
                 // Currently only support send one item at the time
                 #region Private members
                 #region UI Members
-                ListView _secretsList;
-                SecretListAdapter _adapter;
+                Dictionary<View, SecretItem> _secretItems = new Dictionary<View, SecretItem> ();
+                LinearLayout _mainLayout;
                 Button _showSecret;
                 EditText _newSecret;
                 TextView _tvDesc;
-#endregion
-                #region Secrets Members
-                List<SecretItem> _previousSecrets = new List<SecretItem> ();
+                LayoutInflater _inflater;
 #endregion
                 #region Intent Filter Members
                 string _theExtraText;
@@ -45,19 +43,16 @@ namespace CrossCopy.AndroidClient
                 protected override void OnCreate (Bundle bundle)
                 {
                         base.OnCreate (bundle);
-                        SetContentView (Resource.Layout.MainScreen);
+                        SetContentView (Resource.Layout.CodeWordsView);
 
-                        _secretsList = FindViewById<ListView> (Resource.Id.listViewSecrets);
+                        _mainLayout = FindViewById<LinearLayout> (Resource.Id.codeWordsLayout);
                         _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
                         _showSecret = FindViewById<Button> (Resource.Id.btnOpen);
                         _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
 
                         _showSecret.Click += OnNewSecret;
 
-                        _adapter = new SecretListAdapter (this, _previousSecrets);
-                        _secretsList.Adapter = _adapter;
-                        _secretsList.ItemClick += (s,e) => OnShowSecret (e);
-
+                        _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
                         HandleIntentFilterFeature ();
                 }
 
@@ -68,7 +63,7 @@ namespace CrossCopy.AndroidClient
                         CrossCopyApp.Srv.Abort ();
 
                         _newSecret.Text = "";
-                        LoadSecretsList ();
+                        LoadCodeWords ();
                 }
 
                 protected override void OnPause ()
@@ -89,34 +84,62 @@ namespace CrossCopy.AndroidClient
 #endregion
  
                 #region Secrets Management
-                void LoadSecretsList ()
+                void LoadCodeWords ()
                 {
-                        _previousSecrets.Clear ();
+                        // Remove the views that
+                        // are based on the code words
+                        foreach (var kvp in _secretItems) { 
+                                _mainLayout.RemoveView (kvp.Key);
+                        }
+                        _secretItems.Clear ();
+
+                        // Start adding all use code words
                         Task.Factory.StartNew (() => {
                                 RunOnUiThread (() => {
+                                        //  var its = CrossCopyApp.HistoryData.Secrets.ToList ();
+                                        //    its.Reverse ();
+
                                         foreach (var s in CrossCopyApp.HistoryData.Secrets) {
-                                                s.WatchEvent += UpdateSecretDeviceCount;
-                                                _previousSecrets.Add (new SecretItem { Secret = s.Phrase, Devices = s.ListenersCount });
+                                                AddCodeWordToView (s);
                                         }
-                                        _previousSecrets.Reverse ();
-                                        _adapter.NotifyDataSetChanged (); });
+                                });
                         });
+                }
+
+                void AddCodeWordToView (Secret s)
+                {
+                        s.WatchEvent += UpdateSecretDeviceCount;
+                        var secret = new SecretItem {
+                                Secret = s.Phrase,
+                                Devices = s.ListenersCount
+                        };
+                        var view = _inflater.Inflate (Resource.Layout.SecretItemView, _mainLayout, false);
+                        var tv = view.FindViewById<TextView> (Resource.Id.textViewSecrets);
+                        tv.Text = secret.Secret;
+                        tv = view.FindViewById<TextView> (Resource.Id.textViewDevices);
+                        tv.Text = secret.Devices.ToString ();
+                        _secretItems [view] = secret;
+                        view.Click += OnShowSecret;
+                        _mainLayout.AddView (view, 4);
                 }
 
                 void UpdateSecretDeviceCount (Secret secret)
                 {
-                        var item = _previousSecrets.Where (s => s.Secret == secret.Phrase).SingleOrDefault ();
-                        if (item == null)
-                                return;
+                        var item = _secretItems.Where (s => s.Value.Secret == secret.Phrase).SingleOrDefault ();
 
                         RunOnUiThread (() => {
-                                item.Devices = secret.ListenersCount;
-                                _adapter.NotifyDataSetChanged (); });
+                                item.Value.Devices = secret.ListenersCount;
+                                var tv = item.Key.FindViewById<TextView> (Resource.Id.textViewDevices);
+                                tv.Text = item.Value.Devices.ToString ();
+                        });
                 }
 
-                public void OnShowSecret (AdapterView.ItemClickEventArgs e)
+                void OnShowSecret (object sender, EventArgs e)
                 {
-                        var item = _adapter [e.Position];
+                        var item = _secretItems [sender as View];
+                        if (item == null || string.IsNullOrEmpty (item.Secret))
+                                return;
+
                         ShowSecret (item.Secret);
                 }
 
@@ -133,7 +156,7 @@ namespace CrossCopy.AndroidClient
                 {
                         if (!CrossCopyApp.HistoryData.Secrets.Any (s => s.Phrase == phrase)) {
                                 CrossCopyApp.HistoryData.Secrets.Add (new Secret (phrase));
-                                LoadSecretsList ();
+                                LoadCodeWords ();
                         }
                         var sessionIntent = new Intent ();
                         sessionIntent.SetClass (this, typeof(SessionActivity));
