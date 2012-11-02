@@ -37,6 +37,7 @@ namespace CrossCopy.AndroidClient
                 LinearLayout _mainLayout;
                 LayoutInflater _inflater;
 #endregion
+     
                 #region Upload File Members
                 string _uploadingFilePath;
 #endregion
@@ -44,6 +45,7 @@ namespace CrossCopy.AndroidClient
                 #region CrossCopyApi Members
                 Secret _secret;
 #endregion
+   
                 #region Constants
                 static string BaseDir = "/sdcard/cross-copy";
                 static int SELECT_FILE_CODE = 1;
@@ -124,6 +126,7 @@ namespace CrossCopy.AndroidClient
                         }
                 }
 #endregion
+  
                 #region History Management
                 /// <summary>
                 /// Populates the list of history items with the 
@@ -379,6 +382,8 @@ namespace CrossCopy.AndroidClient
                                 return "application/vnd.android.package-archive";
                         case ".txt":
                                 return "text/plain";
+                        case ".srt":
+                                return "text/plain";
                         case ".csv":
                                 return "text/csv";
                         case ".xml":
@@ -412,6 +417,8 @@ namespace CrossCopy.AndroidClient
                         case ".amr":
                                 return "audio/AMR";
                         case ".mpeg":
+                                return "video/mpeg";
+                        case ".mpg":
                                 return "video/mpeg";
                         case ".3gp":
                                 return "video/3gpp";
