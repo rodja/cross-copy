@@ -39,7 +39,8 @@ namespace CrossCopy.AndroidClient
 #endregion
      
                 #region Upload File Members
-                string _uploadingFilePath;
+                string _uploadingFileName;
+                string _localUri;
 #endregion
 
                 #region CrossCopyApi Members
@@ -134,6 +135,9 @@ namespace CrossCopy.AndroidClient
                 /// </summary>
                 void LoadHistory ()
                 {
+                        if (CrossCopyApp.Srv.CurrentSecret.DataItems.Count <= _historyItems.Count)
+                                return;
+
                         foreach (var v in _historyItems.Keys)
                                 _mainLayout.RemoveView (v);
 
@@ -157,7 +161,7 @@ namespace CrossCopy.AndroidClient
                 {
                         RunOnUiThread (() => { 
                                 _tvShareCount.Text = secret.ListenersCount == 1 
-                                        ? GetString (Resource.String.ShareWith1Device)
+                                        ? GetString (Resource.String.ShareWithNoDevices)
                                                 : string.Format (GetString (Resource.String.ShareWithNDevices), secret.ListenersCount); 
                         });
                 }
@@ -176,50 +180,72 @@ namespace CrossCopy.AndroidClient
                 /// </param>
                 public void Paste (DataItem item)
                 {
-                        if (item.Direction == DataItemDirection.Out && !string.IsNullOrEmpty (_uploadingFilePath)) {
-                                item.Data = _uploadingFilePath;
-                                _uploadingFilePath = string.Empty;
-                        }
+                        if (item.Direction == DataItemDirection.Out && !string.IsNullOrEmpty (_uploadingFileName))
+                                item.Data = _localUri;
 
                         CrossCopyApp.Srv.CurrentSecret.DataItems.Insert (0, item);
                         Task.Factory.StartNew (() => {
                                 CrossCopyApp.Save (Application.Context);
                         });
-                        AddNewItemToHistory (item);
+
+                        if (item.Direction == DataItemDirection.In)
+                                AddIncomingItemToHistory (item, false);
+                        else if (!string.IsNullOrEmpty (_uploadingFileName)) {
+                                _uploadingFileName = string.Empty;
+                                _localUri = string.Empty;
+                        } else
+                                AddOutgoingItemToHistory (item);
                 }
 
                 private void AddOldItemToHistory (DataItem item)
                 {
-                        AddItemToHistory (item, true);
+                        if (item.Direction == DataItemDirection.In)
+                                AddIncomingItemToHistory (item, true);
+                        else
+                                AddOutgoingItemToHistory (item);
                 }
 
-                public void AddNewItemToHistory (DataItem item)
+                void AddIncomingItemToHistory (DataItem item, bool isOldItem)
                 {
-                        AddItemToHistory (item, false);
+                        var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                        var theNewItem = CreateIncomingItem (item, isOldItem);
+                        var tv = view.FindViewById<TextView> (Resource.Id.textViewLeft);
+                        tv.Text = theNewItem.Incoming; 
+
+                        _historyItems [view] = theNewItem;
+
+                        AddView (view);
                 }
 
-                public void AddItemToHistory (DataItem item, bool isOldItem)
+                void AddOutgoingItemToHistory (DataItem item)
                 {
-                        RunOnUiThread (() => {
-                                HistoryItem theNewItem;
-                                var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                        View view;
+                        HistoryItem historyItem;
+                        if (string.IsNullOrEmpty (_uploadingFileName)) {
+                                // This happens when we are starting and we are
+                                // adding the old items to the history
+                                view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                                var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
+                                tv.Text = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.Data));
+                                historyItem = CreateOutgoingItem (item);
+                        } else {
+                                // This is the dummy view we create just to speed up showing the
+                                // item to the user
+                                view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                                var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
+                                tv.Text = _uploadingFileName;
+                                historyItem = CreateOutgoingItem (item);
+                                historyItem.LocalPath = _localUri;
+                        } 
+                        
+                        _historyItems [view] = historyItem;
+                        AddView (view);
+                }
 
-                                if (item.Direction == DataItemDirection.In) {
-                                        theNewItem = CreateIncomingItem (item, isOldItem);
-                                        var tv = view.FindViewById<TextView> (Resource.Id.textViewLeft);
-                                        tv.Text = theNewItem.Incoming; 
-                                        
-                                } else {
-                                        theNewItem = CreateOutgoingItem (item);
-                                        var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
-                                        tv.Text = theNewItem.Outgoing;  
-                                }
-
-                                _historyItems [view] = theNewItem;
-                                view.Click += DisplayHistoryItem;
-                                _mainLayout.AddView (view, 6);
-                        }
-                        );
+                void AddView (View view)
+                {
+                        view.Click += DisplayHistoryItem;
+                        RunOnUiThread (() => _mainLayout.AddView (view, 6));
                 }
 
                 HistoryItem CreateIncomingItem (DataItem item, bool alreadyDownloaded)
@@ -239,12 +265,16 @@ namespace CrossCopy.AndroidClient
                 
                 HistoryItem CreateOutgoingItem (DataItem item)
                 {
-                        if (!File.Exists (item.Data))
-                                return new HistoryItem { Outgoing = item.Data, Downloading = false };
-                                        
-                        return new HistoryItem { Outgoing = Path.GetFileName (item.Data), 
+                        try {
+                                var input = GetRealPathFromURI (Android.Net.Uri.Parse (item.Data));
+                                if (!string.IsNullOrEmpty (input) && File.Exists (input))
+                                        return new HistoryItem { Outgoing = Path.GetFileName (input), 
                                                  LocalPath = item.Data, 
                                                  Downloading = false};
+                        } catch (Exception) {
+                        }
+
+                        return new HistoryItem { Outgoing = item.Data, Downloading = false };
                 }
 
                 private void StartDownload (string url, HistoryItem hItem)
@@ -301,23 +331,29 @@ namespace CrossCopy.AndroidClient
 
                         base.OnActivityResult (requestCode, resultCode, data);                        
                 }
+#endregion
 
+                #region Upload File
                 void UploadFile (Android.Net.Uri data)
                 {
                         _uploadProgress.Progress = 0;
-                        Console.WriteLine(data.Scheme);
-                        if (data.Scheme == "file") {
-                                var filePath = GetRealPathFromURI (data);
-                                if (String.IsNullOrEmpty (filePath))
-                                        return;
+                        Console.WriteLine (data.Scheme);
+                        _localUri = data.Scheme + ":" + data.SchemeSpecificPart;
+                        AddOutgoingItemToHistory (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
+                        Task.Factory.StartNew (() => {
+                                _uploadProgress.Progress = 0;
+                                var buffer = new byte[4096];
+                        
+                                var input = ContentResolver.OpenInputStream (data);
+                                var mem = new MemoryStream ();
+                                var readed = 0;
+                                while ((readed = input.Read(buffer, 0, 4096)) > 0)
+                                        mem.Write (buffer, 0, (int)readed);
 
-                                _uploadingFilePath = filePath;
-
-                                CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
-                        } else if (data.Scheme == "content"){
-                                Stream stream = this.ContentResolver.OpenInputStream(data);
-                                // TODO: new method CrossCopyApp.Srv.UploadDataAsync (stream, OnUploadProgress, OnUploadCompleted);
-                        }
+                                input.Close ();
+                                if (mem.Length > 0)
+                                        CrossCopyApp.Srv.UploadFileAsync (_uploadingFileName, mem.ToArray (), OnUploadCompleted);
+                        });
                 }
 
 #endregion
@@ -362,15 +398,21 @@ namespace CrossCopy.AndroidClient
                                 return;
                         }
 
-                        var theFile = new Java.IO.File (item.LocalPath);
+                        string name;
+                        if (!string.IsNullOrEmpty (item.Outgoing))
+                                name = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.LocalPath));
+                        else
+                                name = item.LocalPath;
+
+                        //                    var theFile = new Java.IO.File (name);
                         var intent = new Intent ();
                         intent.SetAction (Intent.ActionView);
 
-                        var mimeType = GetMimeTypeForFile (item.LocalPath);
+                        var mimeType = GetMimeTypeForFile (name);
                         if (! string.IsNullOrEmpty (mimeType))
-                                intent.SetDataAndType (Android.Net.Uri.FromFile (theFile), mimeType);
+                                intent.SetDataAndType (Android.Net.Uri.Parse (item.LocalPath), mimeType);
                         else
-                                intent.SetData (Android.Net.Uri.FromFile (theFile));
+                                intent.SetData (Android.Net.Uri.Parse (item.LocalPath));
 
                         if (PackageManager.QueryIntentActivities (intent, 0).Any ())
                                 StartActivityForResult (intent, VIEW_FILE_CODE);
@@ -452,16 +494,38 @@ namespace CrossCopy.AndroidClient
 #endregion
 
                 #region Utils
+                string GetDisplayNameFromURI (Android.Net.Uri contentURI)
+                {
+                        if (contentURI.Scheme == "content") {
+
+                                var filePathColumn = new []{
+                                        MediaStore.Images.ImageColumns.DisplayName
+                                };
+                                var cursor = ContentResolver.Query (contentURI, filePathColumn, null, null, null); 
+                                if (cursor != null && cursor.MoveToFirst ()) {
+                                        var columnIndex = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.DisplayName);
+                                        return cursor.GetString (columnIndex); 
+                                }
+                        } else if (contentURI.Scheme == Uri.UriSchemeFile) {
+                                return Path.GetFileName (contentURI.Path);
+                        }
+                        // return contentURI.Path;
+                        return contentURI.Path;
+                }
                 string GetRealPathFromURI (Android.Net.Uri contentURI)
                 {
                         if (contentURI.Scheme == "content") {
-                                var cursor = ContentResolver.Query (contentURI, null, null, null, null); 
+                                
+                                var filePathColumn = new []{
+                                        MediaStore.Images.ImageColumns.Data
+                                };
+                                var cursor = ContentResolver.Query (contentURI, filePathColumn, null, null, null); 
                                 if (cursor != null && cursor.MoveToFirst ()) {
-                                        var idx = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.Data); 
-                                        return cursor.GetString (idx); 
+                                        var columnIndex = cursor.GetColumnIndex (MediaStore.Images.ImageColumns.Data);
+                                        return cursor.GetString (columnIndex); 
                                 }
-                        }
-//                        else if (contentURI.Scheme == Uri.UriSchemeFile)
+                        } 
+                        //                        else if (contentURI.Scheme == Uri.UriSchemeFile)
                         // return contentURI.Path;
                         return contentURI.Path;
                 }
