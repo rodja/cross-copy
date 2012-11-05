@@ -305,14 +305,19 @@ namespace CrossCopy.AndroidClient
                 void UploadFile (Android.Net.Uri data)
                 {
                         _uploadProgress.Progress = 0;
-                        
-                        var filePath = GetRealPathFromURI (data);
-                        if (String.IsNullOrEmpty (filePath))
-                                return;
+                        Console.WriteLine(data.Scheme);
+                        if (data.Scheme == "file") {
+                                var filePath = GetRealPathFromURI (data);
+                                if (String.IsNullOrEmpty (filePath))
+                                        return;
 
-                        _uploadingFilePath = filePath;
+                                _uploadingFilePath = filePath;
 
-                        CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
+                                CrossCopyApp.Srv.UploadFileAsync (filePath, OnUploadProgress, OnUploadCompleted);
+                        } else if (data.Scheme == "content"){
+                                Stream stream = this.ContentResolver.OpenInputStream(data);
+                                // TODO: new method CrossCopyApp.Srv.UploadDataAsync (stream, OnUploadProgress, OnUploadCompleted);
+                        }
                 }
 
 #endregion
