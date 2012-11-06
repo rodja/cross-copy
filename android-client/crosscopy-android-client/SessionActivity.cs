@@ -394,7 +394,7 @@ namespace CrossCopy.AndroidClient
                                 return;
 
                         if (item.Downloading) {
-                                Toast.MakeText (this, "This file is still being transfered, wait untill it finishes", ToastLength.Short).Show ();
+                                Toast.MakeText (this, "This file is still being transfered, wait until it finishes", ToastLength.Short).Show ();
                                 return;
                         }
 
@@ -404,20 +404,14 @@ namespace CrossCopy.AndroidClient
                         else
                                 name = item.LocalPath;
 
-                        //                    var theFile = new Java.IO.File (name);
                         var intent = new Intent ();
                         intent.SetAction (Intent.ActionView);
 
-                        var mimeType = GetMimeTypeForFile (name);
-                        if (! string.IsNullOrEmpty (mimeType))
-                                intent.SetDataAndType (Android.Net.Uri.Parse (item.LocalPath), mimeType);
-                        else
-                                intent.SetData (Android.Net.Uri.Parse (item.LocalPath));
-
-                        if (PackageManager.QueryIntentActivities (intent, 0).Any ())
+                        intent.SetData (Android.Net.Uri.Parse (item.LocalPath));
+                        if (PackageManager.QueryIntentActivities (intent, PackageInfoFlags.IntentFilters).Any ())
                                 StartActivityForResult (intent, VIEW_FILE_CODE);
                         else
-                                StartActivityForResult (Intent.CreateChooser (intent, "Choose an application to open with:"), VIEW_FILE_CODE);
+                                Toast.MakeText (this, "No application found to open this content.", ToastLength.Short).Show ();
                 }
 
                 #region Mime types
@@ -512,6 +506,7 @@ namespace CrossCopy.AndroidClient
                         // return contentURI.Path;
                         return contentURI.Path;
                 }
+
                 string GetRealPathFromURI (Android.Net.Uri contentURI)
                 {
                         if (contentURI.Scheme == "content") {
