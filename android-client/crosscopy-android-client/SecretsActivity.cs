@@ -49,7 +49,15 @@ namespace CrossCopy.AndroidClient
                         _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
                         _showSecret = FindViewById<Button> (Resource.Id.btnOpen);
                         _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
-
+                        _newSecret.KeyPress += (object sender, View.KeyEventArgs e) =>
+                        {
+                                if (e.KeyCode == Keycode.Enter && e.Event.Action == KeyEventActions.Down) {
+                                        var phrase = _newSecret.Text.Trim ();
+                                        if (String.IsNullOrEmpty (phrase))
+                                                return;
+                                        ShowSecret (phrase);
+                                }
+                        };
                         _showSecret.Click += OnNewSecret;
 
                         _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
@@ -82,7 +90,6 @@ namespace CrossCopy.AndroidClient
                 }
                         
 #endregion
- 
                 #region Secrets Management
                 void LoadCodeWords ()
                 {

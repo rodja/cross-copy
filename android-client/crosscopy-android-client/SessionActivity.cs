@@ -39,6 +39,7 @@ namespace CrossCopy.AndroidClient
 #endregion
      
                 #region Upload File Members
+                string _tmpOutFilename;
                 string _uploadingFileName;
                 string _localUri;
 #endregion
@@ -344,16 +345,17 @@ namespace CrossCopy.AndroidClient
                         Task.Factory.StartNew (() => {
                                 _uploadProgress.Progress = 0;
                                 var buffer = new byte[4096];
-                        
+                                _tmpOutFilename = Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.Personal), _uploadingFileName);
                                 var input = ContentResolver.OpenInputStream (data);
-                                var mem = new MemoryStream ();
+                                var outFile = File.Create (_tmpOutFilename);
+
                                 var readed = 0;
                                 while ((readed = input.Read(buffer, 0, 4096)) > 0)
-                                        mem.Write (buffer, 0, (int)readed);
+                                        outFile.Write (buffer, 0, (int)readed);
 
                                 input.Close ();
-                                if (mem.Length > 0)
-                                        CrossCopyApp.Srv.UploadFileAsync (_uploadingFileName, mem.ToArray (), OnUploadCompleted);
+                                outFile.Close ();
+                                CrossCopyApp.Srv.UploadFileAsync (_tmpOutFilename, OnUploadProgress, OnUploadCompleted);
                         });
                 }
 
@@ -379,6 +381,10 @@ namespace CrossCopy.AndroidClient
 
                 void OnUploadCompleted ()
                 {
+                        if (!string.IsNullOrEmpty (_tmpOutFilename)) {
+                                File.Delete (_tmpOutFilename);
+                                _tmpOutFilename = null;
+                        }
                         RunOnUiThread (() => {
                                 _uploadProgress.Progress = 100;
                                 _chooseContent.Visibility = ViewStates.Visible;
