@@ -32,7 +32,7 @@ namespace CrossCopy.AndroidClient
                 TextView _textToSend;
                 TextView _tvShareCount;
                 TextView _tvCodeWord;
-                ProgressBar _uploadProgress;
+                ProgressBarX _uploadProgress;
                 Button _chooseContent;
                 LinearLayout _mainLayout;
                 LayoutInflater _inflater;
@@ -65,7 +65,7 @@ namespace CrossCopy.AndroidClient
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
                         _tvShareCount = FindViewById<TextView> (Resource.Id.tvShareCount);
                         _tvCodeWord = FindViewById<TextView> (Resource.Id.tvCodeWord);
-                        _uploadProgress = FindViewById<ProgressBar> (Resource.Id.uploadProgress);
+                        _uploadProgress = FindViewById<ProgressBarX> (Resource.Id.uploadProgress);
                         _chooseContent = FindViewById<Button> (Resource.Id.btnChooseContent);
                         _mainLayout = FindViewById<LinearLayout> (Resource.Id.shareLayout);
 
@@ -345,12 +345,15 @@ namespace CrossCopy.AndroidClient
                 void UploadFile (Android.Net.Uri data)
                 {
                         _uploadProgress.Progress = 0;
-                        Console.WriteLine (data.Scheme);
+                        _uploadProgress.Text = _uploadingFileName;
+                        UpdateProgress (0);
+
                         _localUri = data.Scheme + ":" + data.SchemeSpecificPart;
                         _uploadingFileName = GetDisplayNameFromURI (data);
                         AddOutgoingItemToHistory (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
+
                         Task.Factory.StartNew (() => {
-                                _uploadProgress.Progress = 0;
+
                                 var buffer = new byte[4096];
                                 _tmpOutFilename = Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.Personal), _uploadingFileName);
                                 var input = ContentResolver.OpenInputStream (data);
@@ -371,17 +374,21 @@ namespace CrossCopy.AndroidClient
                 #region Progress Display
                 void OnUploadProgress (UploadProgressChangedEventArgs e)
                 {
+                        UpdateProgress (e.ProgressPercentage);
+                }
+                void UpdateProgress (int progress)
+                {
                         RunOnUiThread (() => {
-                                _uploadProgress.Progress = e.ProgressPercentage;
+                                _uploadProgress.Progress = progress;
 
-                                if (e.ProgressPercentage > 0) {
+                                if (progress >= 0) {
                                         _uploadProgress.Visibility = ViewStates.Visible;
                                         _chooseContent.Visibility = ViewStates.Invisible;
                                 }
 
                                 // I'll call the OnUploadComplete here because the
                                 // real event takes forever to fire...
-                                if (e.ProgressPercentage == 100)
+                                if (progress == 100)
                                         OnUploadCompleted ();
                         });
                 }

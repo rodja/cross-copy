@@ -70,6 +70,7 @@
     <Compile Include="CrossCopyApp.cs" />
     <Compile Include="HistoryItem.cs" />
     <Compile Include="SecretItem.cs" />
+    <Compile Include="Resources\ProgressBarX.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

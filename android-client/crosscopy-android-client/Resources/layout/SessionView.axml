@@ -88,7 +88,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/frameLayout1">
-            <ProgressBar
+            <CrossCopy.AndroidClient.ProgressBarX
                 style="?android:attr/progressBarStyleHorizontal"
                 android:id="@+id/uploadProgress"
                 android:layout_width="fill_parent"
