@@ -70,8 +70,15 @@ namespace CrossCopy.AndroidClient
                         _mainLayout = FindViewById<LinearLayout> (Resource.Id.shareLayout);
 
                         var btnSend = FindViewById<Button> (Resource.Id.buttonSend);
-                        btnSend.Click += SendText;
+                        btnSend.Click += (object sender, EventArgs e) => {
+                                SendText ();
+                        };
 
+                        _textToSend.KeyPress += (object sender, View.KeyEventArgs e) => {
+                                if (e.KeyCode == Keycode.Enter && e.Event.Action == KeyEventActions.Down) {
+                                        SendText ();
+                                }
+                        };
                         _chooseContent.Click += ChooseFile;
 
                         var phrase = Intent.GetStringExtra ("Secret");
@@ -119,7 +126,7 @@ namespace CrossCopy.AndroidClient
                         if (this.Intent.HasExtra ("SharedText")) {
                                 RunOnUiThread (() => { 
                                         _textToSend.Text = Intent.GetStringExtra ("SharedText");
-                                        SendText (this, EventArgs.Empty);
+                                        SendText ();
                                 });
                         } else if (this.Intent.HasExtra ("SharedUri")) {
                                 var uri = Intent.GetStringExtra ("SharedUri");
@@ -493,9 +500,9 @@ namespace CrossCopy.AndroidClient
 #endregion
 
                 #region Send Text
-                void SendText (object sender, EventArgs e)
+                void SendText ()
                 {
-                        if (String.IsNullOrEmpty (_textToSend.Text))
+                        if (String.IsNullOrEmpty (_textToSend.Text.Trim ()))
                                 return;
                         CrossCopyApp.Srv.Send (_textToSend.Text.Trim ());
                 }

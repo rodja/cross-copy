@@ -69,7 +69,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/buttonSend"
-                android:layout_marginLeft="2dp" />
+                android:layout_marginLeft="2dp"
+                android:capitalize="none"
+                android:inputType="text" />
             <Button
                 android:text="@string/Send"
                 android:id="@+id/buttonSend"

@@ -52,13 +52,12 @@ namespace CrossCopy.AndroidClient
                         _newSecret.KeyPress += (object sender, View.KeyEventArgs e) =>
                         {
                                 if (e.KeyCode == Keycode.Enter && e.Event.Action == KeyEventActions.Down) {
-                                        var phrase = _newSecret.Text.Trim ();
-                                        if (String.IsNullOrEmpty (phrase))
-                                                return;
-                                        ShowSecret (phrase);
+                                        ShowSecret (_newSecret.Text.Trim ());
                                 }
                         };
-                        _showSecret.Click += OnNewSecret;
+
+                        _showSecret.Click += (object sender, EventArgs e) => {
+                                ShowSecret (_newSecret.Text.Trim ()); };
 
                         _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
                         HandleIntentFilterFeature ();
@@ -150,17 +149,11 @@ namespace CrossCopy.AndroidClient
                         ShowSecret (item.Secret);
                 }
 
-                void OnNewSecret (object sender, EventArgs e)
+                void ShowSecret (string phrase)
                 {
-                        var phrase = _newSecret.Text.Trim ();
                         if (String.IsNullOrEmpty (phrase))
                                 return;
 
-                        ShowSecret (phrase);
-                }
-
-                void ShowSecret (string phrase)
-                {
                         if (!CrossCopyApp.HistoryData.Secrets.Any (s => s.Phrase == phrase)) {
                                 CrossCopyApp.HistoryData.Secrets.Add (new Secret (phrase));
                                 LoadCodeWords ();
