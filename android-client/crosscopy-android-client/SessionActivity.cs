@@ -339,6 +339,7 @@ namespace CrossCopy.AndroidClient
                         _uploadProgress.Progress = 0;
                         Console.WriteLine (data.Scheme);
                         _localUri = data.Scheme + ":" + data.SchemeSpecificPart;
+                        _uploadingFileName = GetDisplayNameFromURI (data);
                         AddOutgoingItemToHistory (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
                         Task.Factory.StartNew (() => {
                                 _uploadProgress.Progress = 0;
@@ -398,22 +399,29 @@ namespace CrossCopy.AndroidClient
                                 return;
                         }
 
-                        string name;
-                        if (!string.IsNullOrEmpty (item.Outgoing))
-                                name = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.LocalPath));
-                        else
-                                name = item.LocalPath;
+                        var intent = CreateProperIntent (item);
 
-                        var intent = new Intent ();
-                        intent.SetAction (Intent.ActionView);
-
-                        intent.SetData (Android.Net.Uri.Parse (item.LocalPath));
                         if (PackageManager.QueryIntentActivities (intent, PackageInfoFlags.IntentFilters).Any ())
                                 StartActivityForResult (intent, VIEW_FILE_CODE);
                         else
                                 Toast.MakeText (this, "No application found to open this content.", ToastLength.Short).Show ();
                 }
 
+                Intent CreateProperIntent (HistoryItem item)
+                {
+                        var intent = new Intent ();
+                        intent.SetAction (Intent.ActionView);
+
+                        if (!string.IsNullOrEmpty (item.Outgoing)) {
+                                var uri = Android.Net.Uri.Parse (item.LocalPath);
+                                intent.SetDataAndType (uri, GetMimeTypeForFile (GetDisplayNameFromURI (uri)));
+                        } else {
+                                var uri = Android.Net.Uri.FromFile (new Java.IO.File (item.LocalPath));
+                                intent.SetDataAndType (uri, GetMimeTypeForFile (item.LocalPath));
+                        }
+
+                        return intent;
+                }
                 #region Mime types
 
                 string GetMimeTypeForFile (string fileAndPath)
