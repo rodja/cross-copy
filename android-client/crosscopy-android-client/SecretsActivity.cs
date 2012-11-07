@@ -53,7 +53,9 @@ namespace CrossCopy.AndroidClient
                         {
                                 if (e.KeyCode == Keycode.Enter && e.Event.Action == KeyEventActions.Down) {
                                         ShowSecret (_newSecret.Text.Trim ());
-                                }
+                                        e.Handled = true;
+                                } else
+                                        e.Handled = false;
                         };
 
                         _showSecret.Click += (object sender, EventArgs e) => {
@@ -89,6 +91,7 @@ namespace CrossCopy.AndroidClient
                 }
                         
 #endregion
+
                 #region Secrets Management
                 void LoadCodeWords ()
                 {
@@ -131,9 +134,8 @@ namespace CrossCopy.AndroidClient
 
                 void UpdateSecretDeviceCount (Secret secret)
                 {
-                        var item = _secretItems.Where (s => s.Value.Secret == secret.Phrase).SingleOrDefault ();
-
                         RunOnUiThread (() => {
+                                var item = _secretItems.Where (s => s.Value.Secret == secret.Phrase).SingleOrDefault ();
                                 item.Value.Devices = secret.ListenersCount;
                                 var tv = item.Key.FindViewById<TextView> (Resource.Id.textViewDevices);
                                 tv.Text = item.Value.Devices.ToString ();

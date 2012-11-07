@@ -47,7 +47,7 @@ namespace CrossCopy.AndroidClient
                         canvas.DrawText (_text, x, y, textPaint);
                 }
 
-                private string _text;
+                private string _text = string.Empty;
                 public string Text {
                         get { return _text; }
                         set { 

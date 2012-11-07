@@ -16,6 +16,7 @@ using System.IO;
 using Android.Provider;
 using System.Threading.Tasks;
 using Android.Util;
+using Android.Views.InputMethods;
  
 namespace CrossCopy.AndroidClient
 {
@@ -32,7 +33,6 @@ namespace CrossCopy.AndroidClient
                 TextView _textToSend;
                 TextView _tvShareCount;
                 TextView _tvCodeWord;
-                ProgressBarX _uploadProgress;
                 Button _chooseContent;
                 LinearLayout _mainLayout;
                 LayoutInflater _inflater;
@@ -46,6 +46,9 @@ namespace CrossCopy.AndroidClient
 
                 #region CrossCopyApi Members
                 Secret _secret;
+#endregion
+                #region Keyboard Members
+                InputMethodManager _inputMethodManager;
 #endregion
    
                 #region Constants
@@ -61,11 +64,9 @@ namespace CrossCopy.AndroidClient
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.SessionView);
 
-                        //_history = FindViewById<ListView> (Resource.Id.listViewHistory);
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
                         _tvShareCount = FindViewById<TextView> (Resource.Id.tvShareCount);
                         _tvCodeWord = FindViewById<TextView> (Resource.Id.tvCodeWord);
-                        _uploadProgress = FindViewById<ProgressBarX> (Resource.Id.uploadProgress);
                         _chooseContent = FindViewById<Button> (Resource.Id.btnChooseContent);
                         _mainLayout = FindViewById<LinearLayout> (Resource.Id.shareLayout);
 
@@ -77,7 +78,8 @@ namespace CrossCopy.AndroidClient
                         _textToSend.KeyPress += (object sender, View.KeyEventArgs e) => {
                                 if (e.KeyCode == Keycode.Enter && e.Event.Action == KeyEventActions.Down) {
                                         SendText ();
-                                }
+                                } else
+                                        e.Handled = false;
                         };
                         _chooseContent.Click += ChooseFile;
 
@@ -95,6 +97,7 @@ namespace CrossCopy.AndroidClient
                         _tvShareCount.Text = GetString (Resource.String.ShareWithNoDevices);
 
                         _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
+                        _inputMethodManager = (InputMethodManager)GetSystemService (InputMethodService);
                         HandlePossibleSharedContent ();
                 }
 
@@ -215,38 +218,73 @@ namespace CrossCopy.AndroidClient
 
                 void AddIncomingItemToHistory (DataItem item, bool isOldItem)
                 {
-                        var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
-                        var theNewItem = CreateIncomingItem (item, isOldItem);
-                        var tv = view.FindViewById<TextView> (Resource.Id.textViewLeft);
-                        tv.Text = theNewItem.Incoming; 
+                        RunOnUiThread (() => { 
+                                var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                                var progress = view.FindViewById<ProgressBarX> (Resource.Id.transferProgress);
+                                var textView = view.FindViewById<TextView> (Resource.Id.textViewLeft);
+                                var relativeView = view.FindViewById<RelativeLayout> (Resource.Id.rlTextViews);
+                                var theNewItem = CreateIncomingItem (item, isOldItem, progress, relativeView);
 
-                        _historyItems [view] = theNewItem;
+                                textView.Text = progress.Text = theNewItem.Incoming; 
 
-                        AddView (view);
+                                _historyItems [view] = theNewItem;
+
+                                AddView (view);
+                        });
                 }
+
+                void AddNewOutgoingItemToHistory (Android.Net.Uri data)
+                {
+                        // This is the dummy view we create just to speed up showing the
+                        // item to the user
+                        _localUri = data.Scheme + ":" + data.SchemeSpecificPart;
+                        _uploadingFileName = GetDisplayNameFromURI (data);
+       
+                        var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                        var textview = view.FindViewById<TextView> (Resource.Id.textViewRight);
+                        var relativeView = view.FindViewById<RelativeLayout> (Resource.Id.rlTextViews);
+                        var progress = view.FindViewById<ProgressBarX> (Resource.Id.transferProgress);
+                        textview.Text = progress.Text = _uploadingFileName;
+                        progress.Visibility = ViewStates.Visible;
+                        relativeView.Visibility = ViewStates.Invisible;
+                        var historyItem = CreateOutgoingItem (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
+                        historyItem.LocalPath = _localUri;
+                        _historyItems [view] = historyItem;
+                        AddView (view);
+
+                        Task.Factory.StartNew (() => {
+                                
+                                var buffer = new byte[4096];
+                                _tmpOutFilename = Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.Personal), _uploadingFileName);
+                                var input = ContentResolver.OpenInputStream (data);
+                                var outFile = File.Create (_tmpOutFilename);
+                                
+                                var readed = 0;
+                                while ((readed = input.Read(buffer, 0, 4096)) > 0)
+                                        outFile.Write (buffer, 0, (int)readed);
+                                
+                                input.Close ();
+                                outFile.Close ();
+                                CrossCopyApp.Srv.UploadFileAsync (_tmpOutFilename, 
+                                                                  (e) => {
+                                        UpdateProgress (progress, relativeView, e.ProgressPercentage);},
+                                                                   () => {
+                                        if (!string.IsNullOrEmpty (_tmpOutFilename)) {
+                                                File.Delete (_tmpOutFilename);
+                                                _tmpOutFilename = null;
+                                        }});
+                        });
+                } 
+
 
                 void AddOutgoingItemToHistory (DataItem item)
                 {
-                        View view;
-                        HistoryItem historyItem;
-                        if (string.IsNullOrEmpty (_uploadingFileName)) {
-                                // This happens when we are starting and we are
-                                // adding the old items to the history
-                                view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
-                                var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
-                                tv.Text = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.Data));
-                                historyItem = CreateOutgoingItem (item);
-                        } else {
-                                // This is the dummy view we create just to speed up showing the
-                                // item to the user
-                                view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
-                                var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
-                                tv.Text = _uploadingFileName;
-                                historyItem = CreateOutgoingItem (item);
-                                historyItem.LocalPath = _localUri;
-                        } 
-                        
-                        _historyItems [view] = historyItem;
+                        // This happens when we are starting and we are
+                        // adding the old items to the history
+                        var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
+                        var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
+                        tv.Text = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.Data));
+                        _historyItems [view] = CreateOutgoingItem (item);
                         AddView (view);
                 }
 
@@ -256,7 +294,7 @@ namespace CrossCopy.AndroidClient
                         RunOnUiThread (() => _mainLayout.AddView (view, 6));
                 }
 
-                HistoryItem CreateIncomingItem (DataItem item, bool alreadyDownloaded)
+                HistoryItem CreateIncomingItem (DataItem item, bool alreadyDownloaded, ProgressBarX progress, View view)
                 {
                         if (!item.Data.StartsWith (CrossCopyApp.Srv.CurrentPath))
                                 return new HistoryItem { Incoming = item.Data, Downloading = false };
@@ -265,8 +303,12 @@ namespace CrossCopy.AndroidClient
                                                       LocalPath = BaseDir + item.Data.Substring (4, item.Data.Length - 4),
                                                       Downloading = !alreadyDownloaded
                                                      };
-                        if (hItem.Downloading)
-                                StartDownload (item.Data, hItem);
+                        if (hItem.Downloading) {
+                                progress.Visibility = ViewStates.Visible;
+                                progress.Indeterminate = true;
+                                view.Visibility = ViewStates.Invisible;
+                                StartDownload (item.Data, hItem, progress, view);
+                        }        
 
                         return hItem;
                 }
@@ -285,16 +327,15 @@ namespace CrossCopy.AndroidClient
                         return new HistoryItem { Outgoing = item.Data, Downloading = false };
                 }
 
-                private void StartDownload (string url, HistoryItem hItem)
+                private void StartDownload (string url, HistoryItem hItem, ProgressBarX progress, View view)
                 {
-                        Server.DownloadFileAsync (url, (s, e) => {
-                                if (e.Result == null) {
-                                        Console.Out.WriteLine ("Error fetching file");
-                                } else {
-                                        Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
-                                        File.WriteAllBytes (hItem.LocalPath, e.Result);
-                                }
+                        Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
+                        Server.DownloadFileAsync (url, hItem.LocalPath,
+                                (s, e) => {
+                                if (e.Error != null)
+                                        Console.Out.WriteLine ("Error fetching file: " + e.Error.ToString ());
                                 hItem.Downloading = false;
+                                UpdateProgress (progress, view, 100);
                         });
                 }
 
@@ -344,65 +385,25 @@ namespace CrossCopy.AndroidClient
                 #region Upload File
                 void UploadFile (Android.Net.Uri data)
                 {
-                        _uploadProgress.Progress = 0;
-                        _uploadProgress.Text = _uploadingFileName;
-                        UpdateProgress (0);
-
-                        _localUri = data.Scheme + ":" + data.SchemeSpecificPart;
-                        _uploadingFileName = GetDisplayNameFromURI (data);
-                        AddOutgoingItemToHistory (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
-
-                        Task.Factory.StartNew (() => {
-
-                                var buffer = new byte[4096];
-                                _tmpOutFilename = Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.Personal), _uploadingFileName);
-                                var input = ContentResolver.OpenInputStream (data);
-                                var outFile = File.Create (_tmpOutFilename);
-
-                                var readed = 0;
-                                while ((readed = input.Read(buffer, 0, 4096)) > 0)
-                                        outFile.Write (buffer, 0, (int)readed);
-
-                                input.Close ();
-                                outFile.Close ();
-                                CrossCopyApp.Srv.UploadFileAsync (_tmpOutFilename, OnUploadProgress, OnUploadCompleted);
-                        });
+                        AddNewOutgoingItemToHistory (data);
                 }
 
 #endregion
 
                 #region Progress Display
-                void OnUploadProgress (UploadProgressChangedEventArgs e)
-                {
-                        UpdateProgress (e.ProgressPercentage);
-                }
-                void UpdateProgress (int progress)
+                void UpdateProgress (ProgressBarX progressBar, View view, int progress)
                 {
                         RunOnUiThread (() => {
-                                _uploadProgress.Progress = progress;
+                                progressBar.Progress = progress;
 
-                                if (progress >= 0) {
-                                        _uploadProgress.Visibility = ViewStates.Visible;
-                                        _chooseContent.Visibility = ViewStates.Invisible;
+                                if (progress >= 0 && progress < 100) {
+                                        progressBar.Visibility = ViewStates.Visible;
+                                        view.Visibility = ViewStates.Invisible;
+                                } else if (progress == 100) {
+                                        progressBar.Indeterminate = false;
+                                        progressBar.Visibility = ViewStates.Invisible;
+                                        view.Visibility = ViewStates.Visible;
                                 }
-
-                                // I'll call the OnUploadComplete here because the
-                                // real event takes forever to fire...
-                                if (progress == 100)
-                                        OnUploadCompleted ();
-                        });
-                }
-
-                void OnUploadCompleted ()
-                {
-                        if (!string.IsNullOrEmpty (_tmpOutFilename)) {
-                                File.Delete (_tmpOutFilename);
-                                _tmpOutFilename = null;
-                        }
-                        RunOnUiThread (() => {
-                                _uploadProgress.Progress = 100;
-                                _chooseContent.Visibility = ViewStates.Visible;
-                                _uploadProgress.Visibility = ViewStates.Invisible;
                         });
                 }
 #endregion
@@ -509,10 +510,20 @@ namespace CrossCopy.AndroidClient
                 #region Send Text
                 void SendText ()
                 {
+                        HideKeyboard ();
                         if (String.IsNullOrEmpty (_textToSend.Text.Trim ()))
                                 return;
                         CrossCopyApp.Srv.Send (_textToSend.Text.Trim ());
+                        _textToSend.Text = string.Empty;
                 }
+
+                void HideKeyboard ()
+                {
+                        RunOnUiThread (() => {
+                                _inputMethodManager.HideSoftInputFromWindow (_textToSend.WindowToken, 0);
+                        });
+                }
+
 #endregion
 
                 #region Utils
