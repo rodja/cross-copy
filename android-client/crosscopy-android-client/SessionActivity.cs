@@ -221,9 +221,9 @@ namespace CrossCopy.AndroidClient
                         RunOnUiThread (() => { 
                                 var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
                                 var progress = view.FindViewById<ProgressBarX> (Resource.Id.transferProgress);
-                                var textView = view.FindViewById<TextView> (Resource.Id.textViewLeft);
-                                var relativeView = view.FindViewById<RelativeLayout> (Resource.Id.rlTextViews);
-                                var theNewItem = CreateIncomingItem (item, isOldItem, progress, relativeView);
+                                var textView = view.FindViewById<TextView> (Resource.Id.tvText);
+                                textView.Gravity = GravityFlags.Left;
+                                var theNewItem = CreateIncomingItem (item, isOldItem, progress, textView);
 
                                 textView.Text = progress.Text = theNewItem.Incoming; 
 
@@ -241,12 +241,13 @@ namespace CrossCopy.AndroidClient
                         _uploadingFileName = GetDisplayNameFromURI (data);
        
                         var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
-                        var textview = view.FindViewById<TextView> (Resource.Id.textViewRight);
-                        var relativeView = view.FindViewById<RelativeLayout> (Resource.Id.rlTextViews);
+                        var textView = view.FindViewById<TextView> (Resource.Id.tvText);
+                        textView.Gravity = GravityFlags.Right;
+                        
                         var progress = view.FindViewById<ProgressBarX> (Resource.Id.transferProgress);
-                        textview.Text = progress.Text = _uploadingFileName;
+                        textView.Text = progress.Text = _uploadingFileName;
                         progress.Visibility = ViewStates.Visible;
-                        relativeView.Visibility = ViewStates.Invisible;
+                        textView.Visibility = ViewStates.Invisible;
                         var historyItem = CreateOutgoingItem (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
                         historyItem.LocalPath = _localUri;
                         _historyItems [view] = historyItem;
@@ -267,7 +268,7 @@ namespace CrossCopy.AndroidClient
                                 outFile.Close ();
                                 CrossCopyApp.Srv.UploadFileAsync (_tmpOutFilename, 
                                                                   (e) => {
-                                        UpdateProgress (progress, relativeView, e.ProgressPercentage);},
+                                        UpdateProgress (progress, textView, e.ProgressPercentage);},
                                                                    () => {
                                         if (!string.IsNullOrEmpty (_tmpOutFilename)) {
                                                 File.Delete (_tmpOutFilename);
@@ -276,14 +277,14 @@ namespace CrossCopy.AndroidClient
                         });
                 } 
 
-
                 void AddOutgoingItemToHistory (DataItem item)
                 {
                         // This happens when we are starting and we are
                         // adding the old items to the history
                         var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
-                        var tv = view.FindViewById<TextView> (Resource.Id.textViewRight);
-                        tv.Text = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.Data));
+                        var textView = view.FindViewById<TextView> (Resource.Id.tvText);
+                        textView.Gravity = GravityFlags.Right;
+                        textView.Text = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.Data));
                         _historyItems [view] = CreateOutgoingItem (item);
                         AddView (view);
                 }

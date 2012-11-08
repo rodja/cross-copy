@@ -83,10 +83,7 @@
     <AndroidResource Include="Resources\drawable\Icon.png" />
     <AndroidResource Include="Resources\drawable\dialog_disclosure.png" />
     <AndroidResource Include="Resources\drawable\dialog_expander_ic_minimized.9.png" />
-    <AndroidResource Include="Resources\drawable\browse.png" />
-    <AndroidResource Include="Resources\drawable\download.png" />
     <AndroidResource Include="Resources\drawable\file.png" />
-    <AndroidResource Include="Resources\drawable\folder.png" />
     <AndroidResource Include="Resources\drawable\remove.png" />
     <AndroidResource Include="Resources\drawable\upload.png" />
     <AndroidResource Include="Resources\drawable\crosscopyicon114.png" />
@@ -99,6 +96,7 @@
     <AndroidResource Include="Resources\layout\SessionView.axml" />
     <AndroidResource Include="Resources\layout\CodeWordsView.axml" />
     <AndroidResource Include="Resources\values\Themes.xml" />
+    <AndroidResource Include="Resources\drawable\LayoutSelector.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup />

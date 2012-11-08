@@ -45,23 +45,9 @@ namespace CrossCopy.AndroidClient
                         base.OnCreate (bundle);
                         SetContentView (Resource.Layout.CodeWordsView);
 
-                        _mainLayout = FindViewById<LinearLayout> (Resource.Id.codeWordsLayout);
-                        _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
-                        _showSecret = FindViewById<Button> (Resource.Id.btnOpen);
-                        _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
-                        _newSecret.KeyPress += (object sender, View.KeyEventArgs e) =>
-                        {
-                                if (e.KeyCode == Keycode.Enter && e.Event.Action == KeyEventActions.Down) {
-                                        ShowSecret (_newSecret.Text.Trim ());
-                                        e.Handled = true;
-                                } else
-                                        e.Handled = false;
-                        };
-
-                        _showSecret.Click += (object sender, EventArgs e) => {
-                                ShowSecret (_newSecret.Text.Trim ()); };
-
-                        _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
+                        GetViews ();
+                        GetSystemServices ();
+                        AddHandlers ();
                         HandleIntentFilterFeature ();
                 }
 
@@ -92,7 +78,38 @@ namespace CrossCopy.AndroidClient
                         
 #endregion
 
-                #region Secrets Management
+                #region Init Methods
+                void GetViews ()
+                {
+                        _mainLayout = FindViewById<LinearLayout> (Resource.Id.codeWordsLayout);
+                        _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
+                        _showSecret = FindViewById<Button> (Resource.Id.btnOpen);
+                        _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
+                }
+                
+                void AddHandlers ()
+                {
+                        _newSecret.KeyPress += (object sender, View.KeyEventArgs e) =>
+                        {
+                                if (e.KeyCode != Keycode.Enter || e.Event.Action != KeyEventActions.Down) {
+                                        e.Handled = false;
+                                        return;
+                                }
+                                ShowSecret (_newSecret.Text.Trim ());
+                                e.Handled = true;
+                        };
+                        
+                        _showSecret.Click += (object sender, EventArgs e) => {
+                                ShowSecret (_newSecret.Text.Trim ()); };
+                }
+                
+                void GetSystemServices ()
+                {
+                        _inflater = (LayoutInflater)GetSystemService (Context.LayoutInflaterService);
+                }
+#endregion
+
+                #region Core Words Management
                 void LoadCodeWords ()
                 {
                         // Remove the views that
@@ -105,12 +122,8 @@ namespace CrossCopy.AndroidClient
                         // Start adding all use code words
                         Task.Factory.StartNew (() => {
                                 RunOnUiThread (() => {
-                                        //  var its = CrossCopyApp.HistoryData.Secrets.ToList ();
-                                        //    its.Reverse ();
-
-                                        foreach (var s in CrossCopyApp.HistoryData.Secrets) {
+                                        foreach (var s in CrossCopyApp.HistoryData.Secrets)
                                                 AddCodeWordToView (s);
-                                        }
                                 });
                         });
                 }
