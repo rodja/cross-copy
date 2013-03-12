@@ -107,10 +107,10 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy TabsToSpaces="True" EolMarker="Unix" inheritsSet="Mono" inheritsScope="text/plain" scope="text/x-csharp" />
+          <TextStylePolicy TabsToSpaces="True" EolMarker="Windows" inheritsSet="Mono" inheritsScope="text/plain" scope="text/x-csharp" />
           <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
-          <TextStylePolicy TabsToSpaces="True" EolMarker="Unix" inheritsSet="Mono" inheritsScope="text/plain" scope="text/plain" />
-          <TextStylePolicy TabsToSpaces="True" EolMarker="Unix" inheritsSet="Mono" inheritsScope="text/plain" scope="application/xml" />
+          <TextStylePolicy TabsToSpaces="True" EolMarker="Windows" inheritsSet="Mono" inheritsScope="text/plain" scope="text/plain" />
+          <TextStylePolicy TabsToSpaces="True" EolMarker="Windows" inheritsSet="Mono" inheritsScope="text/plain" scope="application/xml" />
           <XmlFormattingPolicy inheritsSet="Mono" inheritsScope="application/xml" scope="application/xml" />
         </Policies>
       </Properties>

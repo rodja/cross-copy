@@ -16,5 +16,8 @@ Global
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = crosscopy-android-client\crosscopy-android-client.csproj
+		Policies = $0
+		$0.VersionControlPolicy = $1
+		$1.inheritsSet = Mono
 	EndGlobalSection
 EndGlobal

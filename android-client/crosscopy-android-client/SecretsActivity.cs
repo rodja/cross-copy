@@ -10,7 +10,7 @@ using CrossCopy.BL;
 using System.Collections.Generic;
 
 namespace CrossCopy.AndroidClient
-{
+{ 
         [Activity (Label = "cross copy", 
                    MainLauncher = true, 
                    WindowSoftInputMode = SoftInput.AdjustPan,
@@ -30,6 +30,7 @@ namespace CrossCopy.AndroidClient
                 Button _showSecret;
                 EditText _newSecret;
                 TextView _tvDesc;
+                TextView _tvSecretsTitle;
                 LayoutInflater _inflater;
 #endregion
                 #region Intent Filter Members
@@ -85,6 +86,7 @@ namespace CrossCopy.AndroidClient
                         _newSecret = FindViewById<EditText> (Resource.Id.editTextSecret);
                         _showSecret = FindViewById<Button> (Resource.Id.btnOpen);
                         _tvDesc = FindViewById<TextView> (Resource.Id.textViewDesc);
+                        _tvSecretsTitle = FindViewById<TextView> (Resource.Id.textViewSecretsLbl);
                 }
                 
                 void AddHandlers ()
@@ -119,13 +121,20 @@ namespace CrossCopy.AndroidClient
                         }
                         _secretItems.Clear ();
 
+                        if (CrossCopyApp.HistoryData.Secrets.Count == 0) { 
+                                _tvSecretsTitle.Visibility = ViewStates.Invisible;
+                                return;
+                        }
+                        
+                        _tvSecretsTitle.Visibility = ViewStates.Visible;;
+
                         // Start adding all use code words
                         Task.Factory.StartNew (() => {
                                 RunOnUiThread (() => {
                                         foreach (var s in CrossCopyApp.HistoryData.Secrets)
                                                 AddCodeWordToView (s);
                                 });
-                        });
+                        });                     
                 }
 
                 void AddCodeWordToView (Secret s)

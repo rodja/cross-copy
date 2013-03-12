@@ -33,6 +33,7 @@ namespace CrossCopy.AndroidClient
                 TextView _textToSend;
                 TextView _tvShareCount;
                 TextView _tvCodeWord;
+                TextView _tvHistoryLabel;
                 Button _chooseContent;
                 LinearLayout _mainLayout;
                 LayoutInflater _inflater;
@@ -67,6 +68,7 @@ namespace CrossCopy.AndroidClient
                         _textToSend = FindViewById<EditText> (Resource.Id.textViewUpload);
                         _tvShareCount = FindViewById<TextView> (Resource.Id.tvShareCount);
                         _tvCodeWord = FindViewById<TextView> (Resource.Id.tvCodeWord);
+                        _tvHistoryLabel = FindViewById<TextView> (Resource.Id.tvHistoryLabel);
                         _chooseContent = FindViewById<Button> (Resource.Id.btnChooseContent);
                         _mainLayout = FindViewById<LinearLayout> (Resource.Id.shareLayout);
 
@@ -146,6 +148,10 @@ namespace CrossCopy.AndroidClient
                 /// </summary>
                 void LoadHistory ()
                 {
+                        _tvHistoryLabel.Visibility = (_historyItems.Count == 0)
+                                                        ? ViewStates.Invisible
+                                                        : ViewStates.Visible;
+
                         if (CrossCopyApp.Srv.CurrentSecret.DataItems.Count <= _historyItems.Count)
                                 return;
 
