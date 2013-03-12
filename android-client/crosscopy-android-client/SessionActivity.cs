@@ -228,12 +228,13 @@ namespace CrossCopy.AndroidClient
                                 var view = _inflater.Inflate (Resource.Layout.HistoryItemView, _mainLayout, false);
                                 var progress = view.FindViewById<ProgressBarX> (Resource.Id.transferProgress);
                                 var textView = view.FindViewById<TextView> (Resource.Id.tvText);
+                                textView.Click += DisplayHistoryItem;
                                 textView.Gravity = GravityFlags.Left;
                                 var theNewItem = CreateIncomingItem (item, isOldItem, progress, textView);
 
                                 textView.Text = progress.Text = theNewItem.Incoming; 
 
-                                _historyItems [view] = theNewItem;
+                                _historyItems [textView] = theNewItem;
 
                                 AddView (view);
                         });
@@ -252,11 +253,12 @@ namespace CrossCopy.AndroidClient
                         
                         var progress = view.FindViewById<ProgressBarX> (Resource.Id.transferProgress);
                         textView.Text = progress.Text = _uploadingFileName;
+                        textView.Click += DisplayHistoryItem;
                         progress.Visibility = ViewStates.Visible;
                         textView.Visibility = ViewStates.Invisible;
                         var historyItem = CreateOutgoingItem (new DataItem (_localUri, DataItemDirection.Out, DateTime.Now));
                         historyItem.LocalPath = _localUri;
-                        _historyItems [view] = historyItem;
+                        _historyItems [textView] = historyItem;
                         AddView (view);
 
                         Task.Factory.StartNew (() => {
@@ -291,13 +293,13 @@ namespace CrossCopy.AndroidClient
                         var textView = view.FindViewById<TextView> (Resource.Id.tvText);
                         textView.Gravity = GravityFlags.Right;
                         textView.Text = GetDisplayNameFromURI (Android.Net.Uri.Parse (item.Data));
-                        _historyItems [view] = CreateOutgoingItem (item);
+                        textView.Click += DisplayHistoryItem;
+                        _historyItems [textView] = CreateOutgoingItem (item);
                         AddView (view);
                 }
 
                 void AddView (View view)
                 {
-                        view.Click += DisplayHistoryItem;
                         RunOnUiThread (() => _mainLayout.AddView (view, 6));
                 }
 
