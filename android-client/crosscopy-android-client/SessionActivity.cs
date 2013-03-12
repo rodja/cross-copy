@@ -338,8 +338,9 @@ namespace CrossCopy.AndroidClient
 
                 private void StartDownload (string url, HistoryItem hItem, ProgressBarX progress, View view)
                 {
-                        Directory.CreateDirectory (Path.GetDirectoryName (hItem.LocalPath));
-                        Server.DownloadFileAsync (url, hItem.LocalPath,
+                        var localPath = hItem.LocalPath;
+                        Directory.CreateDirectory (Path.GetDirectoryName (localPath));
+                        Server.DownloadFileAsync (url, localPath,
                                 (s, e) => {
                                 if (e.Error != null)
                                         Console.Out.WriteLine ("Error fetching file: " + e.Error.ToString ());
