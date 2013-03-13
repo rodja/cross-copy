@@ -104,7 +104,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
-    <Reference Include="MonoTouch.Dialog-1" />
     <Reference Include="System.Json" />
     <Reference Include="GoogleAnalytics">
       <HintPath>GoogleAnalytics.dll</HintPath>

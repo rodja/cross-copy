@@ -179,7 +179,7 @@ namespace CrossCopy.AndroidClient
                         RunOnUiThread (() => { 
                                 _tvShareCount.Text = secret.ListenersCount == 1 
                                         ? GetString (Resource.String.ShareWithNoDevices)
-                                                : string.Format (GetString (Resource.String.ShareWithNDevices), secret.ListenersCount); 
+                                                : string.Format (GetString (Resource.String.ShareWithNDevices), secret.ListenersCount - 1); 
                         });
                 }
 

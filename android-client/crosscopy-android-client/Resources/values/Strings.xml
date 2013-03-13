@@ -16,9 +16,9 @@
         <string name="Send">Send</string>
         <string name="ShareWith1Device">1 device</string>
         <string name="ShareWithNoDevices">only this device</string>
-        <string name="ShareWithNDevices">{0} devices</string>
+        <string name="ShareWithNDevices">{0} other</string>
         <string name="EnterNewSecretPhrase">enter new code word</string>
         <string name="SelectFile">Select file</string>
         <string name="SessionTitle">CURRENT CODE WORD</string>
-        <string name="FilterDesc">Choose and existing secret from the list bellow or create a new one to share the content.</string>
+        <string name="FilterDesc">Choose an code word for sharing this content.</string>
 </resources>
