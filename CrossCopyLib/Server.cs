@@ -136,7 +136,7 @@ namespace CrossCopy.Api
                                 return;
                         
                         var destinationPath = String.Format ("/api/{0}/{1}", CurrentSecret, UrlHelper.GetFileName (filePath));
-                        var client = new WebClient ();
+                        var client = new ProgressBugfixedWebClient ((new FileInfo(filePath)).Length);
                         client.Headers ["content-type"] = "application/octet-stream";
                         client.Encoding = Encoding.UTF8;
                         
@@ -160,6 +160,7 @@ namespace CrossCopy.Api
                                 }
                         };
                         Send (destinationPath);
+                        client.computeContentLength(filePath);
                         client.UploadFileAsync (new Uri (SERVER + destinationPath), "POST", filePath);
                 }
 #endregion

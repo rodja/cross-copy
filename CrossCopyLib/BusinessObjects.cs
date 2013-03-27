@@ -6,7 +6,9 @@ using System.Json;
 using System.Net;
 using System.Net.Cache;
 using CrossCopy.Api;
- 
+using System.Linq;
+using System.IO;
+
 namespace CrossCopy.BL
 {
         [System.Diagnostics.DebuggerDisplay("History - Secrets {Secrets.Count}")]
@@ -176,6 +178,31 @@ namespace CrossCopy.BL
                         req.Pipelined = false;
                         return req;
                 } 
+        }
+
+        // fixing upload progress (see http://stackoverflow.com/questions/12119766/uploading-large-files-with-monodroid)
+        public class ProgressBugfixedWebClient : WebClient
+        {
+                long contentLength;
+                
+                protected override WebRequest GetWebRequest(Uri address)
+                {
+                        var req = base.GetWebRequest(address) as HttpWebRequest;
+                        req.AllowWriteStreamBuffering = false;
+                        req.ContentLength = contentLength;
+                        return req;
+                }
+                
+                public ProgressBugfixedWebClient(long contentLength)
+                {
+                        this.contentLength = contentLength;
+                }
+
+                public void computeContentLength(string filePath){
+                        this.contentLength = Headers.ToByteArray().Length;
+                        this.contentLength += (new FileInfo(filePath)).Length + 200;
+                }
+
         }
 }
 

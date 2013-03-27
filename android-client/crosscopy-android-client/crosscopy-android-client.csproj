@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
-    <AndroidResource Include="Resources\drawable\Icon.png" />
     <AndroidResource Include="Resources\drawable\dialog_disclosure.png" />
     <AndroidResource Include="Resources\drawable\dialog_expander_ic_minimized.9.png" />
     <AndroidResource Include="Resources\drawable\file.png" />
@@ -97,11 +96,19 @@
     <AndroidResource Include="Resources\layout\CodeWordsView.axml" />
     <AndroidResource Include="Resources\values\Themes.xml" />
     <AndroidResource Include="Resources\drawable\LayoutSelector.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-ldpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\Icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup />
   <ItemGroup>
     <Folder Include="CrossCopyLib\" />
+    <Folder Include="Resources\drawable-hdpi\" />
+    <Folder Include="Resources\drawable-ldpi\" />
+    <Folder Include="Resources\drawable-mdpi\" />
+    <Folder Include="Resources\drawable-xhdpi\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

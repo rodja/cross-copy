@@ -277,7 +277,7 @@ namespace CrossCopy.AndroidClient
                                 CrossCopyApp.Srv.UploadFileAsync (_tmpOutFilename, 
                                                                   (e) => {
                                         UpdateProgress (progress, textView, e.ProgressPercentage);},
-                                                                   () => {
+                                () => { Console.WriteLine("completed");
                                         if (!string.IsNullOrEmpty (_tmpOutFilename)) {
                                                 File.Delete (_tmpOutFilename);
                                                 _tmpOutFilename = null;
@@ -403,6 +403,7 @@ namespace CrossCopy.AndroidClient
                 #region Progress Display
                 void UpdateProgress (ProgressBarX progressBar, View view, int progress)
                 {
+                        Console.WriteLine(progress);
                         RunOnUiThread (() => {
                                 progressBar.Progress = progress;
 
